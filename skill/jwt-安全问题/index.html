@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>JWT 安全问题 | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">JWT 安全问题</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2024-04-02
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/skill/" title="Skill">
+                      Skill
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/jwt/" title="JWT">
+                      #JWT
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h2 id="1-空加密算法"><a href="#1-空加密算法" class="headerlink" title="1. 空加密算法"></a>1. 空加密算法</h2><p>JWT 全称 JSON Web Token, 是⼀种被⽤于替代传统 cookie + session 的身份验证⽅法.<span class="hexo-wm">𝘀​⑶𝐯𝐞𝒏．﻿𝘀i﻿‍𝒕e﻿</span> JWT 的声明被存储在客户端中, ⽽服务器通过某个特定的加密/签名算法对JWT 进⾏验证</p>
+<p>JWT 有三部分组成, 分别为 Header, Payload <span class="hexo-wm">𝐬‌⑶v𝐞𝘯∙﻿﻿𝒔ⅈ﻿‍𝒕ｅ﻿‍</span>和 Signature, 通过 <code>.</code> 连接</p>
+<p>Header 中⼀般会有 alg 和 typ 两个字段, 前者指定 JWT 的加密算法, 后者则固定为<br>JWT , 使⽤ <span class="hexo-wm">𝐬‌3𝒗𝘦𝐧∙​𝘀𝐢‍𝐭℮‌﻿</span>Base64 URL 编码</p>
+<p>Payload 负责储存身份认证的信息, <span class="hexo-wm">𝐬‌3𝐯ｅ𝒏．‌‍𝘀ｉ​ｔ℮﻿​</span>例如⽤户权限等级, 编码⽅式同上</p>
+<p>Signature 则为 Header 和 Payload 两个部分的签名, 主要过程是将两者的原始内容<br>通过 Base64 URL 编码, 然后使⽤ . 拼接, 最后使⽤某个特定的算法 (例如 HMAC、SHA256) 进⾏加密</p>
+<p>JWT 规范允许指定加密算法 (即 alg 字段) 为 none, 从⽽完全忽略 Signature 的部分,<br>使得任何⼈都可以伪造任意身份的 JWT,<span class="hexo-wm">𝘴‌‌³𝒗e𝘯·﻿​𝘴𝐢​﻿𝒕℮﻿</span> 因此某些第三⽅ JWT 库在实现规范的时候<br>可能会存在这个漏洞</p>
+<p>eg.</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example<span class="token punctuation">.</span>jwtdemo<span class="token punctuation">.</span>controller</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>nio<span class="token punctuation">.</span>file<span class="token punctuation">.</span></span><span class="token class-name">Files</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>nio<span class="token punctuation">.</span>file<span class="token punctuation">.</span></span><span class="token class-name">Paths</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>time<span class="token punctuation">.</span></span><span class="token class-name">ZoneOffset</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>time<span class="token punctuation">.</span></span><span class="token class-name">ZonedDateTime</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>time<span class="token punctuation">.</span></span><span class="token class-name">ZonedDateTime</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Random</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">Cookie</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">HttpServletResponse</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>primeframework<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span></span><span class="token class-name">Signer</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>primeframework<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span></span><span class="token class-name">Verifier</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>primeframework<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span>domain<span class="token punctuation">.</span></span><span class="token class-name">JWT</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>primeframework<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span>hmac<span class="token punctuation">.</span></span><span class="token class-name">HMACSigner</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>primeframework<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span>hmac<span class="token punctuation">.</span></span><span class="token class-name">HMACVerifier</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">CookieValue</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">IndexController</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token class-name">String</span> <span class="token constant">SECRETS</span><span class="token punctuation">;</span>
+    
+    <span class="token keyword">public</span> <span class="token class-name">IndexController</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> data <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token class-name">Random</span> r <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        r<span class="token punctuation">.</span><span class="token function">nextBytes</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token constant">SECRETS</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"/"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token annotation punctuation">@CookieValue</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"token"</span><span class="token punctuation">,</span> defaultValue <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">)</span> <span class="token class-name">String</span> token<span class="token punctuation">,</span> <span class="token class-name">HttpServletResponse</span> response<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>token<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">JWT</span> jWT <span class="token operator">=</span> <span class="token constant">JWT</span><span class="token punctuation">.</span><span class="token function">getDecoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span>token<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Verifier</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span> <span class="token punctuation">(</span><span class="token class-name">Verifier</span><span class="token punctuation">)</span><span class="token class-name">HMACVerifier</span><span class="token punctuation">.</span><span class="token function">newVerifier</span><span class="token punctuation">(</span><span class="token constant">SECRETS</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token string">"hello "</span> <span class="token operator">+</span> jWT<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token class-name">JWT</span> jwt <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">JWT</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setIssuedAt</span><span class="token punctuation">(</span><span class="token class-name">ZonedDateTime</span><span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token class-name">ZoneOffset</span><span class="token punctuation">.</span><span class="token constant">UTC</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setExpiration</span><span class="token punctuation">(</span><span class="token class-name">ZonedDateTime</span><span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token class-name">ZoneOffset</span><span class="token punctuation">.</span><span class="token constant">UTC</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">plusMinutes</span><span class="token punctuation">(</span><span class="token number">60L</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jwt<span class="token punctuation">.</span><span class="token function">addClaim</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">,</span> <span class="token string">"guest"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> encodedJWT <span class="token operator">=</span> <span class="token constant">JWT</span><span class="token punctuation">.</span><span class="token function">getEncoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>jwt<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">Signer</span><span class="token punctuation">)</span><span class="token class-name">HMACSigner</span><span class="token punctuation">.</span><span class="token function">newSHA256Signer</span><span class="token punctuation">(</span><span class="token constant">SECRETS</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        response<span class="token punctuation">.</span><span class="token function">addCookie</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Cookie</span><span class="token punctuation">(</span><span class="token string">"token"</span><span class="token punctuation">,</span> encodedJWT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token string">"hello guest"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"/admin"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">admin</span><span class="token punctuation">(</span><span class="token annotation punctuation">@CookieValue</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"token"</span><span class="token punctuation">,</span> defaultValue <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">)</span> <span class="token class-name">String</span> token<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>token<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">JWT</span> jwt <span class="token operator">=</span> <span class="token constant">JWT</span><span class="token punctuation">.</span><span class="token function">getDecoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span>token<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Verifier</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span> <span class="token punctuation">(</span><span class="token class-name">Verifier</span><span class="token punctuation">)</span><span class="token class-name">HMACVerifier</span><span class="token punctuation">.</span><span class="token function">newVerifier</span><span class="token punctuation">(</span><span class="token constant">SECRETS</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token class-name">String</span> role <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">"admin"</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>role<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token class-name">Files</span><span class="token punctuation">.</span><span class="token function">readAllBytes</span><span class="token punctuation">(</span><span class="token class-name">Paths</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token string">"you are not admin"</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token string">"unauthorized"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>index 路由会解析 JWT 中的 role 字段, admin 路由会验证 role <span class="hexo-wm">ѕ​3vｅｎ∙​𝒔𝐢﻿‌𝐭e‍</span>是否为 admin, 然后输出 flag</p>
+<p>查看 pom.xml 可以发现程序使⽤了 com.inversoft:prime-jwt:1.3.0 依赖,<span class="hexo-wm">𝘴﻿​³𝒗𝘦𝐧．​ѕi​ｔ𝘦‌</span> 该版本存在⼀个 JWT 身份绕过漏洞, 即可以指定 alg 字段为 none, 从⽽忽略签名, 伪造⾼权限的 JWT</p>
+<p>⾸先拿到 gues<span class="hexo-wm">ѕ​﻿𝟯𝐯𝘦𝒏․‍𝘴𝐢﻿﻿ｔe​‍</span>t 的 JWT<br><img src="image-1.png" alt="image-1.png"></p>
+<p>在 jwt.io ⽹站上 base64 <span class="hexo-wm">𝘴‍﻿³𝐯ℯn·‌s𝘪‍𝒕℮​</span>解码查看 payload 的构成<br><img src="image-2.png" alt="image-2.png"></p>
+<p>尝试⼿动构造 alg <span class="hexo-wm">s‍³𝘷ｅ𝘯·‌‍ѕ𝘪‍𝘵ｅ‌</span>为 none 的 jwt</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> jwt
+token <span class="token operator">=</span> jwt<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">'role'</span><span class="token punctuation">:</span> <span class="token string">'admin'</span><span class="token punctuation">}</span><span class="token punctuation">,</span> algorithm<span class="token operator">=</span><span class="token string">"none"</span><span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token string">""</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>token<span class="token punctuation">)</span></code></pre>
+<p>得到：</p>
+<pre class="language-none"><code class="language-none">eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJyb2xlIjoiYWRtaW4ifQ</code></pre>
+<p>最后携带 JWT <span class="hexo-wm">𝐬‍³𝐯𝘦𝐧•​ꜱ𝐢‌𝒕ｅ​</span>访问 admin 路由, 拿到 flag</p>
+<h2 id="2-HMAC-弱密钥爆破"><a href="#2-HMAC-弱密钥爆破" class="headerlink" title="2. HMAC 弱密钥爆破"></a>2. HMAC 弱密钥爆破</h2><p>⼤多数 JWT 使⽤的签名算法都是 HMAC. 在使⽤ HMAC <span class="hexo-wm">𝘀​​³𝐯𝐞n•﻿ꜱ𝐢‌‍𝐭e‍﻿</span>对 JWT 进⾏签名和验证时, 会指定⼀个密钥 secret, 这个过程类似于对称加密, 因此如果我们能够得到这个 secret, 便可以伪造任意的 JWT</p>
+<p>eg.</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> crypto <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'crypto'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> express <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'express'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> cookieParser <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'cookie-parser'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> jwt <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'jsonwebtoken'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> app <span class="token operator">=</span> <span class="token function">express</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token function">cookieParser</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>fs<span class="token punctuation">.</span><span class="token function">existsSync</span><span class="token punctuation">(</span><span class="token string">'.secret'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    fs<span class="token punctuation">.</span><span class="token function">writeFileSync</span><span class="token punctuation">(</span><span class="token string">'.secret'</span><span class="token punctuation">,</span> crypto<span class="token punctuation">.</span><span class="token function">randomBytes</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token string">'hex'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> secret <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'.secret'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> flag <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'/flag'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string-property property">'role'</span><span class="token operator">:</span> <span class="token string">'guest'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> token <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">sign</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> secret<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token literal-property property">algorithm</span><span class="token operator">:</span> <span class="token string">'HS256'</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">cookie</span><span class="token punctuation">(</span><span class="token string">'token'</span><span class="token punctuation">,</span> token<span class="token punctuation">)</span>
+    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'hello world'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/admin'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>token<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">let</span> obj <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">verify</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>token<span class="token punctuation">,</span> secret<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token literal-property property">algorithms</span><span class="token operator">:</span> <span class="token string">'HS256'</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>obj<span class="token punctuation">.</span>role <span class="token operator">===</span> <span class="token string">'admin'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                    <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'welcome admin'</span><span class="token punctuation">,</span>
+                    <span class="token string-property property">'flag'</span><span class="token operator">:</span> flag<span class="token punctuation">,</span>
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                    <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'you are not admin'</span><span class="token punctuation">,</span>
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                <span class="token string-property property">'err'</span><span class="token operator">:</span> err<span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'unauthorized'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+app<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span><span class="token number">80</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'server listening at :80'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>程序的 JWT 使⽤ HS256 算法, 存在 secret 密钥, 尽管 secret 是随机⽣成的<code>crypto.randomBytes(2).toString('hex')</code> , 但是⻓度很短 (仅有四个字节),<span class="hexo-wm">𝘀﻿𝟯ⅴ𝘦𝘯․​ꜱ𝘪‍ｔ𝐞‍</span> 因此我们仍然有机会去爆破这个 secret</p>
+<p>⾸先访问⽹站拿到 JWT<br><img src="image-3.png" alt="image-3.png"></p>
+<pre class="language-none"><code class="language-none">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZ3Vlc3QiLCJpYXQiOjE3MDUwNTU0NDR9.Lt3NmiVNE6z1ZRaQ0KRjLfnMqjIBYVSIzdAWltyYVgo</code></pre>
+<p>使⽤ c-jwt-cracker <span class="hexo-wm">𝒔﻿³𝒗e𝘯․﻿𝘴𝘪‍‍𝒕𝐞﻿‍</span>爆破 secret<br><img src="image-4.png" alt="image-4.png"></p>
+<p>然后使⽤ jwt.io <span class="hexo-wm">𝘀‍𝟯v𝐞𝐧•‍ѕ𝐢﻿𝐭℮​</span>构造 admin 的 JWT<br><img src="image-5.png" alt="image-5.png"><br>最后携带 JWT 访问 admin 路由拿到 flag</p>
+<h2 id="3-RSA-改-HMAC"><a href="#3-RSA-改-HMAC" class="headerlink" title="3. RSA 改 HMAC"></a>3. RSA 改 HMAC</h2><p>JWT 除了⽀持 HMAC 算法以外, 还⽀持 RSA 算法. JWT 的 RSA 算法使⽤私钥对 <span class="hexo-wm">𝒔‌𝟯𝒗𝘦𝒏·‍​𝒔𝐢​﻿𝐭𝘦﻿</span>JWT 进⾏签名, 使⽤公钥对 JWT 进⾏验证</p>
+<p>在部分情况下, 我们可以拿到⽤于验证 JWT 的 RSA 公钥, 那么这个时候就可以尝试将 JWT Header 中的算法改成 HMAC, 这样流程就变成了: 使⽤公钥 (HMAC secret <span class="hexo-wm">ꜱ‌​𝟯ⅴ𝐞𝒏•‍𝘀𝐢‍​t𝐞﻿​</span>key) 对 JWT 进⾏签名, 使⽤公钥 (HMAC secret key) 对 JWT 进⾏验证, 从⽽可以任意构造 JWT 的内容</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> express <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'express'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> cookieParser <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'cookie-parser'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> jwt <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'jwt-simple'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> app <span class="token operator">=</span> <span class="token function">express</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token function">cookieParser</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> privateKey <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'private-key.pem'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> publicKey <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'public-key.pem'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> flag <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'/flag'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string-property property">'role'</span><span class="token operator">:</span> <span class="token string">'guest'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> token <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> privateKey<span class="token punctuation">,</span> <span class="token string">'RS256'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">cookie</span><span class="token punctuation">(</span><span class="token string">'token'</span><span class="token punctuation">,</span> token<span class="token punctuation">)</span>
+    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'hello world'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/getpubkey'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'now you can verify jwt with the public key on your own'</span><span class="token punctuation">,</span>
+            <span class="token string-property property">'public'</span><span class="token operator">:</span> <span class="token function">btoa</span><span class="token punctuation">(</span>publicKey<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/admin'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>token<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                <span class="token keyword">let</span> obj <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>token<span class="token punctuation">,</span> publicKey<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>obj<span class="token punctuation">.</span>role <span class="token operator">===</span> <span class="token string">'admin'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                        <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'welcome admin'</span><span class="token punctuation">,</span>
+                        <span class="token string-property property">'flag'</span><span class="token operator">:</span> flag<span class="token punctuation">,</span>
+                    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                        <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'you are not admin'</span><span class="token punctuation">,</span>
+                    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                    <span class="token string-property property">'err'</span><span class="token operator">:</span> err
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'unauthorized'</span><span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    app<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span><span class="token number">3000</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'server listening at :3000'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>程序使⽤了 jwt-simple 库, 版本为 0.5.1, 该版本存在 CVE-2016-10555 漏洞, 即可以将 JWT 的算法从 RS256 改成 HS256, 使得程序使⽤ RSA 公钥, 以 HS256 算法对 JWT 进⾏验证, ⽽ /getpubkey 路由正好会泄露公钥, 因此整个利⽤过程如下</p>
+<p>⾸先拿到公钥</p>
+<p>然后将公钥作为 HMAC secret, 构造 JWT, 注意勾选 secret base64 encoded<br><img src="image-6.png" alt="image-6.png"></p>
+<p>最后访问 /admin 路由拿到 flag</p>
+<h2 id="4-JKU-地址伪造"><a href="#4-JKU-地址伪造" class="headerlink" title="4. JKU 地址伪造"></a>4. JKU 地址伪造</h2><p>在 JWT 的相关规范中, 存在 JWK 和 JKU 的概念, <span class="hexo-wm">𝘀‍³𝒗eｎ.‍​ꜱi﻿​t𝐞​​</span>JWK 即 JSON Web Key, 是⼀个 JSON 对象, 表示⽤于加密/签名的密钥 (⼀般为 RSA 算法)</p>
+<p>⽽ JKU (JSON Web Key Set URL) 是 JWT Header 的⼀个字段,<span class="hexo-wm">s‍⑶𝐯𝘦ｎ∙​﻿𝘴ⅈ‌‍t℮‍</span> ⽤于指定 JWK ⽂件所在的 URL 地址</p>
+<p>⼀个很经典的场景是某系统存在多个服务器均需要对⽤户请求的 JWT 进⾏验证, ⽽ JWK 密钥会定期更新, 如果直接将 JWK 以⽂件的形式复制多份放在不同的服务器上, 显然很不⽅便, <span class="hexo-wm">𝘴​‌³v𝘦ｎ∙​𝐬ｉ‌t℮﻿</span>这时候就需要⼀个专⻔⽤于存放 JWK 的可信任的服务器 (JKU), 之后只需请求 JKU 地址即可拿到最新的 JWK, 然后再进⾏ JWT 的验证, 这样会⽅便很多</p>
+<p>尽管如此, 但部分程序会强依赖于 Header 中的 JKU 进⾏签名的验证, 导致我们可以尝试将 <span class="hexo-wm">ѕ‍‌3𝘷𝘦𝐧․‌𝘀ⅈ​‍te‌﻿</span>JKU 指向恶意的 URL 地址, 即可使⽤我们已知的 JWK 密钥对 JWT 进⾏验证, 从⽽构造任意内容的 JWT</p>
+<p>eg.</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> express <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'express'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> cookieParser <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'cookie-parser'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> jwt <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'jsonwebtoken'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> jwksClient <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'jwks-rsa'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> app <span class="token operator">=</span> <span class="token function">express</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token function">cookieParser</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> flag <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'/flag'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    res<span class="token punctuation">.</span><span class="token function">cookie</span><span class="token punctuation">(</span><span class="token string">'token'</span><span class="token punctuation">,</span> <span class="token string">'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZ3Vlc3QifQ.X8CEnicXPdsIk_P0V - wM8EElKL8FyKSi7aE - _p11oLsQzvR48mEk92jeS9E8 iJpSO1gcz8gUVSZvDS2Ne0cGIc86O4aZphVG - uZYydYVctZT - ho7vRuflOK9uNVf7SNnjEcxi TP5 - driA547Dc_v6zPqfBrSid2kLQElsYKIlklwJX0H - qHTNjClrxh9fFkIe1d_MSksrYahVX SCsxi0mm3JPVwK8NjdPKNHEWLCw0DR2HaK64SUDFbE9wucYQCo4L6HBBF2hg4KRXIgBApHIoG jFrdM5BB7z0nXWqZpxuF_DjvzNiMwPbPWpEV02bQa6j52zg3o0DYGXRFLu1FtQA'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'hello world'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/static/jwks.json'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    res<span class="token punctuation">.</span><span class="token function">sendFile</span><span class="token punctuation">(</span><span class="token string">'./jwks.json'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token literal-property property">root</span><span class="token operator">:</span> __dirname<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+
+app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/flag'</span><span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>token<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">let</span> decoded <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>token<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token literal-property property">complete</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">let</span> client <span class="token operator">=</span> <span class="token function">jwksClient</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                <span class="token literal-property property">jwksUri</span><span class="token operator">:</span> decoded<span class="token punctuation">.</span>header<span class="token punctuation">.</span>jku <span class="token operator">??</span> <span class="token string">'http://127.0.0.1:80/static/ jwks.json'</span><span class="token punctuation">,</span>
+                <span class="token literal-property property">cache</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">let</span> key <span class="token operator">=</span> <span class="token keyword">await</span> client<span class="token punctuation">.</span><span class="token function">getSigningKey</span><span class="token punctuation">(</span>decoded<span class="token punctuation">.</span>header<span class="token punctuation">.</span>kid <span class="token operator">??</span> <span class="token string">'test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">let</span> pubKey <span class="token operator">=</span> key<span class="token punctuation">.</span><span class="token function">getPublicKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">let</span> data <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">verify</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>token<span class="token punctuation">,</span> pubKey<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">.</span>role <span class="token operator">===</span> <span class="token string">'admin'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                    <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'welcome admin'</span><span class="token punctuation">,</span>
+                    <span class="token string-property property">'flag'</span><span class="token operator">:</span> flag
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                    <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'you are not admin'</span>
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                <span class="token string-property property">'err'</span><span class="token operator">:</span> err
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+            <span class="token string-property property">'msg'</span><span class="token operator">:</span> <span class="token string">'unauthorized'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+
+app<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span><span class="token number">80</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'server listening at :80'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>程序默认发送⼀个已经签名好的 <span class="hexo-wm">𝐬​3𝒗ｅ𝘯·‍﻿𝒔𝐢﻿𝘵℮‌</span>jwt, 同时 JWK 密钥已知</p>
+<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"keys"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+            <span class="token property">"kty"</span><span class="token operator">:</span> <span class="token string">"RSA"</span><span class="token punctuation">,</span>
+            <span class="token property">"e"</span><span class="token operator">:</span> <span class="token string">"AQAB"</span><span class="token punctuation">,</span>
+            <span class="token property">"use"</span><span class="token operator">:</span> <span class="token string">"sig"</span><span class="token punctuation">,</span>
+            <span class="token property">"alg"</span><span class="token operator">:</span> <span class="token string">"RS256"</span><span class="token punctuation">,</span>
+            <span class="token property">"kid"</span><span class="token operator">:</span> <span class="token string">"test"</span><span class="token punctuation">,</span>
+            <span class="token property">"n"</span><span class="token operator">:</span> <span class="token string">"mvZIyoISigFRl86lzZoIRrx6RUek5C-de0HqnitsrZ1mD4Box6Ko8Bt6YroUQda7ickhFwc9Ldxtgcms3Q_zoBtXOHYgq9ym6BPl275ZOD-kOpHOCtMrRPe5KO66bdT4uhKab4Pu1KExfmPEVn6jf7Plo_NTmR6MP8H3nn8_z8NroSNwNe_Lf7AKVeVm-Ys0hPbpr5RbFeKt2EXMIUScQrvTLgOfRil6lT-KFhloWBvzo91OGtGdwAZr99woolkPtOfHxyoboc-zGdWsIVR2Q6cGyXY2dbsq-rwOleY9Vc0PVSj9uVm96c3Z8G1q84hOxaIY8QxziuWWcE4q7_8Blw"</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>但是这⾥的 JWK 仅仅是 RSA 的公钥, 只能⽤于验证, 不能⽤于签名</p>
+<p>仔细阅读代码可以发现程序会通过 JWT Header 中提供的 JKU 地址来获取 JWK, 那么我们就可以搭建⼀个可控的服务器来托管我们⾃⼰的 JWK, 进⽽伪造 admin 的权限</p>
+<p>⾸先利⽤ mkj<span class="hexo-wm">s​‌³ⅴ𝘦n·﻿𝘴ｉ﻿‍𝐭𝘦​</span>wk ⽣成 JWK<br><img src="image-7.png" alt="image-7.png"></p>
+<p>构造 jwks.json</p>
+<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"keys"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+            <span class="token property">"kty"</span><span class="token operator">:</span> <span class="token string">"RSA"</span><span class="token punctuation">,</span>
+            <span class="token property">"e"</span><span class="token operator">:</span> <span class="token string">"AQAB"</span><span class="token punctuation">,</span>
+            <span class="token property">"use"</span><span class="token operator">:</span> <span class="token string">"sig"</span><span class="token punctuation">,</span>
+            <span class="token property">"alg"</span><span class="token operator">:</span> <span class="token string">"RS256"</span><span class="token punctuation">,</span>
+            <span class="token property">"kid"</span><span class="token operator">:</span> <span class="token string">"test"</span><span class="token punctuation">,</span>
+            <span class="token property">"n"</span><span class="token operator">:</span> <span class="token string">"2QTsyirNootelqW9xfKtSrxFRE2G_1VA8wnD6YbXwJNmpgrWQo2eJPR4HpGoKJphawL8xuYbdbzVStt9MnlENlCxFv8F5jlbGgn6cD0AOgRV9WrQh9GqLHWBZKNhoTXa9KCPAHjprclu_Lt9-u3DgsoJoI9v8_oOPd7XNPIEQKP7U9rJPQPVOUP1JQ4zBWpdNHkjY0Qbok8PsTAX2u5o6XbhQIG_2mU-RXoZutdOv5Os1Uh0q-jSeWDn6OiaixvkPtAZxCIiXniOf_BtdsXVkobEhbj8kjjEx5XPJPwg9vz_wzticNqxkH4hkkGZLsrIavxpMkhyuyqPt2qaT0VyUQ"</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>构造 JWT<br><img src="image-8.png" alt="image-8.png"><br>搭建 HTTP 服务器托管 jwks.<span class="hexo-wm">𝘀﻿﻿⑶𝘷𝐞𝘯·‍﻿𝒔𝘪​𝘵℮​</span>json, 携带 JWT 访问 flag 路由, 拿到 flag</p>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../crlf-%E6%B3%A8%E5%85%A5/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../../write-up/2024-d-3ctf-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%A9%BA%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95"><span class="toc-text">1. 空加密算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-HMAC-%E5%BC%B1%E5%AF%86%E9%92%A5%E7%88%86%E7%A0%B4"><span class="toc-text">2. HMAC 弱密钥爆破</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-RSA-%E6%94%B9-HMAC"><span class="toc-text">3. RSA 改 HMAC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-JKU-%E5%9C%B0%E5%9D%80%E4%BC%AA%E9%80%A0"><span class="toc-text">4. JKU 地址伪造</span></a></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

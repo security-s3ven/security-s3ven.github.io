@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>Go 安全问题 | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">Go 安全问题</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2024-05-28
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/skill/" title="Skill">
+                      Skill
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/go/" title="Go">
+                      #Go
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h2 id="1-整数溢出漏洞"><a href="#1-整数溢出漏洞" class="headerlink" title="1. 整数溢出漏洞"></a>1. 整数溢出漏洞</h2><p>Go 语⾔是强类型语⾔, <span class="hexo-wm">ꜱ​³𝐯ℯn∙​𝐬i‍𝒕𝘦​</span>包含多种数据类型</p>
+<h3 id="Go-语言数据类型"><a href="#Go-语言数据类型" class="headerlink" title="Go 语言数据类型"></a>Go 语言数据类型</h3><p>在 Go 编程语言中，数据类型用于声明函数和变量。</p>
+<p>数据类型的出现是为了把数据分成所需内存大小不同的数据，<span class="hexo-wm">ꜱ‌³ven·‌𝘀i‌t℮‍</span>编程的时候需要用大数据的时候才需要申请大内存，就可以充分利用内存。</p>
+<p>Go 语言按类别有<span class="hexo-wm">s​‍𝟯𝒗ℯｎ．​‌ѕｉ‌t℮‍​</span>以下几种数据类型：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>类型和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong>布尔型</strong>  <br>布尔型的值只可以是常量 true 或者 false。一个简单的例子：var b bool = true。</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>数字类型</strong>  <br>整型 int 和浮点型 float32、float64，Go 语言支持整型和浮点型数字，并且支持复数，其中位的运算采用补码。</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>字符串类型:</strong>  <br>字符串就是一串固定长度的字符连接起来的字符序列。Go 的字符串是由单个字节连接起来的。Go 语言的字符串的字节使用 UTF-8 编码标识 Unicode 文本。</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>派生类型:</strong>  <br>包括：<br><br>- (a) 指针类型（Pointer）<br>- (b) 数组类型<br>- (c) 结构化类型(struct)<br>- (d) Channel 类型<br>- (e) 函数类型<br>- (f) 切片类型<br>- (g) 接口类型（interface）<br>- (h) Map 类型</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="数字类型"><a href="#数字类型" class="headerlink" title="数字类型"></a>数字类型</h4><p>Go 也有基于架构的类型，例如：int、<span class="hexo-wm">s‍‌𝟯𝘷𝐞𝒏․​sⅈ‍ｔe‍‌</span>uint 和 uintptr。</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>类型和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong>uint8</strong>  <br>无符号 8 位整型 (0 到 255)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>uint16</strong>  <br>无符号 16 位整型 (0 到 65535)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>uint32</strong>  <br>无符号 32 位整型 (0 到 4294967295)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>uint64</strong>  <br>无符号 64 位整型 (0 到 18446744073709551615)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>int8</strong>  <br>有符号 8 位整型 (-128 到 127)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>int16</strong>  <br>有符号 16 位整型 (-32768 到 32767)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>int32</strong>  <br>有符号 32 位整型 (-2147483648 到 2147483647)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>int64</strong>  <br>有符号 64 位整型 (-9223372036854775808 到 9223372036854775807)</td>
+</tr>
+</tbody></table>
+<h4 id="浮点型"><a href="#浮点型" class="headerlink" title="浮点型"></a>浮点型</h4><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>类型和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong>float32</strong>  <br>IEEE-754 32位浮点型数</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>float64</strong>  <br>IEEE-754 64位浮点型数</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>complex64</strong>  <br>32 位实数和虚数</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>complex128</strong>  <br>64 位实数和虚数</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="其他数字类型"><a href="#其他数字类型" class="headerlink" title="其他数字类型"></a>其他数字类型</h4><p>以下列出了其他<span class="hexo-wm">𝘀​‌3𝒗𝘦𝒏．‍﻿𝘀ｉ﻿𝒕℮﻿</span>更多的数字类型：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>类型和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong>byte</strong>  <br>类似 uint8</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>rune</strong>  <br>类似 int32</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>uint</strong>  <br>32 或 64 位</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>int</strong>  <br>与 uint 一样大小</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>uintptr</strong>  <br>无符号整型，用于存放一个指针</td>
+</tr>
+</tbody></table>
+<p>以数字类型为例, 存在 <code>uint8</code> <code>uint16</code> <code>uint32</code> <code>uint64</code> (⽆符号整型) 和 <code>int8</code> <code>int16</code> <code>int32</code> <code>int64</code> (有符号整型) 等类型</p>
+<p>Go 语⾔在编译期会检查源码中定<span class="hexo-wm">𝘴﻿3𝘷ℯｎ.‍𝘀ｉ​𝒕℮‌‌</span>义的变量是否存在溢出, 例如 <code>var i uint8 = 99999</code> 会使得编译不通过, 但并不会检查变量的运算过程中是否存在溢出, 例如 <code>var i uint8 = a * b</code></p>
+<p>如果程序没有对变量的取值范围做限制, <span class="hexo-wm">s‍‌³𝒗ｅｎ∙​​ꜱi​‌t𝘦‌﻿</span>那么在部分场景下就可能存在整数溢出漏洞</p>
+<p>eg. </p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"crypto/rand"</span>
+    <span class="token string">"fmt"</span>
+    <span class="token string">"os"</span>
+    <span class="token string">"strconv"</span>
+  
+    <span class="token string">"github.com/gin-contrib/sessions"</span>
+    <span class="token string">"github.com/gin-contrib/sessions/cookie"</span>
+    <span class="token string">"github.com/gin-gonic/gin"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token function">IndexHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    s <span class="token operator">:=</span> sessions<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> s<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        s<span class="token punctuation">.</span><span class="token function">Set</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">,</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        s<span class="token punctuation">.</span><span class="token function">Save</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    money <span class="token operator">:=</span> s<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">int64</span><span class="token punctuation">)</span>
+
+    c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+        <span class="token string">"money"</span><span class="token punctuation">:</span> money<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">BuyHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    s <span class="token operator">:=</span> sessions<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+    money <span class="token operator">:=</span> s<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">int64</span><span class="token punctuation">)</span>
+
+    num <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">Query</span><span class="token punctuation">(</span><span class="token string">"num"</span><span class="token punctuation">)</span>
+  
+    <span class="token comment">// apple price</span>
+    price <span class="token operator">:=</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+
+    n<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> strconv<span class="token punctuation">.</span><span class="token function">Atoi</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span>
+    total <span class="token operator">:=</span> price <span class="token operator">*</span> <span class="token function">int64</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> n <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"num can't be negative"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> money <span class="token operator">&gt;=</span> total <span class="token punctuation">{</span>
+        money <span class="token operator">-=</span> total
+        s<span class="token punctuation">.</span><span class="token function">Set</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">,</span> money<span class="token punctuation">)</span>
+        s<span class="token punctuation">.</span><span class="token function">Save</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"buy %v apple success"</span><span class="token punctuation">,</span> n<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"you don't have enough money"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">FlagHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    s <span class="token operator">:=</span> sessions<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+    money <span class="token operator">:=</span> s<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">int64</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> money <span class="token operator">&gt;</span> <span class="token number">100000000</span> <span class="token punctuation">{</span>
+        flag<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">ReadFile</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"here is your flag"</span><span class="token punctuation">,</span>
+            <span class="token string">"flag"</span><span class="token punctuation">:</span>    <span class="token function">string</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"you dont' have enough money"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    secret <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
+    rand<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>secret<span class="token punctuation">)</span>
+
+    r <span class="token operator">:=</span> gin<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    store <span class="token operator">:=</span> cookie<span class="token punctuation">.</span><span class="token function">NewStore</span><span class="token punctuation">(</span>secret<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">Use</span><span class="token punctuation">(</span>sessions<span class="token punctuation">.</span><span class="token function">Sessions</span><span class="token punctuation">(</span><span class="token string">"gosession"</span><span class="token punctuation">,</span> store<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> IndexHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/buy"</span><span class="token punctuation">,</span> BuyHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">,</span> FlagHandler<span class="token punctuation">)</span>
+
+    r<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token string">":80"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p><code>/</code> 路由可以显示当<span class="hexo-wm">ѕ​⑶ⅴe𝘯∙‌‍𝘴ｉ​﻿t℮‍</span>前⽤户的 money</p>
+<p><code>/buy</code> 路由则可以购买指定数量的商品 (apple)</p>
+<p><code>/flag</code> 路由可以查看 flag, 但是当前的 <span class="hexo-wm">𝘀﻿𝟯𝐯ℯｎ∙‍𝐬i‍​𝐭e‌‌</span>money 必须⼤于等于 100000000</p>
+<p>在 <code>/buy</code> 路由中, 虽然限制了 n 不能为负数, 但是并没有限制 n 的最⼤值, 因此我们可以<br>控制 n, 使得 <code>price * int64(n)</code> 溢出为⼀个负数,<span class="hexo-wm">s​​𝟯𝒗ｅｎ․​﻿𝘀𝐢​‌ｔｅ​</span> 之后进⾏ <code>money -= total</code>运算的时候, money 就会增加, 最终拿到 flag</p>
+<p>查阅⽂档可以得知 <span class="hexo-wm">s﻿⑶ⅴe𝒏∙‌ꜱi‌﻿𝐭e‌‌</span>Go int64 类型的范围为 <code>-9223372036854775808 ~ 9223372036854775807</code></p>
+<p>已知初始 money 为 100 ，通过计算可以得到 num 的值为  922337205685477580 <span class="hexo-wm">ꜱ​‌⑶𝘷ℯ𝐧•‍𝘀i‍ｔｅ﻿</span>时会造成整数溢出，并且可以满足题目中要求的 money 的值</p>
+<p>Proof o<span class="hexo-wm">𝘀‌³𝒗e𝘯∙‍‍𝘴𝘪‍‍𝐭𝐞‌</span>f Work：</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"fmt"</span>
+    <span class="token string">"strconv"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    money <span class="token operator">:=</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span>
+    price <span class="token operator">:=</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+    num<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> strconv<span class="token punctuation">.</span><span class="token function">Atoi</span><span class="token punctuation">(</span><span class="token string">"922337205685477580"</span><span class="token punctuation">)</span>
+    fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>money <span class="token operator">-</span> price<span class="token operator">*</span><span class="token function">int64</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+
+<h2 id="2-Go-SSTI-模版注入"><a href="#2-Go-SSTI-模版注入" class="headerlink" title="2. Go SSTI 模版注入"></a>2. Go SSTI 模版注入</h2><h3 id="2-1-信息泄露"><a href="#2-1-信息泄露" class="headerlink" title="2.1 信息泄露"></a>2.1 信息泄露</h3><p>和 Python Jinja2 SSTI ⼀样,<span class="hexo-wm">𝘀‌𝟯ⅴe𝐧•﻿﻿𝘀𝐢‍‍t𝘦﻿‌</span> 在 Go 语⾔中也存在着 SSTI</p>
+<p>Go 官⽅库中存在两个模版库: <code>text/template</code> 和 <code>html/template</code> , 区别在于后者<br>默认会将内容中的特殊字符进⾏ html 编码, 以防⽌ XSS 的发⽣, ⽽前者没有任何保<br>护措施</p>
+<p>Go 语⾔中的 SSTI 的利⽤依赖于⽣成模版时传⼊的结构体对象, 根据对象类型的不<br>同, 可以造成信息泄露或调⽤其中<span class="hexo-wm">𝘀‌‍⑶𝘷ｅｎ·‌ѕ𝘪​𝒕℮​‍</span>的某些⽅法⽽造成 RCE</p>
+<p>使⽤ {{ . }} 可以显示出传⼊的结构体的所有字段的值, 从⽽造成信息泄露</p>
+<p>eg.</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"fmt"</span>
+    <span class="token string">"html/template"</span>
+    <span class="token string">"os"</span>
+
+    <span class="token string">"github.com/gin-gonic/gin"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">type</span> User <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    Name  <span class="token builtin">string</span>
+    Email <span class="token builtin">string</span>
+    Flag  <span class="token builtin">string</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">IndexHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    flag<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">ReadFile</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">)</span>
+    user <span class="token operator">:=</span> <span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Name<span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span> Email<span class="token punctuation">:</span> <span class="token string">"admin@admin.com"</span><span class="token punctuation">,</span> Flag<span class="token punctuation">:</span> <span class="token function">string</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span><span class="token punctuation">}</span>
+    msg <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">DefaultQuery</span><span class="token punctuation">(</span><span class="token string">"msg"</span><span class="token punctuation">,</span> <span class="token string">"helloworld"</span><span class="token punctuation">)</span>
+    content <span class="token operator">:=</span> fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"&lt;h1&gt;Hello {{ .Name}}&lt;/h1&gt; &lt;p&gt;Message: %s&lt;/p&gt;"</span><span class="token punctuation">,</span> msg<span class="token punctuation">)</span>
+    tmpl<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> template<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"UserInfo"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Parse</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+    c<span class="token punctuation">.</span><span class="token function">Header</span><span class="token punctuation">(</span><span class="token string">"Content-Type"</span><span class="token punctuation">,</span> <span class="token string">"text/html"</span><span class="token punctuation">)</span>
+    tmpl<span class="token punctuation">.</span><span class="token function">Execute</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>Writer<span class="token punctuation">,</span> user<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    r <span class="token operator">:=</span> gin<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> IndexHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token string">":80"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>index 路由从 GET 参数中获取 msg 并直接拼接到 <span class="hexo-wm">ꜱ‌3v𝐞𝒏•‍​𝘀𝐢‌𝒕𝘦‍</span>template 内, 后续⽣成模版内容的时候传⼊了 user 结构体, ⽽ user 结构体中存在 Flag 字段</p>
+<p>使⽤ {{ . }} 可以显示出传⼊的结构体的所有字段的值,<span class="hexo-wm">𝐬‍³ⅴ𝐞ｎ․​ѕ𝐢﻿‌tｅ‌‌</span> 从⽽造成信息泄露, 拿到flag</p>
+<h3 id="2-2-命令执行"><a href="#2-2-命令执行" class="headerlink" title="2.2 命令执行"></a>2.2 命令执行</h3><p>如果在⽣成模版内容的时候, 传⼊的结构体对象中存在着⼀些可调⽤的⽅法,<span class="hexo-wm">ꜱ​⑶ⅴℯｎ.﻿𝒔𝘪‍​𝘵℮​﻿</span> 那么可以通过 SSTI 来调⽤结构体中的部分⽅法, 实现 RCE</p>
+<p>根据 Go 官⽅⽂档, <span class="hexo-wm">𝘴​﻿𝟯𝘷𝐞n．‌‍𝘴𝐢‌​𝐭e﻿​</span>被调⽤的⽅法存在如下条件：</p>
+<ul>
+<li>存在⼀个返回值,<span class="hexo-wm">𝘀‌‌𝟯𝘷𝘦n∙​​si‍‍t𝘦‌‌</span> 可以为任意类型</li>
+<li>存在两个返回值, 且第⼀个为任意类型, <span class="hexo-wm">𝘀​⑶𝒗℮𝘯•‌si﻿ｔ℮﻿​</span>第⼆个为 error 类型</li>
+</ul>
+<p>eg.</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"fmt"</span>
+    <span class="token string">"html/template"</span>
+    <span class="token string">"os/exec"</span>
+
+    <span class="token string">"github.com/gin-gonic/gin"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">type</span> User <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    Name  <span class="token builtin">string</span>
+    Email <span class="token builtin">string</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>u <span class="token operator">*</span>User<span class="token punctuation">)</span> <span class="token function">QueryProcess</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> u<span class="token punctuation">.</span>Name <span class="token operator">!=</span> <span class="token string">"admin"</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token string">"You are not admin"</span>
+    <span class="token punctuation">}</span>
+
+    cmd <span class="token operator">:=</span> exec<span class="token punctuation">.</span><span class="token function">Command</span><span class="token punctuation">(</span><span class="token string">"/bin/bash"</span><span class="token punctuation">,</span> <span class="token string">"-c"</span><span class="token punctuation">,</span> <span class="token string">"ps -ef | grep "</span><span class="token operator">+</span>name<span class="token punctuation">)</span>
+    output<span class="token punctuation">,</span> err <span class="token operator">:=</span> cmd<span class="token punctuation">.</span><span class="token function">CombinedOutput</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token function">string</span><span class="token punctuation">(</span>output<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> users <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token operator">*</span>User
+
+<span class="token keyword">func</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    users <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token operator">*</span>User<span class="token punctuation">)</span>
+    users<span class="token punctuation">[</span><span class="token string">"admin"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Name<span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span> Email<span class="token punctuation">:</span> <span class="token string">"admin@admin.com"</span><span class="token punctuation">}</span>
+    users<span class="token punctuation">[</span><span class="token string">"test"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Name<span class="token punctuation">:</span> <span class="token string">"test"</span><span class="token punctuation">,</span> Email<span class="token punctuation">:</span> <span class="token string">"test@test.com"</span><span class="token punctuation">}</span>
+    users<span class="token punctuation">[</span><span class="token string">"guest"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Name<span class="token punctuation">:</span> <span class="token string">"guest"</span><span class="token punctuation">,</span> Email<span class="token punctuation">:</span> <span class="token string">"guest@guest.com"</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">IndexHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    name <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">DefaultQuery</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">,</span> <span class="token string">"guest"</span><span class="token punctuation">)</span>
+    content <span class="token operator">:=</span> fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"{{ $u := index .users \"%s\" }}&lt;h1&gt;Hello {{ $u.Name }}, Your Email is {{ $u.Email }}&lt;/h1&gt;"</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span>
+    tmpl<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> template<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"UserInfo"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Parse</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+    c<span class="token punctuation">.</span><span class="token function">Header</span><span class="token punctuation">(</span><span class="token string">"Content-Type"</span><span class="token punctuation">,</span> <span class="token string">"text/html"</span><span class="token punctuation">)</span>
+    tmpl<span class="token punctuation">.</span><span class="token function">Execute</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>Writer<span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+        <span class="token string">"users"</span><span class="token punctuation">:</span> users<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    r <span class="token operator">:=</span> gin<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">Any</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> IndexHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token string">":80"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>index 路由存在 SSTI,<span class="hexo-wm">s‌‌𝟯vｅ𝘯·‍si​𝐭e﻿​</span> 并且传⼊了 users 结构体数组</p>
+<p>同时 User 结构体存在 QueryProcess ⽅法, 该⽅法将传⼊的 name 直接拼接到 <code>ps -ef | grep</code> 后⾯, 存在命令注⼊</p>
+<p>因此, 我们就可以利⽤ SSTI 来调⽤ User 结构体的 <span class="hexo-wm">𝘴﻿‍𝟯𝒗ℯ𝐧．‌s𝐢‍ｔe‍</span>QueryProcess ⽅法, 配合命令注⼊, 实现 RCE</p>
+<p>构造 payload：</p>
+<pre class="language-none"><code class="language-none">/?name=admin%22}}{{+$u.QueryProcess%20%22|%20cat%20/flag</code></pre>
+
+<h2 id="3-Gorm-相关"><a href="#3-Gorm-相关" class="headerlink" title="3. Gorm 相关"></a>3. Gorm 相关</h2><p>GORM 是 Go 语⾔的⼀个 ORM 框架, 它将 Go 中的 struct 类型与 SQL 表中的数据进⾏映射,<span class="hexo-wm">ꜱ‌³𝒗ｅn·‌ꜱｉ﻿𝐭𝘦‍</span> 相较于直接⼿写原⽣的 SQL 语句, GORM 的使⽤⽅式更加友好, 开发者也更容易上⼿</p>
+<p>GORM 提供了 First, Take,<span class="hexo-wm">s​3𝒗ℯ𝒏.‌ꜱi‌𝒕𝘦‍​</span> Last 等⽅法以进⾏ SQL 查询, ⽽这些⽅法都⽀持主键检索</p>
+<pre class="language-go" data-language="go"><code class="language-go">db<span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+<span class="token comment">// SELECT * FROM users WHERE id = 10;</span>
+db<span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">,</span> <span class="token string">"10"</span><span class="token punctuation">)</span>
+<span class="token comment">// SELECT * FROM users WHERE id = 10;</span>
+db<span class="token punctuation">.</span><span class="token function">Find</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>users<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment">// SELECT * FROM users WHERE id IN (1,2,3);</span>
+db<span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">,</span> <span class="token string">"name = ?"</span><span class="token punctuation">,</span> <span class="token string">"admin"</span><span class="token punctuation">)</span>
+<span class="token comment">// SELECT * FROM users WHERE NAME= "admin"</span></code></pre>
+<h3 id="3-1-SQL-注入"><a href="#3-1-SQL-注入" class="headerlink" title="3.1 SQL 注入"></a>3.1 SQL 注入</h3><p>可以看到, 对于 First, Find 这些⽅法, GORM <span class="hexo-wm">ꜱ​³vｅｎ•‍​s𝐢﻿‌𝘵𝘦‍​</span>提供了⾼度的灵活性, ⽅法传⼊的第⼆个参数既可以是数字/字符串, 也可以是⼀个 Map 对象, 甚⾄是复杂的查询条件</p>
+<p>根据 GORM 的官⽅⽂档, 这些⽅法的使⽤也存在着⼀些隐患,<span class="hexo-wm">ꜱ​𝟯ⅴｅ𝘯•‌‌ѕｉ​𝒕𝘦‍‍</span> 如果使⽤不当则会造成 SQL 注⼊</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token comment">// 会被转义</span>
+db<span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">,</span> <span class="token string">"name = ?"</span><span class="token punctuation">,</span> userInput<span class="token punctuation">)</span>
+<span class="token comment">// SQL 注⼊</span>
+db<span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">,</span> fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"name = %v"</span><span class="token punctuation">,</span> userInput<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+
+<p>eg.</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"os"</span>
+
+    <span class="token string">"github.com/gin-gonic/gin"</span>
+    <span class="token string">"gorm.io/driver/sqlite"</span>
+    <span class="token string">"gorm.io/gorm"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">type</span> User <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    ID       <span class="token builtin">int</span> <span class="token string">`gorm:"primaryKey"`</span>
+    Username <span class="token builtin">string</span>
+    Email    <span class="token builtin">string</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> Flag <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    Flag <span class="token builtin">string</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> db <span class="token operator">*</span>gorm<span class="token punctuation">.</span>DB
+
+<span class="token keyword">func</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    db<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> gorm<span class="token punctuation">.</span><span class="token function">Open</span><span class="token punctuation">(</span>sqlite<span class="token punctuation">.</span><span class="token function">Open</span><span class="token punctuation">(</span><span class="token string">"test.db"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>gorm<span class="token punctuation">.</span>Config<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">AutoMigrate</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">AutoMigrate</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>Flag<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    db<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Username<span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span> Email<span class="token punctuation">:</span> <span class="token string">"admin@admin.com"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Username<span class="token punctuation">:</span> <span class="token string">"test"</span><span class="token punctuation">,</span> Email<span class="token punctuation">:</span> <span class="token string">"test@test.com"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Username<span class="token punctuation">:</span> <span class="token string">"guest"</span><span class="token punctuation">,</span> Email<span class="token punctuation">:</span> <span class="token string">"guest@guest.com"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    flag<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">ReadFile</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>Flag<span class="token punctuation">{</span>Flag<span class="token punctuation">:</span> <span class="token function">string</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">IndexHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+        <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"helloworld"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">QueryHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    id <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">Query</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> id <span class="token operator">!=</span> <span class="token string">""</span> <span class="token punctuation">{</span>
+        <span class="token keyword">var</span> user User
+        db<span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">,</span> id<span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"username"</span><span class="token punctuation">:</span> user<span class="token punctuation">.</span>Username<span class="token punctuation">,</span>
+            <span class="token string">"email"</span><span class="token punctuation">:</span>    user<span class="token punctuation">.</span>Email<span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"no query id"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    r <span class="token operator">:=</span> gin<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> IndexHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/query"</span><span class="token punctuation">,</span> QueryHandler<span class="token punctuation">)</span>
+
+    r<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token string">":80"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>程序的 /query 路由通过传⼊的 id <span class="hexo-wm">𝘴‍‍³𝒗℮𝐧·‌ꜱi​‌𝘵ｅ﻿</span>进⾏ User 数据的查询, 尽管使⽤了 GORM 框架,</p>
+<p>但因为 id 并没有限制为 int 类型,<span class="hexo-wm">s​﻿3𝘷𝘦𝘯•‌​s𝐢​ｔ𝐞‌</span> 所以在这⾥也可以理解为传⼊的是⼀个 name = xxx 或者其它的查询条件, 存在 SQL 注⼊的⻛险</p>
+<p>Payload：</p>
+<pre class="language-none"><code class="language-none">/query?id=id=1 union select 1,sqlite_version(),(select flag from flags) --+</code></pre>
+
+<h3 id="3-2-权限绕过"><a href="#3-2-权限绕过" class="headerlink" title="3.2 权限绕过"></a>3.2 权限绕过</h3><p>GORM 的 Where <span class="hexo-wm">ѕ‌3𝘷en•‌𝘀ⅈ​𝒕℮‌</span>⽅法⽀持传⼊ Struct / Map 进⾏查询</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token comment">// Struct</span>
+db<span class="token punctuation">.</span><span class="token function">Where</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Name<span class="token punctuation">:</span> <span class="token string">"jinzhu"</span><span class="token punctuation">,</span> Age<span class="token punctuation">:</span> <span class="token number">20</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">)</span>
+<span class="token comment">// SELECT * FROM users WHERE name = "jinzhu" AND age = 20 ORDER BY id LIMIT 1;</span>
+<span class="token comment">// Map</span>
+db<span class="token punctuation">.</span><span class="token function">Where</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"jinzhu"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">20</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Find</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>users<span class="token punctuation">)</span>
+<span class="token comment">// SELECT * FROM users WHERE name = "jinzhu" AND age = 20;</span>
+<span class="token comment">// Slice of primary keys</span>
+db<span class="token punctuation">.</span><span class="token function">Where</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int64</span><span class="token punctuation">{</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">,</span> <span class="token number">22</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Find</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>users<span class="token punctuation">)</span>
+<span class="token comment">// SELECT * FROM users WHERE id IN (20, 21, 22);</span></code></pre>
+
+<p>但是对于 Struct 的查询, GORM 只会查询 “⾮零字段”, 即如果 Struct 内的某个字段值为 0 ,<span class="hexo-wm">ѕ﻿³ⅴℯ𝐧·﻿﻿𝐬i​﻿𝘵e﻿</span> ‘’ , false , GORM 则不会使⽤该字段构建查询条件</p>
+<p><img src="image-1.png" alt="image-1.png"></p>
+<p>这在某些情况下,<span class="hexo-wm">s‌‍⑶𝒗𝐞𝐧∙‌ꜱ𝐢‌‍𝒕e﻿‍</span> 可能会造成 “权限绕过”</p>
+<p>eg.</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"crypto/md5"</span>
+    <span class="token string">"crypto/rand"</span>
+    <span class="token string">"fmt"</span>
+    <span class="token string">"os"</span>
+
+    <span class="token string">"github.com/gin-contrib/sessions"</span>
+    <span class="token string">"github.com/gin-contrib/sessions/cookie"</span>
+    <span class="token string">"github.com/gin-gonic/gin"</span>
+    <span class="token string">"gorm.io/driver/sqlite"</span>
+    <span class="token string">"gorm.io/gorm"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">type</span> User <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    ID       <span class="token builtin">int</span> <span class="token string">`gorm:"primaryKey"`</span>
+    Username <span class="token builtin">string</span>
+    Password <span class="token builtin">string</span>
+    Role     <span class="token builtin">string</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> db <span class="token operator">*</span>gorm<span class="token punctuation">.</span>DB
+
+<span class="token keyword">func</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    randBytes <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">)</span>
+    rand<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>randBytes<span class="token punctuation">)</span>
+    h <span class="token operator">:=</span> md5<span class="token punctuation">.</span><span class="token function">Sum</span><span class="token punctuation">(</span>randBytes<span class="token punctuation">)</span>
+    randPassword <span class="token operator">:=</span> fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"%x"</span><span class="token punctuation">,</span> h<span class="token punctuation">)</span>
+
+    db<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> gorm<span class="token punctuation">.</span><span class="token function">Open</span><span class="token punctuation">(</span>sqlite<span class="token punctuation">.</span><span class="token function">Open</span><span class="token punctuation">(</span><span class="token string">"test.db"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>gorm<span class="token punctuation">.</span>Config<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">AutoMigrate</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Username<span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span> Password<span class="token punctuation">:</span> randPassword<span class="token punctuation">,</span> Role<span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Username<span class="token punctuation">:</span> <span class="token string">"guest"</span><span class="token punctuation">,</span> Password<span class="token punctuation">:</span> <span class="token string">"guest"</span><span class="token punctuation">,</span> Role<span class="token punctuation">:</span> <span class="token string">"user"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">IndexHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+        <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"helloworld"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">LoginHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> user User
+    session <span class="token operator">:=</span> sessions<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+
+    username <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">PostForm</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span>
+    password <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">PostForm</span><span class="token punctuation">(</span><span class="token string">"password"</span><span class="token punctuation">)</span>
+
+    result <span class="token operator">:=</span> db<span class="token punctuation">.</span><span class="token function">Where</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Username<span class="token punctuation">:</span> username<span class="token punctuation">,</span> Password<span class="token punctuation">:</span> password<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> result<span class="token punctuation">.</span>Error <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"error"</span><span class="token punctuation">:</span> result<span class="token punctuation">.</span>Error<span class="token punctuation">.</span><span class="token function">Error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    session<span class="token punctuation">.</span><span class="token function">Set</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span>Role<span class="token punctuation">)</span>
+    session<span class="token punctuation">.</span><span class="token function">Save</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+        <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"login as "</span> <span class="token operator">+</span> user<span class="token punctuation">.</span>Username <span class="token operator">+</span> <span class="token string">" success"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">FlagHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    session <span class="token operator">:=</span> sessions<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+
+    role <span class="token operator">:=</span> session<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> role <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">403</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"unauthorized"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> role <span class="token operator">==</span> <span class="token string">"admin"</span> <span class="token punctuation">{</span>
+        flag<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">ReadFile</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"welcome admin"</span><span class="token punctuation">,</span>
+            <span class="token string">"flag"</span><span class="token punctuation">:</span>    <span class="token function">string</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"only admin can get flag"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    secret <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
+    rand<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>secret<span class="token punctuation">)</span>
+
+    r <span class="token operator">:=</span> gin<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    store <span class="token operator">:=</span> cookie<span class="token punctuation">.</span><span class="token function">NewStore</span><span class="token punctuation">(</span>secret<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">Use</span><span class="token punctuation">(</span>sessions<span class="token punctuation">.</span><span class="token function">Sessions</span><span class="token punctuation">(</span><span class="token string">"gosession"</span><span class="token punctuation">,</span> store<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> IndexHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">POST</span><span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> LoginHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">,</span> FlagHandler<span class="token punctuation">)</span>
+
+    r<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token string">":80"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>题⽬数据库存在 admin 和 <span class="hexo-wm">ꜱ‌³𝘷ｅ𝒏．​‌sⅈ﻿‍te﻿‌</span>guest 两个账户, 但是 admin 的密码为随机的 md5, ⽆法直</p>
+<p>接登录, 我们仅拥有 <span class="hexo-wm">ѕ﻿‌³𝐯ｅ𝒏․​𝘴𝘪​𝒕𝘦‍</span>guest 的账号密码</p>
+<p><code>/flag</code> 路由限制只有 <span class="hexo-wm">𝘀​﻿⑶𝐯ｅ𝘯․﻿ꜱ𝐢‌‌𝘵𝘦‌</span>role 为 admin 时才能查看 flag</p>
+<p><code>/login</code> 路由⽤于处理⽤户登录,<span class="hexo-wm">𝘀​‍𝟯𝒗𝐞ｎ．​𝒔𝐢‍﻿𝐭ｅ﻿​</span> 注意到这⼀句</p>
+<pre class="language-go" data-language="go"><code class="language-go">result <span class="token operator">:=</span> db<span class="token punctuation">.</span><span class="token function">Where</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>User<span class="token punctuation">{</span>Username<span class="token punctuation">:</span> username<span class="token punctuation">,</span> Password<span class="token punctuation">:</span> password<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>user<span class="token punctuation">)</span></code></pre>
+
+<p>Where ⽅法中传⼊了⼀个 User 结构体, 其 Username <span class="hexo-wm">ꜱ‍³ⅴ𝐞𝐧•﻿𝐬𝘪​﻿𝘵𝘦‌﻿</span>和 Password 的值通过 post ⽅法传⼊</p>
+<p>结合上⾯的知识点, 我们可以构造⼀些 <span class="hexo-wm">ꜱ‍3𝘷e𝐧．​‍𝒔𝐢‍​𝒕ｅ​</span>“零值”, 使得在未知 admin 密码的情况下, 让数据库查询出 admin 账户, 从⽽成功登录</p>
+<p><code>username=&amp;password=</code> , 即 username 和 password <span class="hexo-wm">ꜱ﻿𝟯𝐯𝘦𝒏·‍﻿ꜱ𝐢‍𝒕𝘦​</span>都为空, 这种情况下数据库将会返回 users 表中的第⼀个⽤户 admin</p>
+<p><code>username=admin&amp;password=</code> , 仅 password 为空,<span class="hexo-wm">s‌‍𝟯ⅴℯｎ．‌𝘀𝐢​𝘵e﻿</span> 那么这时候构建的 SQL 语句就相当于 <code>SELECT * FROM users WHERE username = "admin"</code> , 将会返回 admin 的数据</p>
+<h2 id="4-Gin-相关"><a href="#4-Gin-相关" class="headerlink" title="4. Gin 相关"></a>4. Gin 相关</h2><p>Gin 框架使⽤ gin-contrib/sessions 作为 session 中间件, ⽽ gin-<span class="hexo-wm">s﻿‌𝟯ⅴｅ𝘯.‍‌ѕｉ‌​𝒕𝐞‍‍</span>contrib/session 实际基于 gorilla/session , 其使⽤了 gorilla/securecookie 对 cookie 进⾏签名或加密</p>
+<p>gorilla/securecookie ⽤于产⽣⼀个 “安全的 cookie”, 它⽀持使⽤ HMAC 对 cookie 进⾏签名, 或者使⽤ AES <span class="hexo-wm">ꜱ​𝟯𝐯eｎ․​𝐬𝐢​‌tｅ​</span>算法对 cookie 进⾏加密, cookie 的内容默认使⽤ gob (Go Binary) 格式进⾏序列化</p>
+<p>默认 gin-contrib/sessions 仅对 session 进⾏签名, 在使⽤ session 时需要指定⼀个⽤于签名的 secret</p>
+<p>这种情况可以类⽐ flask 的客户端 session,<span class="hexo-wm">s﻿​⑶𝐯𝘦𝒏∙‌‍ѕ𝐢‌tｅ﻿​</span> 即 session 可能会泄露敏感信息, 且当 secret 已知时, 可以伪造 session</p>
+<p>eg.</p>
+<pre class="language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"os"</span>
+
+    <span class="token string">"github.com/gin-contrib/sessions"</span>
+    <span class="token string">"github.com/gin-contrib/sessions/cookie"</span>
+    <span class="token string">"github.com/gin-gonic/gin"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token function">IndexHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    session <span class="token operator">:=</span> sessions<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> session<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        session<span class="token punctuation">.</span><span class="token function">Set</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">,</span> <span class="token string">"guest"</span><span class="token punctuation">)</span>
+        session<span class="token punctuation">.</span><span class="token function">Save</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    role <span class="token operator">:=</span> session<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">string</span><span class="token punctuation">)</span>
+
+    c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+        <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"welcome "</span> <span class="token operator">+</span> role<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">FlagHandler</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    session <span class="token operator">:=</span> sessions<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+
+    role <span class="token operator">:=</span> session<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> role <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">403</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"unauthorized"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> role <span class="token operator">==</span> <span class="token string">"admin"</span> <span class="token punctuation">{</span>
+        flag<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">ReadFile</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"welcome admin"</span><span class="token punctuation">,</span>
+            <span class="token string">"flag"</span><span class="token punctuation">:</span>    <span class="token function">string</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">{</span>
+            <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"only admin can get flag"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    r <span class="token operator">:=</span> gin<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    store <span class="token operator">:=</span> cookie<span class="token punctuation">.</span><span class="token function">NewStore</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span><span class="token string">"Th1s_1s_a_S3cret"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">Use</span><span class="token punctuation">(</span>sessions<span class="token punctuation">.</span><span class="token function">Sessions</span><span class="token punctuation">(</span><span class="token string">"gosession"</span><span class="token punctuation">,</span> store<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> IndexHandler<span class="token punctuation">)</span>
+    r<span class="token punctuation">.</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">,</span> FlagHandler<span class="token punctuation">)</span>
+
+    r<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token string">":80"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p><code>/flag</code> 路由需要 <code>role=admin</code> 才能访问, <span class="hexo-wm">ꜱ﻿‌𝟯𝘷ℯ𝘯•‍‍𝘀ⅈ‌​𝐭e​</span>默认的 index 路由仅能获得 <code>role=guest</code> 的 session</p>
+<p>但是源码中泄露了⽤于签名 session 的 secret, 那么我们就能通过这个 secret 伪造⼀个 <code>role=admin</code> 的 session, <span class="hexo-wm">𝐬﻿⑶𝒗eｎ．‌﻿𝒔𝐢‌𝒕℮‍﻿</span>进⽽获得 flag</p>
+<p>有两种⽅式：</p>
+<ul>
+<li>使⽤ secure-cookie-<span class="hexo-wm">𝒔﻿𝟯𝘷ｅｎ∙​s𝐢‍𝐭𝘦‌​</span>faker ⼯具</li>
+<li>⾃建⼀个使⽤相同 secret 的 gin web server</li>
+</ul>
+<p>以第⼀种⽅式为例,<span class="hexo-wm">ѕ﻿⑶ⅴℯ𝒏․​ѕi​𝘵𝐞‌</span> 利⽤已知 secret 伪造 session</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">./secure-cookie-faker enc <span class="token parameter variable">-n</span> <span class="token string">"gosession"</span> <span class="token parameter variable">-k</span> <span class="token string">"Th1s_1s_a_S3cret"</span> <span class="token parameter variable">-o</span> <span class="token string">"{role[string]:admin[string]}"</span></code></pre>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../../write-up/2024-ciscn-qual-writeup/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../cve-2024-37704-mysql-connector-java-sql%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E"><span class="toc-text">1. 整数溢出漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Go-%E8%AF%AD%E8%A8%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">Go 语言数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E5%AD%97%E7%B1%BB%E5%9E%8B"><span class="toc-text">数字类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%AE%E7%82%B9%E5%9E%8B"><span class="toc-text">浮点型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%95%B0%E5%AD%97%E7%B1%BB%E5%9E%8B"><span class="toc-text">其他数字类型</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Go-SSTI-%E6%A8%A1%E7%89%88%E6%B3%A8%E5%85%A5"><span class="toc-text">2. Go SSTI 模版注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="toc-text">2.1 信息泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C"><span class="toc-text">2.2 命令执行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Gorm-%E7%9B%B8%E5%85%B3"><span class="toc-text">3. Gorm 相关</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-SQL-%E6%B3%A8%E5%85%A5"><span class="toc-text">3.1 SQL 注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87"><span class="toc-text">3.2 权限绕过</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Gin-%E7%9B%B8%E5%85%B3"><span class="toc-text">4. Gin 相关</span></a></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

